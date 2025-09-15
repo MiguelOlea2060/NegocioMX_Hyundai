@@ -1094,6 +1094,18 @@ class DALVehiculo {
     }
 
 
+    suspend fun registrarVINBasico(vin: String): Boolean = withContext(Dispatchers.IO) {
+        return@withContext insertarVehiculo(
+            vin = vin,
+            motor = "DESCONOCIDO",
+            idMarca = 1, // Hyundai por defecto
+            idModelo = 1, // Modelo genérico
+            anio = 2024,
+            idTransmision = 1, // Automática por defecto
+            idDireccion = 1, // Hidráulica por defecto
+            version = "BÁSICA"
+        )
+    }
 
 
 }

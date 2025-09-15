@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    tools:context=".Paso1Entrada_Activity">
+
+    <LinearLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1565C0"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="GESTIÓN DE ENTRADA DE VEHÍCULOS"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- SECCIÓN ESCANEO VIN -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="1. ESCANEAR O INGRESAR VIN"
+                android:textColor="#1565C0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/etVIN"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="Escanear o escribir VIN del vehículo"
+                android:inputType="textCapCharacters"
+                android:maxLength="17"
+                android:background="@drawable/edittext_border"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btnConsultarVehiculo"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="CONSULTAR VEHÍCULO"
+                android:backgroundTint="#1565C0"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
+        <!-- INFORMACIÓN DEL VEHÍCULO -->
+        <LinearLayout
+            android:id="@+id/layoutInfoVehiculo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="2. INFORMACIÓN DEL VEHÍCULO"
+                android:textColor="#1565C0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvBlVehiculo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvMarcaModeloAnnio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvColorExterior"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvColorInterior"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
+
+        </LinearLayout>
+
+        <!-- FORMULARIO DE ENTRADA -->
+        <LinearLayout
+            android:id="@+id/layoutFormularioEntrada"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="3. REGISTRO DE ENTRADA"
+                android:textColor="#1565C0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tipo de Entrada:"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <RadioGroup
+                android:id="@+id/rgTipoEntrada"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <RadioButton
+                    android:id="@+id/rbRodando"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Rodando"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:id="@+id/rbEnMadrina"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="En Madrina" />
+
+            </RadioGroup>
+
+            <!-- CAMPOS PARA RODANDO -->
+            <LinearLayout
+                android:id="@+id/layoutRodando"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <EditText
+                    android:id="@+id/etEmpresaRodando"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Empresa que lo trajo"
+                    android:background="@drawable/edittext_border"
+                    android:padding="12dp"
+                    android:layout_marginBottom="12dp" />
+
+            </LinearLayout>
+
+            <!-- CAMPOS PARA EN MADRINA -->
+            <LinearLayout
+                android:id="@+id/layoutEnMadrina"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/etPlacaTransporte"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Placa del transporte"
+                    android:background="@drawable/edittext_border"
+                    android:padding="12dp"
+                    android:layout_marginBottom="12dp" />
+
+                <EditText
+                    android:id="@+id/etNumeroEconomico"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Número económico"
+                    android:background="@drawable/edittext_border"
+                    android:padding="12dp"
+                    android:layout_marginBottom="12dp" />
+
+                <EditText
+                    android:id="@+id/etNombreConductor"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Nombre del conductor"
+                    android:background="@drawable/edittext_border"
+                    android:padding="12dp"
+                    android:layout_marginBottom="12dp" />
+
+            </LinearLayout>
+
+            <!-- CAMPOS COMUNES -->
+            <TextView
+                android:id="@+id/tvEmpleadoReceptor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Empleado receptor: [Se llenará automáticamente]"
+                android:textSize="14sp"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvFechaEntrada"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fecha de entrada: [Se llenará automáticamente]"
+                android:textSize="14sp"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/btnGuardarEntrada"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="GUARDAR ENTRADA"
+                android:backgroundTint="#FF6F00"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
+        <!-- OPCIONES DE TRANSICIÓN -->
+        <LinearLayout
+            android:id="@+id/layoutOpcionesTransicion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="4. OPCIONES DISPONIBLES"
+                android:textColor="#1565C0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvStatusActual"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Status actual: [Se mostrará aquí]"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/btnPosicionado"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="POSICIONADO"
+                android:backgroundTint="#37474F"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnMovimientoLocal"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="MOVIMIENTO LOCAL"
+                android:backgroundTint="#37474F"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnEnTaller"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="EN TALLER"
+                android:backgroundTint="#37474F"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/btnSalida"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="SALIDA"
+                android:backgroundTint="#FF6F00"
+                android:textColor="#FFFFFF"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+
+
+        <!-- <CHANGE> Agregar overlay de carga como en Paso1SOC -->
+        <LinearLayout
+            android:id="@+id/loadingContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="24dp"
+            android:layout_marginTop="16dp">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                style="?android:attr/progressBarStyleLarge"
+                android:indeterminateTint="#1565C0" />
+
+            <TextView
+                android:id="@+id/tvLoadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Consultando vehículo..."
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1565C0" />
+
+            <TextView
+                android:id="@+id/tvLoadingSubtext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Verificando información en base de datos"
+                android:textSize="12sp"
+                android:textColor="#37474F" />
+
+        </LinearLayout>
+
+        <!-- <CHANGE> Agregar sección para registrar VIN nuevo -->
+        <LinearLayout
+            android:id="@+id/layoutRegistrarVIN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="VEHÍCULO NO ENCONTRADO"
+                android:textColor="#FF6F00"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="El VIN no existe en la base de datos. ¿Desea registrarlo?"
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:gravity="center"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/btnRegistrarVIN"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="REGISTRAR NUEVO VIN"
+                android:backgroundTint="#FF6F00"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
