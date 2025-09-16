@@ -22,16 +22,16 @@ import java.util.*
 
 // <CHANGE> Agregar imports para Handler y Looper
 import android.os.Handler
-import android.os.Looper
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.example.negociomx_hyundai.BE.VehiculoPasoLog
 
 class Paso1Entrada_Activity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPaso1EntradaBinding
     private val dalVehiculo = DALVehiculo()
     private val dalPasoLog = DALPasoLogVehiculo()
-    private var vehiculoActual: Vehiculo? = null
+    private var vehiculoActual: VehiculoPasoLog? = null
     private var statusActual: PasoLogVehiculoDet? = null
     // <CHANGE> Agregar variables para overlay de carga
     private lateinit var loadingContainer: LinearLayout
@@ -131,46 +131,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         binding.tvEmpleadoReceptor.text = "Empleado receptor: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
     }
 
-  /*  private fun consultarVehiculo() {
-        val vin = binding.etVIN.text.toString().trim()
-        if (vin.isEmpty() || vin.length < 17) {
-            Toast.makeText(this, "Ingrese un VIN válido (17 caracteres)", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        lifecycleScope.launch {
-            try {
-                Log.d("Paso1Entrada", "🔍 Consultando vehículo con VIN: $vin")
-
-                // <CHANGE> Consultar vehículo usando la lógica de Paso1SOC
-                vehiculoActual = dalVehiculo.consultarVehiculoPorVIN(vin)
-
-                if (vehiculoActual != null) {
-                    mostrarInformacionVehiculo(vehiculoActual!!)
-
-                    // Consultar si ya tiene registros en el sistema de logs
-                    statusActual = dalPasoLog.consultarStatusActualVehiculo(vehiculoActual!!.Id!!.toInt())
-
-                    if (statusActual == null) {
-                        // Vehículo nuevo - mostrar formulario de entrada
-                        mostrarFormularioEntrada()
-                    } else {
-                        // Vehículo existente - mostrar opciones de transición
-                        mostrarOpcionesTransicion()
-                    }
-
-                } else {
-                    Toast.makeText(this@Paso1Entrada_Activity, "❌ Vehículo no encontrado", Toast.LENGTH_LONG).show()
-                    limpiarFormulario()
-                }
-
-            } catch (e: Exception) {
-                Log.e("Paso1Entrada", "💥 Error consultando vehículo: ${e.message}")
-                Toast.makeText(this@Paso1Entrada_Activity, "Error de conexión: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        }
-    }*/
-
     private fun consultarVehiculo() {
         val vin = binding.etVIN.text.toString().trim()
         if (vin.isEmpty() || vin.length < 17) {
@@ -185,7 +145,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
             try {
                 Log.d("Paso1Entrada", "🔍 Consultando vehículo con VIN: $vin")
 
-                vehiculoActual = dalVehiculo.consultarVehiculoPorVIN(vin)
+                vehiculoActual = dalPasoLog.consultaVehiculoPorVINParaPasoLogVehiculo(vin)
 
                 // <CHANGE> Ocultar carga antes de mostrar resultados
                 ocultarCargaConsulta()
@@ -193,9 +153,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                 if (vehiculoActual != null) {
                     mostrarInformacionVehiculo(vehiculoActual!!)
 
-                    statusActual = dalPasoLog.consultarStatusActualVehiculo(vehiculoActual!!.Id!!.toInt())
-
-                    if (statusActual == null) {
+                    if (vehiculoActual?.IdPasoLogVehiculo == 0) {
                         mostrarFormularioEntrada()
                     } else {
                         mostrarOpcionesTransicion()
@@ -215,7 +173,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         }
     }
 
-    private fun mostrarInformacionVehiculo(vehiculo: Vehiculo) {
+    private fun mostrarInformacionVehiculo(vehiculo: VehiculoPasoLog) {
         // <CHANGE> Mostrar información del vehículo (copiado de Paso1SOC)
         binding.apply {
             tvBlVehiculo.text = "MBL: ${vehiculo.BL}"

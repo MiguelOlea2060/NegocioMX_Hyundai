@@ -1,27 +1,26 @@
 package com.example.negociomx_hyundai.DAL
 
 import android.util.Log
-import com.example.negociomx_hyundai.BE.PasoLogVehiculo
 import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
+import com.example.negociomx_hyundai.BE.VehiculoPasoLog
 import com.example.negociomx_hyundai.Utils.ConexionSQLServer
+import com.google.zxing.client.result.VINParsedResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import java.text.SimpleDateFormat
-import java.util.*
 
 class DALPasoLogVehiculo {
 
-    suspend fun consultarStatusActualVehiculo(idVehiculo: Int): PasoLogVehiculoDet? = withContext(Dispatchers.IO) {
-        var statusActual: PasoLogVehiculoDet? = null
+    suspend fun consultaVehiculoPorVINParaPasoLogVehiculo(vin: String): VehiculoPasoLog? = withContext(Dispatchers.IO) {
+        var item: VehiculoPasoLog? = null
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
         var resultSet: ResultSet? = null
 
         try {
-            Log.d("DALPasoLogVehiculo", "🔍 Consultando status actual del vehículo ID: $idVehiculo")
+            Log.d("DALPasoLogVehiculo", "🔍 Consultando status actual del vehículo VIN: $vin")
 
             conexion = ConexionSQLServer.obtenerConexion()
             if (conexion == null) {
@@ -30,26 +29,52 @@ class DALPasoLogVehiculo {
             }
 
             val query = """
-                SELECT TOP 1 pld.*, s.Nombre as NombreStatus
-                FROM PasoLogVehiculoDet pld
-                INNER JOIN PasoLogVehiculo pl ON pld.IdPasoLogVehiculo = pl.IdPasoLogVehiculo
-                INNER JOIN Status s ON pld.IdStatus = s.IdStatus
-                WHERE pl.IdVehiculo = ?
-                ORDER BY pld.FechaMovimiento DESC
+                select  v.vin, v.idmarca, v.idmodelo, marcaauto.nombre Marca, modelo.nombre Modelo, v.Annio, Motor, 
+                        v.idvehiculo, ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, 
+                        tv.Nombre TipoVehiculo, bl
+						,pl.IdPasoLogVehiculo 
+                from vehiculo v left join dbo.PasoLogVehiculo pl on v.IdVehiculo=pl.IdVehiculo 
+						inner join dbo.MarcaAuto on v.IdMarca=MarcaAuto.IdMarcaAuto
+                        inner join dbo.Modelo on v.IdModelo=modelo.IdModelo
+                        left join dbo.VehiculoColor vc on v.IdVehiculo=vc.IdVehiculo
+                        left join dbo.Color ce on vc.IdColor=ce.IdColor
+                        left join dbo.Color ci on vc.IdColorInterior=ci.IdColor
+                        left join dbo.TipoCombustible tc on v.idtipocombustible=tc.idtipocombustible
+                        left join dbo.tipovehiculo tv on v.idtipovehiculo=tv.idtipovehiculo
+                        left join dbo.bl b on v.idbl=b.idbl
+                where v.vin = ?
             """.trimIndent()
 
             statement = conexion.prepareStatement(query)
-            statement.setInt(1, idVehiculo)
+            statement.setString(1, vin)
             resultSet = statement.executeQuery()
 
             if (resultSet.next()) {
-                statusActual = PasoLogVehiculoDet(
-                    IdPasoLogVehiculoDet = resultSet.getInt("IdPasoLogVehiculoDet"),
-                    IdPasoLogVehiculo = resultSet.getInt("IdPasoLogVehiculo"),
-                    IdStatus = resultSet.getInt("IdStatus"),
-                    IdTipoEntradaSalida = resultSet.getInt("IdTipoEntradaSalida"),
-                    Placa = resultSet.getString("Placa"),
-                    FechaMovimiento = resultSet.getString("FechaMovimiento")
+                item = VehiculoPasoLog(
+                    Id = resultSet.getInt("IdVehiculo").toString(),
+                    VIN = resultSet.getString("Vin") ?: "",
+                    Marca = resultSet.getString("Marca") ?: "",
+                    Modelo = resultSet.getString("Modelo") ?: "",
+                    Anio = resultSet.getInt("Annio"),
+                    ColorExterior = resultSet.getString("ColorExterior") ?: "",
+                    ColorInterior = resultSet.getString("ColorInterior") ?: "",
+                    BL = resultSet.getString("ColorInterior") ?: "",
+                    NumeroSerie = resultSet.getString("BL") ?: "",
+                    TipoVehiculo = resultSet.getString("TipoVehiculo") ?: "",
+                    TipoCombustible = resultSet.getString("TipoCombustible") ?: "",
+                    IdEmpresa = "", // No existe en el esquema actual
+                    Activo = true, // Asumimos que está activo si existe
+                    FechaCreacion = "", // No existe en el esquema actual
+                    // FechaModificacion = resultSet.getString("FechaModificacion") ?: "",
+                    // CAMPOS SOC - Valores por defecto ya que no existen en la BD actual
+                    Odometro = 0,
+                    Bateria = 0,
+                    ModoTransporte = false,
+                    RequiereRecarga = false,
+                    Evidencia1 = "",
+                    Evidencia2 = "",
+                    FechaActualizacion = "",
+                    IdPasoLogVehiculo = resultSet.getInt("IdPasoLogVehiculo")?:0,
                 )
                 Log.d("DALPasoLogVehiculo", "✅ Status actual encontrado: ${resultSet.getString("NombreStatus")}")
             }
@@ -66,7 +91,7 @@ class DALPasoLogVehiculo {
             }
         }
 
-        return@withContext statusActual
+        return@withContext item
     }
 
     suspend fun crearRegistroEntrada(
