@@ -177,6 +177,7 @@
             </RadioGroup>
 
             <!-- CAMPOS PARA RODANDO -->
+            <!-- CAMPOS PARA RODANDO -->
             <LinearLayout
                 android:id="@+id/layoutRodando"
                 android:layout_width="match_parent"
@@ -184,17 +185,24 @@
                 android:orientation="vertical"
                 android:visibility="visible">
 
-                <EditText
-                    android:id="@+id/etEmpresaRodando"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Empresa transportista:"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerEmpresaRodando"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:hint="Empresa que lo trajo"
                     android:background="@drawable/edittext_border"
-                    android:padding="12dp"
                     android:layout_marginBottom="12dp" />
 
             </LinearLayout>
 
+            <!-- CAMPOS PARA EN MADRINA -->
             <!-- CAMPOS PARA EN MADRINA -->
             <LinearLayout
                 android:id="@+id/layoutEnMadrina"
@@ -202,6 +210,36 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Empresa transportista:"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerEmpresaMadrina"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/edittext_border"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Conductor:"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerConductor"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/edittext_border"
+                    android:layout_marginBottom="12dp" />
 
                 <EditText
                     android:id="@+id/etPlacaTransporte"
@@ -217,15 +255,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:hint="Número económico"
-                    android:background="@drawable/edittext_border"
-                    android:padding="12dp"
-                    android:layout_marginBottom="12dp" />
-
-                <EditText
-                    android:id="@+id/etNombreConductor"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:hint="Nombre del conductor"
                     android:background="@drawable/edittext_border"
                     android:padding="12dp"
                     android:layout_marginBottom="12dp" />

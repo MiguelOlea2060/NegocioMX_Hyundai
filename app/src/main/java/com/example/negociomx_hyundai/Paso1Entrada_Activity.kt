@@ -22,9 +22,19 @@ import java.util.*
 
 // <CHANGE> Agregar imports para Handler y Looper
 import android.os.Handler
+import android.os.Looper
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.example.negociomx_hyundai.BE.VehiculoPasoLog
+
+
+
+import android.widget.Spinner
+import android.widget.ArrayAdapter
+import android.widget.AdapterView
+import com.example.negociomx_hyundai.BE.Cliente
+import com.example.negociomx_hyundai.BE.ClienteEmpleado
+import com.example.negociomx_hyundai.DAL.DALCliente
 
 class Paso1Entrada_Activity : AppCompatActivity() {
 
@@ -39,6 +49,21 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     private lateinit var tvLoadingSubtext: TextView
     private var loadingHandler: Handler? = null
     private var loadingRunnable: Runnable? = null
+
+
+    // Variables para Spinners
+    private val dalCliente = DALCliente()
+    private var transportistas = listOf<Cliente>()
+    private var empleadosTransportista = listOf<ClienteEmpleado>()
+    private lateinit var adapterTransportistasRodando: ArrayAdapter<String>
+    private lateinit var adapterTransportistasMadrina: ArrayAdapter<String>
+    private lateinit var adapterConductores: ArrayAdapter<String>
+
+    // Variables para hora dinámica
+    private lateinit var timerHandler: Handler
+    private lateinit var timerRunnable: Runnable
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -125,10 +150,14 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     }
 
     private fun inicializarFormulario() {
-        // <CHANGE> Inicializar datos del formulario
-        val fechaActual = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
-        binding.tvFechaEntrada.text = "Fecha de entrada: $fechaActual"
+        // Inicializar empleado receptor
         binding.tvEmpleadoReceptor.text = "Empleado receptor: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
+
+        // Inicializar hora dinámica
+        inicializarHoraDinamica()
+
+        // Cargar transportistas
+        cargarTransportistas()
     }
 
     private fun consultarVehiculo() {
@@ -153,9 +182,13 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                 if (vehiculoActual != null) {
                     mostrarInformacionVehiculo(vehiculoActual!!)
 
+                    // <CHANGE> Consultar status actual para determinar el flujo
                     if (vehiculoActual?.IdPasoLogVehiculo == 0) {
+                        // No tiene registros en PasoLogVehiculo
                         mostrarFormularioEntrada()
                     } else {
+                        // Ya tiene registros, consultar status actual
+                        statusActual = dalPasoLog.consultarStatusActual(vehiculoActual!!.Id!!.toInt())
                         mostrarOpcionesTransicion()
                     }
 
@@ -208,7 +241,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     }
 
     private fun configurarBotonesTransicion(statusActual: Int) {
-        // <CHANGE> Configurar botones según reglas de negocio
         // Ocultar todos primero
         binding.btnPosicionado.visibility = View.GONE
         binding.btnMovimientoLocal.visibility = View.GONE
@@ -216,21 +248,21 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         binding.btnSalida.visibility = View.GONE
 
         when (statusActual) {
-            1 -> { // Entrada
+            168 -> { // ENTRADA
                 binding.btnPosicionado.visibility = View.VISIBLE
                 binding.btnMovimientoLocal.visibility = View.VISIBLE
                 binding.btnEnTaller.visibility = View.VISIBLE
             }
-            2 -> { // Posicionado
+            170 -> { // POSICIONADO
                 binding.btnMovimientoLocal.visibility = View.VISIBLE
                 binding.btnEnTaller.visibility = View.VISIBLE
                 binding.btnSalida.visibility = View.VISIBLE
             }
-            3 -> { // En Taller
+            171 -> { // EN TALLER
                 binding.btnPosicionado.visibility = View.VISIBLE
                 binding.btnMovimientoLocal.visibility = View.VISIBLE
             }
-            4 -> { // Movimiento Local
+            172 -> { // MOVIMIENTO LOCAL
                 binding.btnPosicionado.visibility = View.VISIBLE
                 binding.btnEnTaller.visibility = View.VISIBLE
             }
@@ -239,11 +271,11 @@ class Paso1Entrada_Activity : AppCompatActivity() {
 
     private fun obtenerNombreStatus(idStatus: Int): String {
         return when (idStatus) {
-            1 -> "Entrada"
-            2 -> "Posicionado"
-            3 -> "En Taller"
-            4 -> "Movimiento Local"
-            5 -> "Salida"
+            168 -> "ENTRADA"
+            169 -> "SALIDA"
+            170 -> "POSICIONADO"
+            171 -> "EN TALLER"
+            172 -> "MOVIMIENTO LOCAL"
             else -> "Desconocido"
         }
     }
@@ -258,26 +290,45 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                 Log.d("Paso1Entrada", "💾 Guardando entrada del vehículo")
 
                 val tipoEntrada = if (binding.rbRodando.isChecked) 1 else 2
-                val placa = if (tipoEntrada == 1)
-                    binding.etEmpresaRodando.text.toString()
-                else binding.etPlacaTransporte.text.toString()
 
-                val numeroEconomico = if (tipoEntrada == 2)
-                    binding.etNumeroEconomico.text.toString()
-                else null
+                // <CHANGE> Obtener datos correctos según tipo de entrada
+                val idTransporte: Int?
+                val placa: String
+                val numeroEconomico: String?
+                val idEmpleadoTransporte: Int?
+
+                if (tipoEntrada == 1) { // RODANDO
+                    val posicionTransportista = binding.spinnerEmpresaRodando.selectedItemPosition
+                    idTransporte = if (posicionTransportista > 0) transportistas[posicionTransportista - 1].IdCliente else null
+                    placa = "RODANDO" // Para rodando no hay placa específica
+                    numeroEconomico = null
+                    idEmpleadoTransporte = null
+                } else { // EN MADRINA
+                    val posicionTransportista = binding.spinnerEmpresaMadrina.selectedItemPosition
+                    val posicionConductor = binding.spinnerConductor.selectedItemPosition
+
+                    idTransporte = if (posicionTransportista > 0) transportistas[posicionTransportista - 1].IdCliente else null
+                    idEmpleadoTransporte = if (posicionConductor > 0) empleadosTransportista[posicionConductor - 1].IdClienteEmpleado else null
+                    placa = binding.etPlacaTransporte.text.toString().trim()
+                    numeroEconomico = binding.etNumeroEconomico.text.toString().trim()
+                }
+
+                Log.d("Paso1Entrada", "📋 Datos a guardar: idTransporte=$idTransporte, placa=$placa, numeroEconomico=$numeroEconomico, idEmpleadoTransporte=$idEmpleadoTransporte")
 
                 val exito = dalPasoLog.crearRegistroEntrada(
                     idVehiculo = vehiculoActual!!.Id!!.toInt(),
                     idUsuario = ParametrosSistema.usuarioLogueado.Id!!.toInt(),
                     tipoEntrada = tipoEntrada,
                     placa = placa,
-                    numeroEconomico = numeroEconomico
+                    numeroEconomico = numeroEconomico,
+                    idTransporte = idTransporte,
+                    idEmpleadoTransporte = idEmpleadoTransporte
                 )
 
                 if (exito) {
                     Toast.makeText(this@Paso1Entrada_Activity, "✅ Entrada registrada exitosamente", Toast.LENGTH_SHORT).show()
-                    limpiarFormulario()
-                    mostrarOpcionesTransicion()
+                    // <CHANGE> Consultar nuevamente para mostrar opciones de transición
+                    consultarVehiculo()
                 } else {
                     Toast.makeText(this@Paso1Entrada_Activity, "❌ Error guardando entrada", Toast.LENGTH_SHORT).show()
                 }
@@ -290,19 +341,26 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     }
 
     private fun validarFormularioEntrada(): Boolean {
-        // <CHANGE> Validar campos según tipo de entrada
         if (binding.rbRodando.isChecked) {
-            if (binding.etEmpresaRodando.text.toString().trim().isEmpty()) {
-                Toast.makeText(this, "Ingrese la empresa que trajo el vehículo", Toast.LENGTH_SHORT).show()
+            if (binding.spinnerEmpresaRodando.selectedItemPosition == 0) {
+                Toast.makeText(this, "Seleccione la empresa transportista", Toast.LENGTH_SHORT).show()
                 return false
             }
         } else {
+            if (binding.spinnerEmpresaMadrina.selectedItemPosition == 0) {
+                Toast.makeText(this, "Seleccione la empresa transportista", Toast.LENGTH_SHORT).show()
+                return false
+            }
+            if (binding.spinnerConductor.selectedItemPosition == 0) {
+                Toast.makeText(this, "Seleccione el conductor", Toast.LENGTH_SHORT).show()
+                return false
+            }
             if (binding.etPlacaTransporte.text.toString().trim().isEmpty()) {
                 Toast.makeText(this, "Ingrese la placa del transporte", Toast.LENGTH_SHORT).show()
                 return false
             }
-            if (binding.etNombreConductor.text.toString().trim().isEmpty()) {
-                Toast.makeText(this, "Ingrese el nombre del conductor", Toast.LENGTH_SHORT).show()
+            if (binding.etNumeroEconomico.text.toString().trim().isEmpty()) {
+                Toast.makeText(this, "Ingrese el número económico", Toast.LENGTH_SHORT).show()
                 return false
             }
         }
@@ -402,13 +460,125 @@ class Paso1Entrada_Activity : AppCompatActivity() {
 
 
 
+    // MÉTODOS PARA HORA DINÁMICA
+    private fun inicializarHoraDinamica() {
+        timerHandler = Handler(Looper.getMainLooper())
+        timerRunnable = object : Runnable {
+            override fun run() {
+                val fechaActual = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
+                binding.tvFechaEntrada.text = "Fecha de entrada: $fechaActual"
+                timerHandler.postDelayed(this, 1000) // Actualizar cada segundo
+            }
+        }
+        timerHandler.post(timerRunnable)
+    }
+
+    private fun detenerHoraDinamica() {
+        if (::timerHandler.isInitialized) {
+            timerHandler.removeCallbacks(timerRunnable)
+        }
+    }
+
+
+    // MÉTODOS PARA CARGAR SPINNERS
+    private fun cargarTransportistas() {
+        lifecycleScope.launch {
+            try {
+                transportistas = dalCliente.consultarTransportistas()
+
+                val nombresTransportistas = mutableListOf("Seleccionar empresa...")
+                nombresTransportistas.addAll(transportistas.map { it.Nombre ?: "Sin nombre" })
+
+                // Configurar adapter para Rodando
+                adapterTransportistasRodando = ArrayAdapter(
+                    this@Paso1Entrada_Activity,
+                    android.R.layout.simple_spinner_item,
+                    nombresTransportistas
+                )
+                adapterTransportistasRodando.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.spinnerEmpresaRodando.adapter = adapterTransportistasRodando
+
+                // Configurar adapter para Madrina
+                adapterTransportistasMadrina = ArrayAdapter(
+                    this@Paso1Entrada_Activity,
+                    android.R.layout.simple_spinner_item,
+                    nombresTransportistas
+                )
+                adapterTransportistasMadrina.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.spinnerEmpresaMadrina.adapter = adapterTransportistasMadrina
+
+                configurarEventosSpinners()
+
+            } catch (e: Exception) {
+                Log.e("Paso1Entrada", "Error cargando transportistas: ${e.message}")
+                Toast.makeText(this@Paso1Entrada_Activity, "Error cargando empresas", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun configurarEventosSpinners() {
+        // Evento para spinner de empresa en Madrina
+        binding.spinnerEmpresaMadrina.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (position > 0) { // No es "Seleccionar empresa..."
+                    val transportistaSeleccionado = transportistas[position - 1]
+                    cargarConductores(transportistaSeleccionado.IdCliente!!)
+                } else {
+                    limpiarSpinnerConductores()
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    private fun cargarConductores(idCliente: Int) {
+        lifecycleScope.launch {
+            try {
+                empleadosTransportista = dalCliente.consultarEmpleadosTransportista(idCliente)
+
+                val nombresConductores = mutableListOf("Seleccionar conductor...")
+                nombresConductores.addAll(empleadosTransportista.map { it.NombreCompleto ?: "Sin nombre" })
+
+                adapterConductores = ArrayAdapter(
+                    this@Paso1Entrada_Activity,
+                    android.R.layout.simple_spinner_item,
+                    nombresConductores
+                )
+                adapterConductores.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.spinnerConductor.adapter = adapterConductores
+
+            } catch (e: Exception) {
+                Log.e("Paso1Entrada", "Error cargando conductores: ${e.message}")
+                Toast.makeText(this@Paso1Entrada_Activity, "Error cargando conductores", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun limpiarSpinnerConductores() {
+        val conductoresVacio = listOf("Seleccionar conductor...")
+        adapterConductores = ArrayAdapter(
+            this@Paso1Entrada_Activity,
+            android.R.layout.simple_spinner_item,
+            conductoresVacio
+        )
+        adapterConductores.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerConductor.adapter = adapterConductores
+    }
+
+
+
+
     private fun limpiarFormulario() {
         // <CHANGE> Limpiar todos los campos
         binding.etVIN.setText("")
-        binding.etEmpresaRodando.setText("")
+        // Limpiar Spinners
+        binding.spinnerEmpresaRodando.setSelection(0)
+        binding.spinnerEmpresaMadrina.setSelection(0)
+        binding.spinnerConductor.setSelection(0)
+
+        // Limpiar EditText restantes
         binding.etPlacaTransporte.setText("")
         binding.etNumeroEconomico.setText("")
-        binding.etNombreConductor.setText("")
         binding.rbRodando.isChecked = true
 
         binding.layoutInfoVehiculo.visibility = View.GONE
@@ -426,10 +596,14 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     private fun limpiarFormularioCompleto() {
         // Limpiar TODOS los campos incluyendo VIN
         binding.etVIN.setText("")
-        binding.etEmpresaRodando.setText("")
+        // Limpiar Spinners
+        binding.spinnerEmpresaRodando.setSelection(0)
+        binding.spinnerEmpresaMadrina.setSelection(0)
+        binding.spinnerConductor.setSelection(0)
+
+        // Limpiar EditText restantes
         binding.etPlacaTransporte.setText("")
         binding.etNumeroEconomico.setText("")
-        binding.etNombreConductor.setText("")
         binding.rbRodando.isChecked = true
 
         binding.layoutInfoVehiculo.visibility = View.GONE
@@ -441,5 +615,10 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         statusActual = null
 
         binding.etVIN.requestFocus()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        detenerHoraDinamica()
     }
 }

@@ -119,9 +119,10 @@ class DALPasoLogVehiculo {
             conexion.autoCommit = false
 
             // 1. Insertar registro principal
+            // 1. Insertar registro principal
             val queryPrincipal = """
                 INSERT INTO PasoLogVehiculo (IdVehiculo, IdStatusActual, FechaAlta, IdUsuarioAlta)
-                VALUES (?, 1, GETDATE(), ?)
+                VALUES (?, 168, GETDATE(), ?)
             """.trimIndent()
 
             statementPrincipal = conexion.prepareStatement(queryPrincipal, PreparedStatement.RETURN_GENERATED_KEYS)
@@ -146,7 +147,7 @@ class DALPasoLogVehiculo {
                     IdPasoLogVehiculo, IdTransporte, Placa, NumeroEconomico, 
                     IdEmpleadoTransporte, IdTipoEntradaSalida, IdStatus, 
                     FechaMovimiento, IdUsuarioMovimiento
-                ) VALUES (?, ?, ?, ?, ?, ?, 1, GETDATE(), ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, 168, GETDATE(), ?)
             """.trimIndent()
 
             statementDetalle = conexion.prepareStatement(queryDetalle)
@@ -177,5 +178,65 @@ class DALPasoLogVehiculo {
                 Log.e("DALPasoLogVehiculo", "Error cerrando conexión: ${e.message}")
             }
         }
+    }
+
+    // CONSULTAR STATUS ACTUAL DE UN VEHÍCULO
+    suspend fun consultarStatusActual(idVehiculo: Int): PasoLogVehiculoDet? = withContext(Dispatchers.IO) {
+        var statusActual: PasoLogVehiculoDet? = null
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            Log.d("DALPasoLogVehiculo", "🔍 Consultando status actual del vehículo ID: $idVehiculo")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALPasoLogVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext null
+            }
+
+            val query = """
+                SELECT TOP 1 d.*, s.Nombre as NombreStatus
+                FROM PasoLogVehiculoDet d
+                INNER JOIN PasoLogVehiculo p ON d.IdPasoLogVehiculo = p.IdPasoLogVehiculo
+                INNER JOIN Status s ON d.IdStatus = s.IdStatus
+                WHERE p.IdVehiculo = ?
+                ORDER BY d.FechaMovimiento DESC
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setInt(1, idVehiculo)
+            resultSet = statement.executeQuery()
+
+            if (resultSet.next()) {
+                statusActual = PasoLogVehiculoDet(
+                    IdPasoLogVehiculoDet = resultSet.getInt("IdPasoLogVehiculoDet"),
+                    IdPasoLogVehiculo = resultSet.getInt("IdPasoLogVehiculo"),
+                    IdTransporte = resultSet.getObject("IdTransporte") as? Int,
+                    Placa = resultSet.getString("Placa"),
+                    NumeroEconomico = resultSet.getString("NumeroEconomico"),
+                    IdEmpleadoTransporte = resultSet.getObject("IdEmpleadoTransporte") as? Int,
+                    IdTipoEntradaSalida = resultSet.getObject("IdTipoEntradaSalida") as? Int,
+                    IdStatus = resultSet.getInt("IdStatus"),
+                    FechaMovimiento = resultSet.getString("FechaMovimiento"),
+                    IdUsuarioMovimiento = resultSet.getInt("IdUsuarioMovimiento")
+                )
+                Log.d("DALPasoLogVehiculo", "✅ Status actual encontrado: ${resultSet.getString("NombreStatus")}")
+            }
+
+        } catch (e: Exception) {
+            Log.e("DALPasoLogVehiculo", "💥 Error consultando status: ${e.message}")
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALPasoLogVehiculo", "Error cerrando conexión: ${e.message}")
+            }
+        }
+
+        return@withContext statusActual
     }
 }
