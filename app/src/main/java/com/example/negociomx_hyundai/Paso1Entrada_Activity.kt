@@ -42,7 +42,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     private val dalVehiculo = DALVehiculo()
     private val dalPasoLog = DALPasoLogVehiculo()
     private var vehiculoActual: VehiculoPasoLog? = null
-    private var statusActual: PasoLogVehiculoDet? = null
+    //private var statusActual: PasoLogVehiculoDet? = null
     // <CHANGE> Agregar variables para overlay de carga
     private lateinit var loadingContainer: LinearLayout
     private lateinit var tvLoadingText: TextView
@@ -188,7 +188,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                         mostrarFormularioEntrada()
                     } else {
                         // Ya tiene registros, consultar status actual
-                        statusActual = dalPasoLog.consultarStatusActual(vehiculoActual!!.Id!!.toInt())
+                        //statusActual = dalPasoLog.consultarStatusActual(vehiculoActual!!.Id!!.toInt())
                         mostrarOpcionesTransicion()
                     }
 
@@ -231,7 +231,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         binding.layoutFormularioEntrada.visibility = View.GONE
         binding.layoutOpcionesTransicion.visibility = View.VISIBLE
 
-        val idStatusActual = statusActual?.IdStatus ?: 0
+        val idStatusActual = vehiculoActual?.IdStatusActual ?: 0
         binding.tvStatusActual.text = "Status actual: ${obtenerNombreStatus(idStatusActual)}"
 
         // Mostrar botones según reglas de transición
@@ -300,7 +300,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                 if (tipoEntrada == 1) { // RODANDO
                     val posicionTransportista = binding.spinnerEmpresaRodando.selectedItemPosition
                     idTransporte = if (posicionTransportista > 0) transportistas[posicionTransportista - 1].IdCliente else null
-                    placa = "RODANDO" // Para rodando no hay placa específica
+                    placa = "" // Para rodando SE MANDA A VACIO
                     numeroEconomico = null
                     idEmpleadoTransporte = null
                 } else { // EN MADRINA
@@ -367,8 +367,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         return true
     }
 
-
-
     // <CHANGE> Métodos para manejar overlay de carga
     private fun mostrarCargaConsulta() {
         loadingContainer.visibility = View.VISIBLE
@@ -429,7 +427,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         }
 
         mostrarCargaRegistro()
-
         lifecycleScope.launch {
             try {
                 Log.d("Paso1Entrada", "📝 Registrando nuevo VIN: $vin")
@@ -458,8 +455,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         }
     }
 
-
-
     // MÉTODOS PARA HORA DINÁMICA
     private fun inicializarHoraDinamica() {
         timerHandler = Handler(Looper.getMainLooper())
@@ -484,7 +479,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     private fun cargarTransportistas() {
         lifecycleScope.launch {
             try {
-                transportistas = dalCliente.consultarTransportistas()
+                transportistas = dalCliente.consultarTransportistas(true)
 
                 val nombresTransportistas = mutableListOf("Seleccionar empresa...")
                 nombresTransportistas.addAll(transportistas.map { it.Nombre ?: "Sin nombre" })
@@ -534,7 +529,12 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     private fun cargarConductores(idCliente: Int) {
         lifecycleScope.launch {
             try {
-                empleadosTransportista = dalCliente.consultarEmpleadosTransportista(idCliente)
+                empleadosTransportista= listOf(ClienteEmpleado())
+                transportistas.forEach {
+                    if(it.IdCliente==idCliente )
+                       empleadosTransportista= it.Empleados!!
+                }
+//                empleadosTransportista = dalCliente.consultarEmpleadosTransportista(idCliente)
 
                 val nombresConductores = mutableListOf("Seleccionar conductor...")
                 nombresConductores.addAll(empleadosTransportista.map { it.NombreCompleto ?: "Sin nombre" })
@@ -586,7 +586,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         binding.layoutOpcionesTransicion.visibility = View.GONE
 
         vehiculoActual = null
-        statusActual = null
 
         // <CHANGE> Ocultar también la sección de registrar VIN
         binding.layoutRegistrarVIN.visibility = View.GONE
@@ -612,7 +611,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         binding.layoutRegistrarVIN.visibility = View.GONE
 
         vehiculoActual = null
-        statusActual = null
 
         binding.etVIN.requestFocus()
     }

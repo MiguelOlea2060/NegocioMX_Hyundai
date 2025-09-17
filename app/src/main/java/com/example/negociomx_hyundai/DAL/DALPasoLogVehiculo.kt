@@ -31,8 +31,7 @@ class DALPasoLogVehiculo {
             val query = """
                 select  v.vin, v.idmarca, v.idmodelo, marcaauto.nombre Marca, modelo.nombre Modelo, v.Annio, Motor, 
                         v.idvehiculo, ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, 
-                        tv.Nombre TipoVehiculo, bl
-						,pl.IdPasoLogVehiculo 
+                        tv.Nombre TipoVehiculo, bl, pl.IdStatusActual, pl.IdPasoLogVehiculo 
                 from vehiculo v left join dbo.PasoLogVehiculo pl on v.IdVehiculo=pl.IdVehiculo 
 						inner join dbo.MarcaAuto on v.IdMarca=MarcaAuto.IdMarcaAuto
                         inner join dbo.Modelo on v.IdModelo=modelo.IdModelo
@@ -65,16 +64,8 @@ class DALPasoLogVehiculo {
                     IdEmpresa = "", // No existe en el esquema actual
                     Activo = true, // Asumimos que está activo si existe
                     FechaCreacion = "", // No existe en el esquema actual
-                    // FechaModificacion = resultSet.getString("FechaModificacion") ?: "",
-                    // CAMPOS SOC - Valores por defecto ya que no existen en la BD actual
-                    Odometro = 0,
-                    Bateria = 0,
-                    ModoTransporte = false,
-                    RequiereRecarga = false,
-                    Evidencia1 = "",
-                    Evidencia2 = "",
-                    FechaActualizacion = "",
                     IdPasoLogVehiculo = resultSet.getInt("IdPasoLogVehiculo")?:0,
+                    IdStatusActual = resultSet.getInt("IdStatusActual")?:0
                 )
                 Log.d("DALPasoLogVehiculo", "✅ Status actual encontrado: ${resultSet.getString("NombreStatus")}")
             }

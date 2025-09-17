@@ -13,7 +13,7 @@ import java.sql.ResultSet
 class DALCliente {
 
     // CONSULTAR TRANSPORTISTAS (EMPRESAS)
-    suspend fun consultarTransportistas(): List<Cliente> = withContext(Dispatchers.IO) {
+    suspend fun consultarTransportistas(conEmpleados:Boolean): List<Cliente> = withContext(Dispatchers.IO) {
         val transportistas = mutableListOf<Cliente>()
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
@@ -28,17 +28,51 @@ class DALCliente {
                 return@withContext transportistas
             }
 
-            val query = "SELECT c.idcliente, Nombre, Rfc FROM dbo.Cliente c WHERE substring(c.Tabla,5,1)='1'"
+            var query = "SELECT c.idcliente, Nombre, Rfc FROM dbo.Cliente c WHERE substring(c.Tabla,5,1)='1'"
+            if(conEmpleados)
+            {
+                query = "SELECT c.idcliente, Nombre, Rfc, ce.IdClienteEmpleado, ce.NombreCompleto, ce.Celular  \n" +
+                        "FROM dbo.Cliente c left join dbo.ClienteEmpleado ce on c.IdCliente=ce.IdCliente WHERE substring(c.Tabla,5,1)='1'"
+            }
             statement = conexion.prepareStatement(query)
             resultSet = statement.executeQuery()
 
             while (resultSet.next()) {
-                val cliente = Cliente(
+                var ce:ClienteEmpleado?=null
+                var cliente = Cliente(
                     IdCliente = resultSet.getInt("idcliente"),
                     Nombre = resultSet.getString("Nombre") ?: "",
                     Rfc = resultSet.getString("Rfc") ?: ""
                 )
-                transportistas.add(cliente)
+                if(conEmpleados)
+                {
+                    ce=ClienteEmpleado(
+                        IdClienteEmpleado = resultSet.getInt("IdClienteEmpleado")?:0,
+                        NombreCompleto = resultSet.getString("NombreCompleto")?:"",
+                        Celular = resultSet.getString("Celular")?:"")
+                }
+                var existe=false
+                transportistas.forEach{
+                    if(it.IdCliente==cliente.IdCliente) {
+                        existe = true
+                        cliente=it
+                    }
+                }
+                if(!existe) {
+                    if(conEmpleados && ce!=null) {
+                        cliente.Empleados= mutableListOf<ClienteEmpleado>()
+                        cliente.Empleados?.add(ce)
+                    }
+                    transportistas.add(cliente)
+                }
+                else
+                {
+                    if(ce!=null) {
+                        if (cliente?.Empleados == null) cliente?.Empleados =
+                            mutableListOf<ClienteEmpleado>()
+                        cliente?.Empleados!!.add(ce)
+                    }
+                }
             }
 
             Log.d("DALCliente", "✅ Se obtuvieron ${transportistas.size} transportistas")
@@ -75,7 +109,8 @@ class DALCliente {
                 return@withContext empleados
             }
 
-            val query = "SELECT CE.IdClienteEmpleado, ce.NombreCompleto, ce.Celular FROM dbo.ClienteEmpleado ce WHERE CE.IdCliente=?"
+            val query = "SELECT CE.IdClienteEmpleado, ce.NombreCompleto, ce.Celular " +
+                        "FROM dbo.ClienteEmpleado ce WHERE CE.IdCliente=?"
             statement = conexion.prepareStatement(query)
             statement.setInt(1, idCliente)
             resultSet = statement.executeQuery()

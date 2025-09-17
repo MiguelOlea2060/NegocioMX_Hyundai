@@ -19,12 +19,6 @@ data class VehiculoPasoLog(
     var BL:String="",
 
     // ✅ CAMPOS SOC (State of Charge)
-    var Odometro: Int = 0,
-    var Bateria: Int = 0,
-    var ModoTransporte: Boolean = false,
-    var RequiereRecarga: Boolean = false,
-    var Evidencia1: String = "",
-    var Evidencia2: String = "",
-    var FechaActualizacion: String = "",
-    var IdPasoLogVehiculo:Int=0
+    var IdPasoLogVehiculo:Int=0,
+    var IdStatusActual:Int?=null
 )
