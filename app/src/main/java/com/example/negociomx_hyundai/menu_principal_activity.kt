@@ -1,9 +1,11 @@
 package com.example.negociomx_hyundai
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.Window
 import android.widget.Button
 import android.widget.ImageView
@@ -82,6 +84,7 @@ class menu_principal_activity : AppCompatActivity() {
     lateinit var listaCategoriasNube:List<CategoriaNube>
     lateinit var listaTipospagoNube:List<TipoPagoNube>
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu_principal)
@@ -121,13 +124,16 @@ class menu_principal_activity : AppCompatActivity() {
         val btnEmpresas = findViewById<Button>(R.id.btnEmpresas)
         val btnConfigs = findViewById<Button>(R.id.btnConfiguraciones)
         val btnRadmin = findViewById<Button>(R.id.btnRadminVPN)
-        val btnConsultaPaso1 = findViewById<Button>(R.id.btnConsultaPaso1)
+        val btnConsultaPaso1 = findViewById<Button>(R.id.btnConsultaMovimiento)
         val btnConsultaPaso2 = findViewById<Button>(R.id.btnConsultaPaso2)
-        val btnPaso1SOC =findViewById<Button>(R.id.btnPaso1SOC)
+        val btnPaso1SOC =findViewById<Button>(R.id.btnMovimiento)
         val btnVehiculo = findViewById<Button>(R.id.btnVehiculo)
         val btnPaso2Accesorios=findViewById<Button>(R.id.btnPaso2Accesorios)
         val btnPaso3Repuve =findViewById<Button>(R.id.btnPaso3Repuve)
         val btnConsultaPaso3 =findViewById<Button>(R.id.btnConsultaPaso3)
+        val vLinea1 = findViewById<View>(R.id.linea1)
+        val vLinea2 = findViewById<View>(R.id.linea2)
+        val vLinea3 = findViewById<View>(R.id.linea3)
 
         getEmpresaNubeCfgNubeCfgNVNube()
 
@@ -147,6 +153,13 @@ class menu_principal_activity : AppCompatActivity() {
         btnRadmin.isVisible=visibleBtns
         btnEmpresas.isVisible=visibleBtns
         btnVehiculo.isVisible=visibleBtns
+        btnPaso2Accesorios.isVisible=visibleBtns
+        btnConsultaPaso2.isVisible=visibleBtns
+        btnPaso3Repuve.isVisible=visibleBtns
+        btnConsultaPaso3.isVisible=visibleBtns
+        vLinea1.isVisible=visibleBtns
+        vLinea2.isVisible=visibleBtns
+        vLinea3.isVisible=visibleBtns
 
 
         btnUm.setOnClickListener {
@@ -230,7 +243,7 @@ class menu_principal_activity : AppCompatActivity() {
             startActivity(intent)
         }
         btnPaso1SOC.setOnClickListener{
-            val intent = Intent(this, Paso1SOC_Activity::class.java)
+            val intent = Intent(this, Paso1Entrada_Activity::class.java)
             startActivity(intent)
         }
         btnPaso2Accesorios.setOnClickListener{

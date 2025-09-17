@@ -411,10 +411,10 @@ class Paso1Entrada_Activity : AppCompatActivity() {
 
     // <CHANGE> Métodos para manejar VIN no encontrado
     private fun mostrarOpcionRegistrarVIN() {
-        binding.layoutRegistrarVIN.visibility = View.VISIBLE
-        binding.layoutInfoVehiculo.visibility = View.GONE
-        binding.layoutFormularioEntrada.visibility = View.GONE
-        binding.layoutOpcionesTransicion.visibility = View.GONE
+   //     binding.layoutRegistrarVIN.visibility = View.VISIBLE
+    //    binding.layoutInfoVehiculo.visibility = View.GONE
+     //   binding.layoutFormularioEntrada.visibility = View.GONE
+    //    binding.layoutOpcionesTransicion.visibility = View.GONE
 
         Toast.makeText(this, "❌ Vehículo no encontrado", Toast.LENGTH_SHORT).show()
     }

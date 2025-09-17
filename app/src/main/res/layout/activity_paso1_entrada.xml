@@ -321,7 +321,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:text="POSICIONADO"
-                android:backgroundTint="#37474F"
+                android:backgroundTint="#1565C0"
                 android:textColor="#FFFFFF"
                 android:layout_marginBottom="8dp"
                 android:visibility="gone" />
@@ -331,7 +331,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:text="MOVIMIENTO LOCAL"
-                android:backgroundTint="#37474F"
+                android:backgroundTint="#1565C0"
                 android:textColor="#FFFFFF"
                 android:layout_marginBottom="8dp"
                 android:visibility="gone" />
@@ -341,7 +341,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:text="EN TALLER"
-                android:backgroundTint="#37474F"
+                android:backgroundTint="#1565C0"
                 android:textColor="#FFFFFF"
                 android:layout_marginBottom="8dp"
                 android:visibility="gone" />
@@ -351,7 +351,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:text="SALIDA"
-                android:backgroundTint="#FF6F00"
+                android:backgroundTint="#1565C0"
                 android:textColor="#FFFFFF"
                 android:visibility="gone" />
 
