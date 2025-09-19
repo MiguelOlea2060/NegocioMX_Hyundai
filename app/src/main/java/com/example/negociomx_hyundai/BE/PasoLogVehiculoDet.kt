@@ -19,5 +19,6 @@ data class PasoLogVehiculoDet(
     var IdUsuarioMovimiento: Int? = null,
     var Observacion: String? = null,
     var EnviadoAInterface: Boolean? = null,
-    var FechaEnviado: String? = null
+    var FechaEnviado: String? = null,
+    var IdBloque:Short?=null
 )

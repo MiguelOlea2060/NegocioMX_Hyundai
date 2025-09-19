@@ -1,5 +1,7 @@
 package com.example.negociomx_hyundai
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -24,6 +26,7 @@ import java.util.*
 // <CHANGE> Agregar imports para Handler y Looper
 import android.os.Handler
 import android.os.Looper
+import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.example.negociomx_hyundai.BE.VehiculoPasoLog
@@ -126,6 +129,13 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         // Botones de transición
         binding.btnPosicionado.setOnClickListener {
             val intent = Intent(this, PasoPosicionado_Activity::class.java)
+            intent.putExtra("IdVehiculo",vehiculoActual?.Id)
+            intent.putExtra("Vin",vehiculoActual?.VIN)
+            intent.putExtra("Bl",vehiculoActual?.BL)
+            intent.putExtra("Marca",vehiculoActual?.Marca)
+            intent.putExtra("Modelo",vehiculoActual?.Modelo)
+            intent.putExtra("ColorExterior",vehiculoActual?.ColorExterior)
+            intent.putExtra("ColorInterior",vehiculoActual?.ColorInterior)
             startActivity(intent)
         }
 
@@ -192,7 +202,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                         //statusActual = dalPasoLog.consultarStatusActual(vehiculoActual!!.Id!!.toInt())
                         mostrarOpcionesTransicion()
                     }
-
+                    hideKeyboard()
                 } else {
                     // <CHANGE> Mostrar opción para registrar VIN en lugar de solo mensaje
                     mostrarOpcionRegistrarVIN()
@@ -205,6 +215,14 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                 Toast.makeText(this@Paso1Entrada_Activity, "Error de conexión: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    fun Activity.hideKeyboard() {
+        hideKeyboard(currentFocus ?: View(this))
+    }
+    fun Context.hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     private fun mostrarInformacionVehiculo(vehiculo: VehiculoPasoLog) {
@@ -565,7 +583,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         adapterConductores.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerConductor.adapter = adapterConductores
     }
-
 
 
 
