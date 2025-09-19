@@ -20,10 +20,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.Bloque
 import com.example.negociomx_hyundai.BE.ClienteEmpleado
+import com.example.negociomx_hyundai.BE.Empleado
 import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
 import com.example.negociomx_hyundai.BE.PosicionBloque
 import com.example.negociomx_hyundai.BE.VehiculoPasoLog
 import com.example.negociomx_hyundai.DAL.DALCliente
+import com.example.negociomx_hyundai.DAL.DALEmpleadoSQL
 import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
 import com.example.negociomx_hyundai.Utils.ParametrosSistema
 import com.example.negociomx_hyundai.databinding.ActivityPasoPosicionadoBinding
@@ -36,9 +38,10 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private lateinit var binding: ActivityPasoPosicionadoBinding
     private val dalPasoLog = DALPasoLogVehiculo()
     private val dalCliente = DALCliente()
+    private val dalEmp=DALEmpleadoSQL()
     private var vehiculoActual: VehiculoPasoLog? = null
     private var statusActual: PasoLogVehiculoDet? = null
-    private var empleadosPersonal = listOf<ClienteEmpleado>()
+    private var empleados = listOf<Empleado>()
 
     // Variables para overlay de carga
     private lateinit var loadingContainer: LinearLayout
@@ -99,6 +102,10 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         // Botón guardar posicionado
         binding.btnGuardarPosicionado.setOnClickListener {
             guardarPosicionado()
+        }
+
+        binding.btnRegresarPosicionado.setOnClickListener {
+            finish()
         }
     }
 
@@ -171,8 +178,8 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 val columna =  0
 
                 val posicionPersonal = binding.spinnerPersonal.selectedItemPosition
-                val idEmpleadoPersonal = if (posicionPersonal > 0) empleadosPersonal[posicionPersonal - 1].IdClienteEmpleado else null
-                val nombrePersonalMovimiento = if (posicionPersonal > 0) empleadosPersonal[posicionPersonal - 1].NombreCompleto ?: "" else ""
+                val idEmpleadoPersonal = if (posicionPersonal > 0) empleados[posicionPersonal - 1].IdEmpleado else null
+                val nombrePersonalMovimiento = if (posicionPersonal > 0) empleados[posicionPersonal - 1].NombreCompleto ?: "" else ""
 
                 val exito = dalPasoLog.crearRegistroPosicionado(
                     idVehiculo = vehiculoActual!!.Id!!.toInt(),
@@ -218,7 +225,6 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         return true
     }
 
-
     // MÉTODOS PARA HORA DINÁMICA
     private fun inicializarHoraDinamica() {
         timerHandler = Handler(Looper.getMainLooper())
@@ -242,17 +248,10 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private fun cargarPersonal() {
         lifecycleScope.launch {
             try {
-                val transportistas = dalCliente.consultarTransportistas(true)
-                empleadosPersonal = mutableListOf()
-
-                transportistas.forEach { transportista ->
-                    transportista.Empleados?.let { empleados ->
-                        (empleadosPersonal as MutableList).addAll(empleados)
-                    }
-                }
+                val empleados = dalEmp.consultarEmpleados(105)
 
                 val nombresPersonal = mutableListOf("Seleccionar personal...")
-                nombresPersonal.addAll(empleadosPersonal.map { it.NombreCompleto ?: "Sin nombre" })
+                nombresPersonal.addAll(empleados.map { it.NombreCompleto ?: "Sin nombre" })
 
                 val adapter = ArrayAdapter(
                     this@PasoPosicionado_Activity,
