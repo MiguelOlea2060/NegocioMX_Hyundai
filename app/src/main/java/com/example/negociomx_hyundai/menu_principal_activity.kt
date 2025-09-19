@@ -135,7 +135,7 @@ class menu_principal_activity : AppCompatActivity() {
         val vLinea2 = findViewById<View>(R.id.linea2)
         val vLinea3 = findViewById<View>(R.id.linea3)
 
-        getEmpresaNubeCfgNubeCfgNVNube()
+        //getEmpresaNubeCfgNubeCfgNVNube()
 
         var visibleBtns=!ParametrosSistema.usuarioLogueado.IdRol.equals("5")
         btnPOS.isVisible=visibleBtns

@@ -1,11 +1,13 @@
 package com.example.negociomx_hyundai
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
@@ -16,8 +18,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.example.negociomx_hyundai.BE.Bloque
 import com.example.negociomx_hyundai.BE.ClienteEmpleado
 import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
+import com.example.negociomx_hyundai.BE.PosicionBloque
 import com.example.negociomx_hyundai.BE.VehiculoPasoLog
 import com.example.negociomx_hyundai.DAL.DALCliente
 import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
@@ -45,10 +49,8 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private lateinit var timerHandler: Handler
     private lateinit var timerRunnable: Runnable
 
-
-    private var bloques = listOf<String>()
-    private var posiciones = listOf<String>()
-    private var tiposMovimiento = listOf<Pair<Int, String>>()
+    private lateinit var bloques : List<Bloque>
+    private var posiciones = listOf<PosicionBloque>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +62,26 @@ class PasoPosicionado_Activity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        if(intent?.extras!=null)
+        {
+            val IdVehiculo= intent.extras?.getInt("IdVehiculo",0)?:0
+            val marca= intent.extras?.getString("Marca","")?:""
+            val modelo= intent.extras?.getString("Modelo","")?:""
+            val bl= intent.extras?.getString("Bl","")?:""
+            val vin= intent.extras?.getString("Vin","")?:""
+            val colorExterior= intent.extras?.getString("ColorExterior","")?:""
+            val colorInterior= intent.extras?.getString("ColorInterior","")?:""
+            vehiculoActual=VehiculoPasoLog(
+                Id =IdVehiculo.toString(),
+                Marca = marca,
+                Modelo = modelo,
+                BL =bl,
+                VIN = vin,
+                ColorExterior = colorExterior,
+                ColorInterior = colorInterior
+            )
         }
 
         inicializarComponentes()
@@ -74,22 +96,6 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     }
 
     private fun configurarEventos() {
-        binding.etVIN.requestFocus()
-
-        // Captura de Enter en el campo VIN
-        binding.etVIN.setOnKeyListener { v, keyCode, event ->
-            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
-                consultarVehiculo()
-                return@setOnKeyListener true
-            }
-            false
-        }
-
-        // Botón consultar vehículo
-        binding.btnConsultarVehiculo.setOnClickListener {
-            consultarVehiculo()
-        }
-
         // Botón guardar posicionado
         binding.btnGuardarPosicionado.setOnClickListener {
             guardarPosicionado()
@@ -108,64 +114,30 @@ class PasoPosicionado_Activity : AppCompatActivity() {
 
         // <CHANGE> Cargar datos para spinners
         cargarBloques()
-        cargarTiposMovimiento()
 
-    }
-
-
-
-
-
-    private fun consultarVehiculo() {
-        val vin = binding.etVIN.text.toString().trim()
-        if (vin.isEmpty() || vin.length < 17) {
-            Toast.makeText(this, "Ingrese un VIN válido (17 caracteres)", Toast.LENGTH_SHORT).show()
-            return
+        if(vehiculoActual!=null && vehiculoActual?.Id?.toInt()!!>0) {
+            binding.tvVinVehiculo.setText(vehiculoActual?.VIN)
         }
 
-        mostrarCargaConsulta()
-
-        lifecycleScope.launch {
-            try {
-                Log.d("PasoPosicionado", "🔍 Consultando vehículo con VIN: $vin")
-
-                vehiculoActual = dalPasoLog.consultaVehiculoPorVINParaPasoLogVehiculo(vin)
-
-                ocultarCargaConsulta()
-
-                if (vehiculoActual != null) {
-                    // Consultar status actual
-                    statusActual = dalPasoLog.consultarStatusActual(vehiculoActual!!.Id!!.toInt())
-
-                    if (validarStatusParaPosicionado()) {
-                        mostrarInformacionVehiculo(vehiculoActual!!)
-                        mostrarFormularioPosicionado()
-                    } else {
-                        mostrarError("El vehículo no tiene un status válido para posicionado. Status actual: ${obtenerNombreStatus(statusActual?.IdStatus ?: 0)}")
-                    }
-                } else {
-                    mostrarError("El VIN no existe en la base de datos.")
-                }
-
-            } catch (e: Exception) {
-                ocultarCargaConsulta()
-                Log.e("PasoPosicionado", "💥 Error consultando vehículo: ${e.message}")
-                Toast.makeText(this@PasoPosicionado_Activity, "Error de conexión: ${e.message}", Toast.LENGTH_LONG).show()
-            }
-        }
+        mostrarInformacionVehiculo(vehiculoActual!!)
+        mostrarFormularioPosicionado()
     }
 
-    private fun validarStatusParaPosicionado(): Boolean {
-        val statusValidos = listOf(168, 171, 172) // ENTRADA, EN TALLER, MOVIMIENTO LOCAL
-        return statusActual?.IdStatus in statusValidos
+    fun Activity.hideKeyboard() {
+        hideKeyboard(currentFocus ?: View(this))
+    }
+    fun Context.hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     private fun mostrarInformacionVehiculo(vehiculo: VehiculoPasoLog) {
         binding.apply {
+            tvVinVehiculo.text = "VIN: ${vehiculo.VIN}"
             tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
             tvMarcaModeloAnnio.text = "${vehiculo.Marca} - ${vehiculo.Modelo}, ${vehiculo.Anio}"
             tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
-            tvStatusActual.text = "Status actual: ${obtenerNombreStatus(statusActual?.IdStatus ?: 0)}"
+            tvColorInteriorVehiculo.text = "Color Int.: ${vehiculo.ColorInterior}"
 
             layoutInfoVehiculo.visibility = View.VISIBLE
         }
@@ -175,24 +147,6 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         binding.layoutFormularioPosicionado.visibility = View.VISIBLE
         binding.layoutError.visibility = View.GONE
         Toast.makeText(this, "✅ Vehículo válido para posicionado", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun mostrarError(mensaje: String) {
-        binding.layoutError.visibility = View.VISIBLE
-        binding.layoutFormularioPosicionado.visibility = View.GONE
-        binding.layoutInfoVehiculo.visibility = View.GONE
-        binding.tvMensajeError.text = mensaje
-    }
-
-    private fun obtenerNombreStatus(idStatus: Int): String {
-        return when (idStatus) {
-            168 -> "ENTRADA"
-            169 -> "SALIDA"
-            170 -> "POSICIONADO"
-            171 -> "EN TALLER"
-            172 -> "MOVIMIENTO LOCAL"
-            else -> "Desconocido"
-        }
     }
 
     private fun guardarPosicionado() {
@@ -208,16 +162,13 @@ class PasoPosicionado_Activity : AppCompatActivity() {
 
                 // <CHANGE> Obtener datos de los spinners
                 val posicionBloque = binding.spinnerBloque.selectedItemPosition
-                val bloque = if (posicionBloque > 0) bloques[posicionBloque - 1] else ""
+                val idBloque:Short = 0
 
                 val posicionPosicion = binding.spinnerPosicion.selectedItemPosition
                 val posicionSeleccionada = if (posicionPosicion > 0) posiciones[posicionPosicion - 1] else ""
-                val partesPos = posicionSeleccionada.split("-")
-                val fila = partesPos.getOrNull(0)?.toIntOrNull() ?: 0
-                val columna = partesPos.getOrNull(1)?.toIntOrNull() ?: 0
-
-                val posicionTipoMov = binding.spinnerTipoMovimiento.selectedItemPosition
-                val idTipoMovimiento = if (posicionTipoMov > 0) tiposMovimiento[posicionTipoMov - 1].first else 0
+//                val partesPos = posicionSeleccionada.split("-")
+                val fila =  0
+                val columna =  0
 
                 val posicionPersonal = binding.spinnerPersonal.selectedItemPosition
                 val idEmpleadoPersonal = if (posicionPersonal > 0) empleadosPersonal[posicionPersonal - 1].IdClienteEmpleado else null
@@ -226,14 +177,14 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 val exito = dalPasoLog.crearRegistroPosicionado(
                     idVehiculo = vehiculoActual!!.Id!!.toInt(),
                     idUsuario = ParametrosSistema.usuarioLogueado.Id!!.toInt(),
-                    bloque = bloque,
+                    IdBloque = idBloque,
                     fila = fila,
                     columna = columna,
-                    idTipoMovimiento = idTipoMovimiento,
+                    idTipoMovimiento = 0,
                     nombrePersonalMovimiento = nombrePersonalMovimiento,
-                    idEmpleadoPersonal = idEmpleadoPersonal
+                    idEmpleadoPersonal = idEmpleadoPersonal,
+                    bloque = TODO()
                 )
-
                 ocultarCargaGuardado()
 
                 if (exito) {
@@ -258,10 +209,6 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         }
         if (binding.spinnerPosicion.selectedItemPosition == 0) {
             Toast.makeText(this, "Seleccione la posición", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        if (binding.spinnerTipoMovimiento.selectedItemPosition == 0) {
-            Toast.makeText(this, "Seleccione el tipo de movimiento", Toast.LENGTH_SHORT).show()
             return false
         }
         if (binding.spinnerPersonal.selectedItemPosition == 0) {
@@ -322,26 +269,6 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         }
     }
 
-    // MÉTODOS PARA OVERLAY DE CARGA
-    private fun mostrarCargaConsulta() {
-        loadingContainer.visibility = View.VISIBLE
-        binding.btnConsultarVehiculo.isEnabled = false
-        binding.btnConsultarVehiculo.alpha = 0.5f
-
-        binding.layoutInfoVehiculo.visibility = View.GONE
-        binding.layoutFormularioPosicionado.visibility = View.GONE
-        binding.layoutError.visibility = View.GONE
-
-        tvLoadingText.text = "Consultando vehículo..."
-        tvLoadingSubtext.text = "Verificando status para posicionado"
-    }
-
-    private fun ocultarCargaConsulta() {
-        loadingContainer.visibility = View.GONE
-        binding.btnConsultarVehiculo.isEnabled = true
-        binding.btnConsultarVehiculo.alpha = 1.0f
-    }
-
     private fun mostrarCargaGuardado() {
         loadingContainer.visibility = View.VISIBLE
         binding.btnGuardarPosicionado.isEnabled = false
@@ -357,8 +284,6 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         binding.btnGuardarPosicionado.alpha = 1.0f
     }
 
-
-
     // MÉTODOS PARA CARGAR DATOS DE SPINNERS
     private fun cargarBloques() {
         lifecycleScope.launch {
@@ -366,7 +291,9 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 bloques = dalPasoLog.consultarBloques()
 
                 val nombresBloques = mutableListOf("Seleccionar bloque...")
-                nombresBloques.addAll(bloques)
+                bloques.forEach {
+                    nombresBloques.add(it.Nombre)
+                }
 
                 val adapter = ArrayAdapter(
                     this@PasoPosicionado_Activity,
@@ -376,11 +303,10 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 binding.spinnerBloque.adapter = adapter
 
-                // <CHANGE> Configurar listener para cargar posiciones cuando cambie el bloque
                 binding.spinnerBloque.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                         if (position > 0) {
-                            cargarPosiciones(bloques[position - 1])
+                            cargarPosiciones(position )
                         } else {
                             binding.spinnerPosicion.adapter = null
                         }
@@ -395,13 +321,17 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         }
     }
 
-    private fun cargarPosiciones(bloque: String) {
+    private fun cargarPosiciones(posicion: Int) {
         lifecycleScope.launch {
             try {
-                posiciones = dalPasoLog.consultarPosicionesPorBloque(bloque)
+                var bloque:Bloque=bloques[posicion]
+                posiciones = dalPasoLog.consultarPosicionesPorBloque(bloque.IdBloque,bloque.NumColumnas,
+                    bloque.NumFilas)
 
                 val nombresPosiciones = mutableListOf("Seleccionar posición...")
-                nombresPosiciones.addAll(posiciones)
+                posiciones.forEach {
+                    nombresPosiciones.add(it.Nombre)
+                }
 
                 val adapter = ArrayAdapter(
                     this@PasoPosicionado_Activity,
@@ -418,35 +348,9 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         }
     }
 
-    private fun cargarTiposMovimiento() {
-        lifecycleScope.launch {
-            try {
-                tiposMovimiento = dalPasoLog.consultarTiposMovimiento()
-
-                val nombresTipos = mutableListOf("Seleccionar tipo de movimiento...")
-                nombresTipos.addAll(tiposMovimiento.map { it.second })
-
-                val adapter = ArrayAdapter(
-                    this@PasoPosicionado_Activity,
-                    android.R.layout.simple_spinner_item,
-                    nombresTipos
-                )
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.spinnerTipoMovimiento.adapter = adapter
-
-            } catch (e: Exception) {
-                Log.e("PasoPosicionado", "Error cargando tipos de movimiento: ${e.message}")
-                Toast.makeText(this@PasoPosicionado_Activity, "Error cargando tipos de movimiento", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-
     private fun limpiarFormulario() {
-        binding.etVIN.setText("")
         binding.spinnerBloque.setSelection(0)
         binding.spinnerPosicion.setSelection(0)
-        binding.spinnerTipoMovimiento.setSelection(0)
         binding.spinnerPersonal.setSelection(0)
 
         binding.layoutInfoVehiculo.visibility = View.GONE
@@ -455,8 +359,6 @@ class PasoPosicionado_Activity : AppCompatActivity() {
 
         vehiculoActual = null
         statusActual = null
-
-        binding.etVIN.requestFocus()
     }
     override fun onDestroy() {
         super.onDestroy()

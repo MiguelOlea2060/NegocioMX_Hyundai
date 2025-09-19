@@ -26,50 +26,11 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="POSICIONADO DE VEHÍCULOS"
+                android:text="POSICIONA VEHÍCULO"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:gravity="center" />
-
-        </LinearLayout>
-
-        <!-- SECCIÓN ESCANEO VIN -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="1. ESCANEAR O INGRESAR VIN"
-                android:textColor="#1565C0"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <EditText
-                android:id="@+id/etVIN"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:hint="Escanear o escribir VIN del vehículo"
-                android:inputType="textCapCharacters"
-                android:maxLength="17"
-                android:background="@drawable/edittext_border"
-                android:padding="12dp"
-                android:layout_marginBottom="12dp" />
-
-            <Button
-                android:id="@+id/btnConsultarVehiculo"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="CONSULTAR VEHÍCULO"
-                android:backgroundTint="#1565C0"
-                android:textColor="#FFFFFF" />
 
         </LinearLayout>
 
@@ -87,12 +48,18 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="2. INFORMACIÓN DEL VEHÍCULO"
+                android:text="1. INFORMACIÓN DEL VEHÍCULO"
                 android:textColor="#1565C0"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
 
+            <TextView
+                android:id="@+id/tvVinVehiculo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
             <TextView
                 android:id="@+id/tvBlVehiculo"
                 android:layout_width="match_parent"
@@ -112,14 +79,14 @@
                 android:id="@+id/tvColorExterior"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:layout_marginBottom="4dp" />
 
             <TextView
-                android:id="@+id/tvStatusActual"
+                android:id="@+id/tvColorInteriorVehiculo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#FF6F00"
                 android:layout_marginBottom="4dp" />
@@ -140,62 +107,70 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="3. DATOS DE POSICIONADO"
+                android:text="2. DATOS DE POSICIONADO"
                 android:textColor="#1565C0"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
 
+            <LinearLayout
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bloque:"
+                    android:textSize="16sp"
+                    android:layout_marginRight="10dp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:layout_weight="1"
+                    android:id="@+id/spinnerBloque"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:background="@drawable/edittext_border" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Posicion:"
+                    android:textSize="18sp"
+                    android:layout_marginRight="10dp"
+                    android:textStyle="bold"/>
+
+                <Spinner
+                    android:layout_weight="1"
+                    android:id="@+id/spinnerPosicion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:background="@drawable/edittext_border"/>
+            </LinearLayout>
+
+            <View
+                android:layout_marginTop="10dp"
+                android:background="@color/deep_blue"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"/>
+
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Bloque:"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <Spinner
-                android:id="@+id/spinnerBloque"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/edittext_border"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Posición:"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <Spinner
-                android:id="@+id/spinnerPosicion"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/edittext_border"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Tipo de movimiento:"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <Spinner
-                android:id="@+id/spinnerTipoMovimiento"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/edittext_border"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Personal que lo manejará:"
-                android:textSize="14sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
 
@@ -211,7 +186,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Empleado receptor: [Se llenará automáticamente]"
-                android:textSize="14sp"
+                android:textSize="18sp"
                 android:layout_marginBottom="12dp" />
 
             <TextView
@@ -219,14 +194,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Fecha de movimiento: [Se llenará automáticamente]"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:layout_marginBottom="16dp" />
+            <View
+                android:layout_marginTop="10dp"
+                android:background="@color/deep_blue"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"/>
 
             <Button
+                android:layout_marginTop="10dp"
                 android:id="@+id/btnGuardarPosicionado"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:text="GUARDAR POSICIONADO"
+                android:text="GUARDAR"
                 android:backgroundTint="#FF6F00"
                 android:textColor="#FFFFFF" />
 

@@ -1,10 +1,12 @@
 package com.example.negociomx_hyundai.DAL
 
 import android.util.Log
+import com.example.negociomx_hyundai.BE.Bloque
+import com.example.negociomx_hyundai.BE.BloqueColumnaFilaUso
 import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
+import com.example.negociomx_hyundai.BE.PosicionBloque
 import com.example.negociomx_hyundai.BE.VehiculoPasoLog
 import com.example.negociomx_hyundai.Utils.ConexionSQLServer
-import com.google.zxing.client.result.VINParsedResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.sql.Connection
@@ -236,6 +238,7 @@ class DALPasoLogVehiculo {
     suspend fun crearRegistroPosicionado(
         idVehiculo: Int,
         idUsuario: Int,
+        IdBloque:Short?=null,
         bloque: String,
         fila: Int,
         columna: Int,
@@ -321,55 +324,42 @@ class DALPasoLogVehiculo {
     }
 
 
-
-
-
     // CONSULTAR BLOQUES DISPONIBLES
-    suspend fun consultarBloques(): List<String> = withContext(Dispatchers.IO) {
-        val bloques = mutableListOf<String>()
+    suspend fun consultarBloques(): List<Bloque> = withContext(Dispatchers.IO) {
+        val bloques = mutableListOf<Bloque>()
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
         var resultSet: ResultSet? = null
 
         try {
             Log.d("DALPasoLogVehiculo", "🔍 Consultando bloques disponibles...")
-
             conexion = ConexionSQLServer.obtenerConexion()
             if (conexion == null) {
                 Log.e("DALPasoLogVehiculo", "❌ No se pudo obtener conexión")
                 return@withContext bloques
             }
 
-            // <CHANGE> Consultar bloques únicos de la tabla de configuración o usar valores predefinidos
             val query = """
-                SELECT DISTINCT Bloque 
-                FROM PasoLogVehiculoDet 
-                WHERE Bloque IS NOT NULL AND Bloque != ''
-                UNION
-                SELECT 'A' as Bloque
-                UNION SELECT 'B' as Bloque
-                UNION SELECT 'C' as Bloque
-                UNION SELECT 'D' as Bloque
-                UNION SELECT 'E' as Bloque
-                ORDER BY Bloque
+                    select IdBloque, NumColumnas, NumFilas, Nombre from dbo.Bloque 
+                    where Activo=1 order by Nombre
             """.trimIndent()
 
             statement = conexion.prepareStatement(query)
             resultSet = statement.executeQuery()
 
             while (resultSet.next()) {
-                val bloque = resultSet.getString("Bloque")
-                if (!bloque.isNullOrEmpty()) {
-                    bloques.add(bloque)
-                }
+                val bloque =Bloque(
+                    IdBloque =  resultSet.getShort("IdBloque"),
+                    NumColumnas = resultSet.getShort("NumColumnas"),
+                    NumFilas = resultSet.getShort("NumFilas"),
+                    Nombre = resultSet.getString("Nombre")
+                )
+                bloques.add(bloque)
             }
 
             Log.d("DALPasoLogVehiculo", "✅ Se obtuvieron ${bloques.size} bloques")
-
         } catch (e: Exception) {
             Log.e("DALPasoLogVehiculo", "💥 Error consultando bloques: ${e.message}")
-            // <CHANGE> Valores por defecto si falla la consulta
-            bloques.addAll(listOf("A", "B", "C", "D", "E"))
         } finally {
             try {
                 resultSet?.close()
@@ -384,30 +374,71 @@ class DALPasoLogVehiculo {
     }
 
     // CONSULTAR POSICIONES DISPONIBLES PARA UN BLOQUE
-    suspend fun consultarPosicionesPorBloque(bloque: String): List<String> = withContext(Dispatchers.IO) {
-        val posiciones = mutableListOf<String>()
+    suspend fun consultarPosicionesPorBloque(idBloque: Short,numColumnas:Short, numFilas:Short):
+            List<PosicionBloque> = withContext(Dispatchers.IO) {
+        val posiciones = mutableListOf<PosicionBloque>()
+        var ocupadas= mutableListOf<BloqueColumnaFilaUso>()
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
         var resultSet: ResultSet? = null
 
         try {
-            Log.d("DALPasoLogVehiculo", "🔍 Consultando posiciones para bloque: $bloque")
-
+            Log.d("DALPasoLogVehiculo", "🔍 Consultando posiciones para bloque: $idBloque")
             conexion = ConexionSQLServer.obtenerConexion()
             if (conexion == null) {
                 Log.e("DALPasoLogVehiculo", "❌ No se pudo obtener conexión")
                 return@withContext posiciones
             }
 
-            // <CHANGE> Generar posiciones disponibles (1-1 a 20-10 como ejemplo)
-            for (fila in 1..20) {
-                for (columna in 1..10) {
-                    posiciones.add("$fila-$columna")
+            val query = """
+                    select IdBloque, NumColumna, NumFila, Nombre 
+                    from dbo.BloqueColumnaFilaUso 
+                    where IdBloque= ?
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setShort(1, idBloque)
+            resultSet = statement.executeQuery()
+
+            while (resultSet.next()) {
+                val ocupada =BloqueColumnaFilaUso(
+                    IdBloque =  resultSet.getShort("IdBloque"),
+                    Nombre = resultSet.getString("Nombre"),
+                    NumFila = resultSet.getShort("NumFila"),
+                    NumColumna = resultSet.getShort("NumColumna"),
+                )
+                ocupadas.add(ocupada)
+            }
+
+            var columna:Short=1
+            var fila:Short=1
+            var nombre:String=""
+            while (columna<=numColumnas)
+            {
+                fila=1
+                while (fila<=numFilas)
+                {
+                    var existe=false
+                    if(ocupadas!=null && ocupadas.count()>0)
+                      existe= ocupadas.filter { it->it.NumFila==fila && it.NumColumna==columna
+                              && it.IdBloque==idBloque }.count()>0
+
+                    if(!existe) {
+                        nombre = "Col -> ${columna} - Fila -> ${fila}"
+                        posiciones.add(
+                            PosicionBloque(
+                                IdBloque = idBloque,
+                                Nombre = nombre,
+                                Fila = fila,
+                                Columna = columna)
+                        )
+                    }
+                    fila++
                 }
+                columna++
             }
 
             Log.d("DALPasoLogVehiculo", "✅ Se generaron ${posiciones.size} posiciones")
-
         } catch (e: Exception) {
             Log.e("DALPasoLogVehiculo", "💥 Error consultando posiciones: ${e.message}")
         } finally {
@@ -470,11 +501,5 @@ class DALPasoLogVehiculo {
 
         return@withContext tiposMovimiento
     }
-
-
-
-
-
-
 
 }
