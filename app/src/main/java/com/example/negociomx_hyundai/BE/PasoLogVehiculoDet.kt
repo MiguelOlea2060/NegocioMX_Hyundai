@@ -7,8 +7,8 @@ data class PasoLogVehiculoDet(
     var Placa: String? = null,
     var NumeroEconomico: String? = null,
     var Bloque: String? = null,
-    var Fila: Int? = null,
-    var Columna: Int? = null,
+    var Fila: Short? = null,
+    var Columna: Short? = null,
     var IdTipoMovimiento: Int? = null,
     var PersonaQueHaraMovimiento: String? = null,
     var IdParteDanno: Int? = null,
@@ -20,5 +20,6 @@ data class PasoLogVehiculoDet(
     var Observacion: String? = null,
     var EnviadoAInterface: Boolean? = null,
     var FechaEnviado: String? = null,
-    var IdBloque:Short?=null
+    var IdBloque:Short?=null,
+    var IdEmpleadoPosiciono:Int?=null,
 )

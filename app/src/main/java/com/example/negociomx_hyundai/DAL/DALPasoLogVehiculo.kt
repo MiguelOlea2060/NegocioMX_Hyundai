@@ -323,6 +323,77 @@ class DALPasoLogVehiculo {
         }
     }
 
+    suspend fun insertaStatusNuevoPasoLogVehiculo(paso:PasoLogVehiculoDet ): Boolean = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statementPrincipal: PreparedStatement? = null
+        var statementDetalle: PreparedStatement? = null
+
+        try {
+            Log.d("DALPasoLogVehiculo", "💾 Creando registro de posicionado para vehículo ID: " +
+                    "${paso.IdPasoLogVehiculo}")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALPasoLogVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext false
+            }
+
+            conexion.autoCommit = false
+            // 1. Actualizar status actual en PasoLogVehiculo
+            val queryPrincipal = """
+                UPDATE PasoLogVehiculo  SET IdStatusActual = ?  WHERE IdPasoLogVehiculo = ?
+            """.trimIndent()
+
+            statementPrincipal = conexion.prepareStatement(queryPrincipal)
+            statementPrincipal.setInt(1, paso?.IdStatus!!)
+            statementPrincipal.setInt(2, paso?.IdPasoLogVehiculo!!)
+            statementPrincipal.executeUpdate()
+
+            // 2. Insertar detalle de posicionado
+            // <CHANGE> Agregar campos faltantes: IdTipoMovimiento y PersonaQueHaraMovimiento
+            val queryDetalle = """
+                INSERT INTO PasoLogVehiculoDet (IdPasoLogVehiculo, Bloque, Fila, Columna, IdTipoMovimiento, 
+                                PersonaQueHaraMovimiento, IdStatus, FechaMovimiento, IdUsuarioMovimiento,
+                                IdEmpleadoPosiciono, IdBloque, EnviadoAInterface, NumeroEconomico
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """.trimIndent()
+
+            statementDetalle = conexion.prepareStatement(queryDetalle)
+            statementDetalle.setInt(1, paso?.IdPasoLogVehiculo!!)
+            statementDetalle.setString(2, paso?.Bloque)
+            statementDetalle.setShort(3, paso?.Fila!!)
+            statementDetalle.setShort(4, paso?.Columna!!)
+            statementDetalle.setInt(5, paso?.IdTipoMovimiento!!)
+            statementDetalle.setString(6, paso.PersonaQueHaraMovimiento)
+            statementDetalle.setInt(7, paso?.IdStatus!!)
+            statementDetalle.setString(8, paso?.FechaMovimiento)
+            statementDetalle.setInt(9, paso?.IdUsuarioMovimiento!!)
+            statementDetalle.setInt(10, paso?.IdEmpleadoPosiciono!!)
+            statementDetalle.setShort(11, paso?.IdBloque!!)
+            statementDetalle.setBoolean(12, paso?.EnviadoAInterface!!)
+            statementDetalle.setString(13, paso?.NumeroEconomico)
+
+            statementDetalle.executeUpdate()
+
+            conexion.commit()
+            Log.d("DALPasoLogVehiculo", "✅ Registro de posicionado creado exitosamente")
+            return@withContext true
+
+        } catch (e: Exception) {
+            Log.e("DALPasoLogVehiculo", "💥 Error creando registro de posicionado: ${e.message}")
+            conexion?.rollback()
+            return@withContext false
+        } finally {
+            try {
+                statementDetalle?.close()
+                statementPrincipal?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALPasoLogVehiculo", "Error cerrando conexión: ${e.message}")
+            }
+        }
+    }
+
 
     // CONSULTAR BLOQUES DISPONIBLES
     suspend fun consultarBloques(): List<Bloque> = withContext(Dispatchers.IO) {

@@ -130,6 +130,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         binding.btnPosicionado.setOnClickListener {
             val intent = Intent(this, PasoPosicionado_Activity::class.java)
             intent.putExtra("IdVehiculo",vehiculoActual?.Id)
+            intent.putExtra("IdPasoLogVehiculo",vehiculoActual?.IdPasoLogVehiculo)
             intent.putExtra("Vin",vehiculoActual?.VIN)
             intent.putExtra("Bl",vehiculoActual?.BL)
             intent.putExtra("Marca",vehiculoActual?.Marca)

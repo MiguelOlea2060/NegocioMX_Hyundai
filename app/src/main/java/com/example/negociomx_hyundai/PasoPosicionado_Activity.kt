@@ -19,7 +19,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.Bloque
-import com.example.negociomx_hyundai.BE.ClienteEmpleado
 import com.example.negociomx_hyundai.BE.Empleado
 import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
 import com.example.negociomx_hyundai.BE.PosicionBloque
@@ -69,6 +68,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
 
         if(intent?.extras!=null)
         {
+            val idPasoLogVehiculo= intent.extras?.getInt("IdPasoLogVehiculo",0)?:0
             val IdVehiculo= intent.extras?.getInt("IdVehiculo",0)?:0
             val marca= intent.extras?.getString("Marca","")?:""
             val modelo= intent.extras?.getString("Modelo","")?:""
@@ -83,7 +83,8 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 BL =bl,
                 VIN = vin,
                 ColorExterior = colorExterior,
-                ColorInterior = colorInterior
+                ColorInterior = colorInterior,
+                IdPasoLogVehiculo = idPasoLogVehiculo
             )
         }
 
@@ -167,31 +168,45 @@ class PasoPosicionado_Activity : AppCompatActivity() {
             try {
                 Log.d("PasoPosicionado", "💾 Guardando posicionado del vehículo")
 
-                // <CHANGE> Obtener datos de los spinners
                 val posicionBloque = binding.spinnerBloque.selectedItemPosition
-                val idBloque:Short = 0
+                val bloque=bloques[posicionBloque-1]
+                val idBloque:Short = bloque.IdBloque
+
+                val posicionEmpleado=binding.spinnerPersonal.selectedItemPosition
+                val empleado= empleados[posicionEmpleado-1]
+                val idEmpleadoPosiciono=empleado.IdEmpleado
+                val nombrePersonalMovimiento = empleado.NombreCompleto
 
                 val posicionPosicion = binding.spinnerPosicion.selectedItemPosition
-                val posicionSeleccionada = if (posicionPosicion > 0) posiciones[posicionPosicion - 1] else ""
-//                val partesPos = posicionSeleccionada.split("-")
-                val fila =  0
-                val columna =  0
+                val posicionSeleccionada = posiciones[posicionPosicion-1]
+                val fila =  posicionSeleccionada.Fila
+                val columna =  posicionSeleccionada.Columna
 
-                val posicionPersonal = binding.spinnerPersonal.selectedItemPosition
-                val idEmpleadoPersonal = if (posicionPersonal > 0) empleados[posicionPersonal - 1].IdEmpleado else null
-                val nombrePersonalMovimiento = if (posicionPersonal > 0) empleados[posicionPersonal - 1].NombreCompleto ?: "" else ""
+                var idUsuario=ParametrosSistema.usuarioLogueado.Id?.toInt()
 
-                val exito = dalPasoLog.crearRegistroPosicionado(
-                    idVehiculo = vehiculoActual!!.Id!!.toInt(),
-                    idUsuario = ParametrosSistema.usuarioLogueado.Id!!.toInt(),
+                val paso=PasoLogVehiculoDet(
+                    IdPasoLogVehiculo = vehiculoActual?.IdPasoLogVehiculo,
+                    IdEmpleadoTransporte =null,
+                    IdEmpleadoPosiciono = idEmpleadoPosiciono,
+                    Fila = fila,
+                    Columna = columna,
                     IdBloque = idBloque,
-                    fila = fila,
-                    columna = columna,
-                    idTipoMovimiento = 0,
-                    nombrePersonalMovimiento = nombrePersonalMovimiento,
-                    idEmpleadoPersonal = idEmpleadoPersonal,
-                    bloque = TODO()
+                    IdStatus = 170,
+                    IdTransporte = null,
+                    IdTipoMovimiento = null,
+                    IdUsuarioMovimiento = idUsuario,
+                    IdPasoLogVehiculoDet = 0,
+                    IdParteDanno = null,
+                    IdTipoEntradaSalida = null,
+                    EnviadoAInterface = null,
+                    FechaEnviado = null,
+                    Observacion = null,
+                    FechaMovimiento = "",
+                    NumeroEconomico = "",
+                    Bloque = bloque.Nombre,
+                    PersonaQueHaraMovimiento = nombrePersonalMovimiento
                 )
+                val exito = dalPasoLog.insertaStatusNuevoPasoLogVehiculo(paso)
                 ocultarCargaGuardado()
 
                 if (exito) {
@@ -248,7 +263,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private fun cargarPersonal() {
         lifecycleScope.launch {
             try {
-                val empleados = dalEmp.consultarEmpleados(105)
+                empleados = dalEmp.consultarEmpleados(105)
 
                 val nombresPersonal = mutableListOf("Seleccionar personal...")
                 nombresPersonal.addAll(empleados.map { it.NombreCompleto ?: "Sin nombre" })
