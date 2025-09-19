@@ -37,6 +37,12 @@
         tools:ignore="MissingClass"
         tools:targetApi="31">
         <activity
+            android:name=".Consulta_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".PasoPosicionado_Activity"
+            android:exported="false" />
+        <activity
             android:name=".Paso1Entrada_Activity"
             android:exported="false" />
         <activity

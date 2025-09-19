@@ -1,5 +1,6 @@
 package com.example.negociomx_hyundai
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -124,8 +125,8 @@ class Paso1Entrada_Activity : AppCompatActivity() {
 
         // Botones de transición
         binding.btnPosicionado.setOnClickListener {
-            // TODO: Navegar a Activity de Posicionado
-            Toast.makeText(this, "Navegar a Posicionado", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, PasoPosicionado_Activity::class.java)
+            startActivity(intent)
         }
 
         binding.btnMovimientoLocal.setOnClickListener {

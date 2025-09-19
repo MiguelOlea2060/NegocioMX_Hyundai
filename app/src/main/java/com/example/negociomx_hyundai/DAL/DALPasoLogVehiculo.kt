@@ -230,4 +230,251 @@ class DALPasoLogVehiculo {
 
         return@withContext statusActual
     }
+
+
+    // CREAR REGISTRO DE POSICIONADO
+    suspend fun crearRegistroPosicionado(
+        idVehiculo: Int,
+        idUsuario: Int,
+        bloque: String,
+        fila: Int,
+        columna: Int,
+        idTipoMovimiento: Int,
+        nombrePersonalMovimiento: String,
+        idEmpleadoPersonal: Int? = null
+    ): Boolean = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statementPrincipal: PreparedStatement? = null
+        var statementDetalle: PreparedStatement? = null
+
+        try {
+            Log.d("DALPasoLogVehiculo", "💾 Creando registro de posicionado para vehículo ID: $idVehiculo")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALPasoLogVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext false
+            }
+
+            conexion.autoCommit = false
+
+            // 1. Actualizar status actual en PasoLogVehiculo
+            val queryPrincipal = """
+                UPDATE PasoLogVehiculo 
+                SET IdStatusActual = 170 
+                WHERE IdVehiculo = ?
+            """.trimIndent()
+
+            statementPrincipal = conexion.prepareStatement(queryPrincipal)
+            statementPrincipal.setInt(1, idVehiculo)
+            statementPrincipal.executeUpdate()
+
+            // 2. Obtener IdPasoLogVehiculo
+            val queryObtenerID = "SELECT IdPasoLogVehiculo FROM PasoLogVehiculo WHERE IdVehiculo = ?"
+            val statementObtenerID = conexion.prepareStatement(queryObtenerID)
+            statementObtenerID.setInt(1, idVehiculo)
+            val resultSet = statementObtenerID.executeQuery()
+
+            var idPasoLogVehiculo = 0
+            if (resultSet.next()) {
+                idPasoLogVehiculo = resultSet.getInt("IdPasoLogVehiculo")
+            }
+
+            // 3. Insertar detalle de posicionado
+            // <CHANGE> Agregar campos faltantes: IdTipoMovimiento y PersonaQueHaraMovimiento
+            val queryDetalle = """
+                INSERT INTO PasoLogVehiculoDet (
+                    IdPasoLogVehiculo, Bloque, Fila, Columna, 
+                    IdTipoMovimiento, PersonaQueHaraMovimiento, 
+                    IdStatus, FechaMovimiento, IdUsuarioMovimiento
+                ) VALUES (?, ?, ?, ?, ?, ?, 170, GETDATE(), ?)
+            """.trimIndent()
+
+            statementDetalle = conexion.prepareStatement(queryDetalle)
+            statementDetalle.setInt(1, idPasoLogVehiculo)
+            statementDetalle.setString(2, bloque)
+            statementDetalle.setInt(3, fila)
+            statementDetalle.setInt(4, columna)
+            statementDetalle.setInt(5, idTipoMovimiento)
+            statementDetalle.setString(6, nombrePersonalMovimiento)
+            statementDetalle.setInt(7, idUsuario)
+
+            statementDetalle.executeUpdate()
+
+            conexion.commit()
+            Log.d("DALPasoLogVehiculo", "✅ Registro de posicionado creado exitosamente")
+            return@withContext true
+
+        } catch (e: Exception) {
+            Log.e("DALPasoLogVehiculo", "💥 Error creando registro de posicionado: ${e.message}")
+            conexion?.rollback()
+            return@withContext false
+        } finally {
+            try {
+                statementDetalle?.close()
+                statementPrincipal?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALPasoLogVehiculo", "Error cerrando conexión: ${e.message}")
+            }
+        }
+    }
+
+
+
+
+
+    // CONSULTAR BLOQUES DISPONIBLES
+    suspend fun consultarBloques(): List<String> = withContext(Dispatchers.IO) {
+        val bloques = mutableListOf<String>()
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            Log.d("DALPasoLogVehiculo", "🔍 Consultando bloques disponibles...")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALPasoLogVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext bloques
+            }
+
+            // <CHANGE> Consultar bloques únicos de la tabla de configuración o usar valores predefinidos
+            val query = """
+                SELECT DISTINCT Bloque 
+                FROM PasoLogVehiculoDet 
+                WHERE Bloque IS NOT NULL AND Bloque != ''
+                UNION
+                SELECT 'A' as Bloque
+                UNION SELECT 'B' as Bloque
+                UNION SELECT 'C' as Bloque
+                UNION SELECT 'D' as Bloque
+                UNION SELECT 'E' as Bloque
+                ORDER BY Bloque
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            resultSet = statement.executeQuery()
+
+            while (resultSet.next()) {
+                val bloque = resultSet.getString("Bloque")
+                if (!bloque.isNullOrEmpty()) {
+                    bloques.add(bloque)
+                }
+            }
+
+            Log.d("DALPasoLogVehiculo", "✅ Se obtuvieron ${bloques.size} bloques")
+
+        } catch (e: Exception) {
+            Log.e("DALPasoLogVehiculo", "💥 Error consultando bloques: ${e.message}")
+            // <CHANGE> Valores por defecto si falla la consulta
+            bloques.addAll(listOf("A", "B", "C", "D", "E"))
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALPasoLogVehiculo", "Error cerrando conexión: ${e.message}")
+            }
+        }
+
+        return@withContext bloques
+    }
+
+    // CONSULTAR POSICIONES DISPONIBLES PARA UN BLOQUE
+    suspend fun consultarPosicionesPorBloque(bloque: String): List<String> = withContext(Dispatchers.IO) {
+        val posiciones = mutableListOf<String>()
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            Log.d("DALPasoLogVehiculo", "🔍 Consultando posiciones para bloque: $bloque")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALPasoLogVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext posiciones
+            }
+
+            // <CHANGE> Generar posiciones disponibles (1-1 a 20-10 como ejemplo)
+            for (fila in 1..20) {
+                for (columna in 1..10) {
+                    posiciones.add("$fila-$columna")
+                }
+            }
+
+            Log.d("DALPasoLogVehiculo", "✅ Se generaron ${posiciones.size} posiciones")
+
+        } catch (e: Exception) {
+            Log.e("DALPasoLogVehiculo", "💥 Error consultando posiciones: ${e.message}")
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALPasoLogVehiculo", "Error cerrando conexión: ${e.message}")
+            }
+        }
+
+        return@withContext posiciones
+    }
+
+    // CONSULTAR TIPOS DE MOVIMIENTO
+    suspend fun consultarTiposMovimiento(): List<Pair<Int, String>> = withContext(Dispatchers.IO) {
+        val tiposMovimiento = mutableListOf<Pair<Int, String>>()
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            Log.d("DALPasoLogVehiculo", "🔍 Consultando tipos de movimiento...")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALPasoLogVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext tiposMovimiento
+            }
+
+            val query = "SELECT IdTipoMovimiento, Nombre FROM TipoMovimiento WHERE Activo = 1 ORDER BY Nombre"
+            statement = conexion.prepareStatement(query)
+            resultSet = statement.executeQuery()
+
+            while (resultSet.next()) {
+                val id = resultSet.getInt("IdTipoMovimiento")
+                val nombre = resultSet.getString("Nombre") ?: ""
+                tiposMovimiento.add(Pair(id, nombre))
+            }
+
+            Log.d("DALPasoLogVehiculo", "✅ Se obtuvieron ${tiposMovimiento.size} tipos de movimiento")
+
+        } catch (e: Exception) {
+            Log.e("DALPasoLogVehiculo", "💥 Error consultando tipos de movimiento: ${e.message}")
+            // <CHANGE> Valores por defecto si falla la consulta
+            tiposMovimiento.addAll(listOf(
+                Pair(1, "POSICIONADO MANUAL"),
+                Pair(2, "POSICIONADO AUTOMÁTICO")
+            ))
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALPasoLogVehiculo", "Error cerrando conexión: ${e.message}")
+            }
+        }
+
+        return@withContext tiposMovimiento
+    }
+
+
+
+
+
+
+
 }
