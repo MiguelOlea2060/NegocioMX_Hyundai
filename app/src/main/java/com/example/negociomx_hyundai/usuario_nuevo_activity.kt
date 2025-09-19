@@ -10,15 +10,19 @@ import android.text.TextWatcher
 import android.util.Log
 import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.example.negociomx_hyundai.BE.Usuario
 import com.example.negociomx_hyundai.BE.UsuarioNube
 import com.example.negociomx_hyundai.DAL.DALEmpresa
 import com.example.negociomx_hyundai.DAL.DALUsuario
+import com.example.negociomx_hyundai.DAL.DALUsuarioSQL
 import com.example.negociomx_hyundai.adapters.SpinnerAdapter
 import com.example.negociomx_hyundai.databinding.ActivityUsuarioNuevoBinding
 import com.example.negociomx_hyundai.room.BLL.BLLUtil
 import com.example.negociomx_hyundai.room.entities.Admins.Rol
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.launch
 
 class usuario_nuevo_activity : AppCompatActivity() {
 
@@ -26,10 +30,10 @@ class usuario_nuevo_activity : AppCompatActivity() {
     lateinit var firebaseRef: DatabaseReference
     lateinit var firebaseUtil: DatabaseUtils
 
-    lateinit var dalUsu: DALUsuario
+    lateinit var dalUsu: DALUsuarioSQL
     lateinit var dalEmp: DALEmpresa
 
-    lateinit var listaUsuarios: List<UsuarioNube>
+    lateinit var listaUsuarios: List<Usuario>
 
     lateinit var bllUtil: BLLUtil
 
@@ -44,7 +48,7 @@ class usuario_nuevo_activity : AppCompatActivity() {
 
         Log.d("UsuarioNuevo", "🎬 === VERSIÓN DEFINITIVA ===")
 
-        dalUsu = DALUsuario()
+        dalUsu = DALUsuarioSQL()
         dalEmp = DALEmpresa()
         bllUtil = BLLUtil()
 
@@ -160,81 +164,80 @@ class usuario_nuevo_activity : AppCompatActivity() {
                 return
             }
             else -> {
-                iniciarProcesamiento()
+                lifecycleScope.launch {
+                    binding.btnEnviarSolicitudUsuarioNuevo.isEnabled=false
+                    //iniciarProcesamiento()
+                    //Log.d("UsuarioNuevo", "🔍 Verificando email con timeout largo...")
 
-                Log.d("UsuarioNuevo", "🔍 Verificando email con timeout largo...")
+                    // Timeout de 15 segundos para verificación
+                    //configurarTimeoutLargo("verificación")
 
-                // Timeout de 15 segundos para verificación
-                configurarTimeoutLargo("verificación")
+                    var find= dalUsu.getUsuarioByEmail(email)
+                    //Log.d("UsuarioNuevo", "📞 Verificación completada")
 
-                dalUsu.getUsuarioByEmail(email) { res: UsuarioNube? ->
-                    Log.d("UsuarioNuevo", "📞 Verificación completada")
+                    //cancelarTimeout()
 
-                    runOnUiThread {
-                        cancelarTimeout()
+                    if (find != null) {
+                        //Log.d("UsuarioNuevo", "⚠️ Email ya existe: ${find.Email}")
+                        finalizarProcesamiento()
 
-                        if (res != null) {
-                            Log.d("UsuarioNuevo", "⚠️ Email ya existe: ${res.Email}")
-                            finalizarProcesamiento()
-
-                            bllUtil.MessageShow(
-                                this@usuario_nuevo_activity,
-                                "El correo ya existe en el sistema",
-                                "Email Existente"
-                            ) {}
-                            binding.txtEmailUsuarioNuevo.requestFocus()
-                        } else {
-                            Log.d("UsuarioNuevo", "✅ Email disponible - Procediendo con registro...")
-                            procederConRegistroDefinitivo(nombreCompleto, email, contrasena)
-                        }
+                        bllUtil.MessageShow(
+                            this@usuario_nuevo_activity,
+                            "El correo ya existe en el sistema",
+                            "Email Existente"
+                        ) {}
+                        binding.txtEmailUsuarioNuevo.requestFocus()
+                    } else {
+                        //Log.d("UsuarioNuevo", "✅ Email disponible - Procediendo con registro...")
+                        procederConRegistroDefinitivo(nombreCompleto, email, contrasena)
                     }
+
+                    binding.btnEnviarSolicitudUsuarioNuevo.isEnabled=true
                 }
             }
         }
     }
 
     private fun procederConRegistroDefinitivo(nombreCompleto: String, email: String, contrasena: String) {
-        val usuario = UsuarioNube(
+        val usuario = Usuario(
             IdEmpresa = null,
-            IdRol = "5", // Cliente
             NombreCompleto = nombreCompleto,
+            IdRol = 2,
             Email = email,
             CuentaVerificada = false,
-            Password = contrasena,
-            Activo = true
+            Contrasena = contrasena,
+            Activo = true,
+            Bloqueado = false,
+            NombreUsuario = "",
+            FechaCuentaVerificada = "",
+            Domicilio = ""
         )
 
-        Log.d("UsuarioNuevo", "💾 === GUARDANDO USUARIO ===")
+        //Log.d("UsuarioNuevo", "💾 === GUARDANDO USUARIO ===")
 
         // Timeout de 20 segundos para insert
-        configurarTimeoutLargo("registro")
+        //configurarTimeoutLargo("registro")
 
-        dalUsu.insert(usuario) { insertResult: String ->
-            Log.d("UsuarioNuevo", "📞 === RESULTADO INSERT ===")
-            Log.d("UsuarioNuevo", "📊 Resultado: '$insertResult'")
+        lifecycleScope.launch {
+            var idUsuario:Int?=dalUsu.addUsuario(usuario)
 
-            runOnUiThread {
-                cancelarTimeout()
-                finalizarProcesamiento()
+            /*cancelarTimeout()
+            finalizarProcesamiento()*/
 
-                if (insertResult.isNotEmpty()) {
-                    Log.d("UsuarioNuevo", "🎉 ¡REGISTRO EXITOSO!")
-                    bllUtil.MessageShow(
-                        this@usuario_nuevo_activity,
-                        "¡Usuario registrado exitosamente!\n\nSu cuenta será verificada por un administrador.",
-                        "¡Éxito!"
-                    ) {
-                        Log.d("UsuarioNuevo", "🚪 Navegando a pantalla de login")
-                        navegarALogin()
-                    }
-                } else {
-                    Log.e("UsuarioNuevo", "❌ Error en registro")
-                    bllUtil.MessageShow(
-                        this@usuario_nuevo_activity,
-                        "Error al registrar usuario.\n\nPor favor, verifique su conexión a internet e intente nuevamente.",
-                        "Error de Registro"
-                    ) {}
+            if (idUsuario!=null && idUsuario>0) {
+                bllUtil.MessageShow(
+                    this@usuario_nuevo_activity,
+                    "¡Usuario registrado exitosamente!\n\nSu cuenta será verificada por un administrador.",
+                    "¡Éxito!"
+                ) {
+                    navegarALogin()
                 }
+            } else {
+                bllUtil.MessageShow(
+                    this@usuario_nuevo_activity,
+                    "Error al registrar usuario.\n\nPor favor, verifique su conexión a internet e intente nuevamente.",
+                    "Error de Registro"
+                ) {}
             }
         }
     }

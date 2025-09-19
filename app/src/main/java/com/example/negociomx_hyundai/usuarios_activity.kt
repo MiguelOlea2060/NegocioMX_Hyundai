@@ -3,21 +3,24 @@ package com.example.negociomx_hyundai
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.negociomx_hyundai.BE.Usuario
 import com.example.negociomx_hyundai.BE.UsuarioNube
 import com.example.negociomx_hyundai.DAL.DALEmpresa
-import com.example.negociomx_hyundai.DAL.DALUsuario
+import com.example.negociomx_hyundai.DAL.DALUsuarioSQL
 import com.example.negociomx_hyundai.adapters.SpinnerAdapter
 import com.example.negociomx_hyundai.adapters.UsuarioNubeAdapter
 import com.example.negociomx_hyundai.databinding.ActivityUsuariosBinding
 import com.example.negociomx_hyundai.room.BLL.BLLUtil
 import com.example.negociomx_hyundai.room.entities.Admins.Rol
 import com.example.negociomx_hyundai.room.entities.ItemSpinner
+import kotlinx.coroutines.launch
 
 class usuarios_activity : AppCompatActivity() {
 
     lateinit var binding: ActivityUsuariosBinding
-    lateinit var dalUsu: DALUsuario
+    lateinit var dalUsu: DALUsuarioSQL
     lateinit var dalEmp: DALEmpresa
 
     lateinit var listaUsuarios: List<UsuarioNube>
@@ -30,7 +33,7 @@ class usuarios_activity : AppCompatActivity() {
         binding = ActivityUsuariosBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        dalUsu = DALUsuario()
+        dalUsu = DALUsuarioSQL()
         dalEmp = DALEmpresa()
 
         bllUtil = BLLUtil()
@@ -41,7 +44,7 @@ class usuarios_activity : AppCompatActivity() {
         listaRoles = arrayListOf()
 
         listaRoles.add(Rol(IdRol = 0, Nombre = "Seleccione..."))
-        listaRoles.add(Rol(IdRol = 1, Nombre = "SA"))
+       // listaRoles.add(Rol(IdRol = 1, Nombre = "SA"))
         listaRoles.add(Rol(IdRol = 2, Nombre = "Admin"))
         listaRoles.add(Rol(IdRol = 3, Nombre = "Ventas"))
         listaRoles.add(Rol(IdRol = 4, Nombre = "Supervisor"))
@@ -88,8 +91,9 @@ class usuarios_activity : AppCompatActivity() {
                 else if (idEmpresa == null || idEmpresa.isEmpty() == true)
                     lblEmpresaUsuarioUsuarios.error = "Es necesario seleccionar una Empresa"
                 else {
-                    dalUsu.getUsuarioByEmail(email) { res: UsuarioNube? ->
-                        if (res != null) {
+                    lifecycleScope.launch {
+                        var find= dalUsu.getUsuarioByEmail(email)
+                        if (find != null) {
                             bllUtil.MessageShow(
                                 this@usuarios_activity, "El correo ya existe en el Sistema",
                                 "Aviso"
@@ -102,17 +106,19 @@ class usuarios_activity : AppCompatActivity() {
 
                             var activo = chkActivoEmpresaNube.isChecked
 
-                            var usuario = UsuarioNube(
-                                IdEmpresa = idEmpresa, IdRol = idRol, NombreCompleto = nombreCompleto,
-                                Email = email, CuentaVerificada = false, Password = contrasena, Activo = activo
+                            var usuario = Usuario(
+                                IdEmpresa = idEmpresa.toInt(),
+                                IdRol = idRol.toInt(),
+                                NombreCompleto = nombreCompleto,
+                                Email = email,
+                                CuentaVerificada = false,
+                                Contrasena = contrasena,
+                                Activo = activo
                             )
-                            dalUsu.insert(usuario) { insertResult: String ->
-                                runOnUiThread {
-                                    limpiaControles()
-                                }
-                            }
+                            val id=dalUsu.addUsuario(usuario)
                         }
                     }
+
                 }
             }
         }
@@ -121,7 +127,7 @@ class usuarios_activity : AppCompatActivity() {
     }
 
     private fun muestraListaUsuarios() {
-        dalUsu.getAllUsuarios { usuarios: List<UsuarioNube> ->
+        /*dalUsu.getAllUsuarios { usuarios: List<UsuarioNube> ->
             runOnUiThread {
                 listaUsuarios = usuarios
 
@@ -130,7 +136,7 @@ class usuarios_activity : AppCompatActivity() {
                 binding.rvUsuarios.layoutManager = LinearLayoutManager(applicationContext)
                 binding.rvUsuarios.adapter = adaptador
             }
-        }
+        }*/
     }
 
     private fun onItemSelected(usuario: UsuarioNube) {
