@@ -10,18 +10,32 @@
     android:padding="4dp"
     tools:context=".ConsultaPaso1Soc_Activity">
 
-    <!-- Título -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="📊 Consulta Diaria"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="#2E7D32"
-        android:gravity="center"
-        android:background="@color/naranja_ligero"
+    <LinearLayout
         android:padding="6dp"
-        android:layout_marginBottom="16dp" />
+        android:gravity="center_vertical"
+        android:background="@color/naranja_ligero"
+        android:orientation="horizontal"
+        android:layout_marginBottom="14dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/btnRegresarConsultaPasoLog"
+            android:src="@drawable/regresar_icono_64x64"
+            android:layout_width="45dp"
+            android:layout_height="45dp">
+
+        </ImageView>
+        <!-- Título -->
+        <TextView
+            android:layout_marginLeft="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📊 Consulta Diaria"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#2E7D32" />
+    </LinearLayout>
 
     <!-- Sección de Filtros -->
     <LinearLayout

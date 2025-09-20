@@ -225,7 +225,8 @@ class DALPasoLogVehiculo {
         placa: String,
         numeroEconomico: String? = null,
         idTransporte: Int? = null,
-        idEmpleadoTransporte: Int? = null
+        idEmpleadoTransporte: Int? = null,
+        idStatus:Int=0
     ): Boolean = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statementPrincipal: PreparedStatement? = null
@@ -239,19 +240,18 @@ class DALPasoLogVehiculo {
                 Log.e("DALPasoLogVehiculo", "❌ No se pudo obtener conexión")
                 return@withContext false
             }
-
             conexion.autoCommit = false
 
             // 1. Insertar registro principal
-            // 1. Insertar registro principal
             val queryPrincipal = """
                 INSERT INTO PasoLogVehiculo (IdVehiculo, IdStatusActual, FechaAlta, IdUsuarioAlta)
-                VALUES (?, 168, GETDATE(), ?)
+                VALUES (?, ?, GETDATE(), ?)
             """.trimIndent()
 
             statementPrincipal = conexion.prepareStatement(queryPrincipal, PreparedStatement.RETURN_GENERATED_KEYS)
             statementPrincipal.setInt(1, idVehiculo)
-            statementPrincipal.setInt(2, idUsuario)
+            statementPrincipal.setInt(2, idStatus)
+            statementPrincipal.setInt(3, idUsuario)
 
             val filasAfectadas = statementPrincipal.executeUpdate()
             if (filasAfectadas == 0) {
@@ -267,11 +267,9 @@ class DALPasoLogVehiculo {
 
             // 2. Insertar detalle
             val queryDetalle = """
-                INSERT INTO PasoLogVehiculoDet (
-                    IdPasoLogVehiculo, IdTransporte, Placa, NumeroEconomico, 
-                    IdEmpleadoTransporte, IdTipoEntradaSalida, IdStatus, 
-                    FechaMovimiento, IdUsuarioMovimiento
-                ) VALUES (?, ?, ?, ?, ?, ?, 168, GETDATE(), ?)
+                INSERT INTO PasoLogVehiculoDet (IdPasoLogVehiculo, IdTransporte, Placa, NumeroEconomico, 
+                    IdEmpleadoTransporte, IdTipoEntradaSalida, IdStatus, FechaMovimiento, IdUsuarioMovimiento
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), ?)
             """.trimIndent()
 
             statementDetalle = conexion.prepareStatement(queryDetalle)
@@ -281,7 +279,8 @@ class DALPasoLogVehiculo {
             statementDetalle.setString(4, numeroEconomico)
             statementDetalle.setObject(5, idEmpleadoTransporte)
             statementDetalle.setInt(6, tipoEntrada)
-            statementDetalle.setInt(7, idUsuario)
+            statementDetalle.setInt(7, idStatus)
+            statementDetalle.setInt(8, idUsuario)
 
             statementDetalle.executeUpdate()
 

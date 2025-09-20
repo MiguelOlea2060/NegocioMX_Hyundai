@@ -54,7 +54,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     private var loadingHandler: Handler? = null
     private var loadingRunnable: Runnable? = null
 
-
     // Variables para Spinners
     private val dalCliente = DALCliente()
     private var transportistas = listOf<Cliente>()
@@ -98,6 +97,11 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                 return@setOnKeyListener true
             }
             false
+        }
+
+        //Boton regresar para que regrese al menu principal
+        binding.btnRegresarPaso1Entrada.setOnClickListener {
+            finish()
         }
 
         // Botón consultar vehículo
@@ -324,6 +328,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                 val placa: String
                 val numeroEconomico: String?
                 val idEmpleadoTransporte: Int?
+                val idStatus:Int=168
 
                 if (tipoEntrada == 1) { // RODANDO
                     val posicionTransportista = binding.spinnerEmpresaRodando.selectedItemPosition
@@ -342,7 +347,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                 }
 
                 Log.d("Paso1Entrada", "📋 Datos a guardar: idTransporte=$idTransporte, placa=$placa, numeroEconomico=$numeroEconomico, idEmpleadoTransporte=$idEmpleadoTransporte")
-
                 val exito = dalPasoLog.crearRegistroEntrada(
                     idVehiculo = vehiculoActual!!.Id!!.toInt(),
                     idUsuario = ParametrosSistema.usuarioLogueado.Id!!.toInt(),
@@ -350,7 +354,8 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                     placa = placa,
                     numeroEconomico = numeroEconomico,
                     idTransporte = idTransporte,
-                    idEmpleadoTransporte = idEmpleadoTransporte
+                    idEmpleadoTransporte = idEmpleadoTransporte,
+                    idStatus = idStatus
                 )
 
                 if (exito) {

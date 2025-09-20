@@ -120,17 +120,14 @@ class PasoPosicionado_Activity : AppCompatActivity() {
 
         // Inicializar hora dinámica
         inicializarHoraDinamica()
-
         // Cargar personal
         cargarPersonal()
-
         // <CHANGE> Cargar datos para spinners
         cargarBloques()
 
         if(vehiculoActual!=null && vehiculoActual?.Id?.toInt()!!>0) {
             binding.tvVinVehiculo.setText(vehiculoActual?.VIN)
         }
-
         mostrarInformacionVehiculo(vehiculoActual!!)
         mostrarFormularioPosicionado()
     }
@@ -167,7 +164,6 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         }
 
         mostrarCargaGuardado()
-
         lifecycleScope.launch {
             try {
                 Log.d("PasoPosicionado", "💾 Guardando posicionado del vehículo")

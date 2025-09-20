@@ -35,6 +35,7 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
     private lateinit var loadingContainer: LinearLayout
     private lateinit var tvLoadingText: TextView
     private lateinit var tvLoadingSubtext: TextView
+    private lateinit var btnRegresar:ImageView
 
     // Estadísticas
     private lateinit var tvVehiculosUnicos: TextView
@@ -73,6 +74,7 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         loadingContainer = findViewById(R.id.loadingContainer)
         tvLoadingText = findViewById(R.id.tvLoadingText)
         tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
+        btnRegresar=findViewById(R.id.btnRegresarConsultaPasoLog)
 
         // Estadísticas
         tvVehiculosUnicos = findViewById(R.id.tvVehiculosUnicos)
@@ -85,6 +87,9 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         // NUEVO: Evento para mostrar/ocultar calendario al hacer clic en la fecha
         tvFechaSeleccionada.setOnClickListener {
             mostrarCalendario()
+        }
+        btnRegresar.setOnClickListener {
+            finish()
         }
 
         // Botón consultar (SIN CAMBIOS)
@@ -149,7 +154,6 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         imgCancelar.setOnClickListener {
             dialog.dismiss()
         }
-
         dialog.show()
     }
 
@@ -158,7 +162,6 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
             // Manejar clic en item
             mostrarDetalleRegistro(registro)
         }
-
         recyclerViewRegistros.layoutManager = LinearLayoutManager(this)
         recyclerViewRegistros.adapter = adapter
     }
@@ -192,7 +195,8 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
                 {
                     totalVehiculos=registros.count()
                     registros.forEach { Unit->
-                        totalStatus+= Unit.CantidadStatus
+                        if(Unit.Detalles!=null)
+                            totalStatus+= Unit.Detalles!!.size
                     }
                 }
                 estadisticas["TotalRegistros"] = 1
@@ -223,7 +227,7 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         // Mostrar estadísticas
         layoutEstadisticas.visibility = View.VISIBLE
         tvVehiculosUnicos.text = "🚗 ${estadisticas["VehiculosUnicos"] ?: 0} vehículos"
-        tvTotalFotos.text = "📸 ${estadisticas["TotalFotos"] ?: 0} fotos"
+        tvTotalFotos.text = "📸 ${estadisticas["TotalFotos"] ?: 0} status"
 
         // Mostrar lista
         recyclerViewRegistros.visibility = View.VISIBLE
