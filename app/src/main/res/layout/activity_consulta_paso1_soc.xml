@@ -14,7 +14,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="📊 Consultas SOC"
+        android:text="📊 Consulta Diaria"
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="#2E7D32"
@@ -102,11 +102,11 @@
             android:gravity="center" />
 
         <TextView
-            android:id="@+id/tvTotalFotos"
+            android:id="@+id/tvTotalStatus"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="📸 0 fotos"
+            android:text="📸 0 Status"
             android:textSize="12sp"
             android:textColor="#424242"
             android:gravity="center" />

@@ -37,6 +37,9 @@
         tools:ignore="MissingClass"
         tools:targetApi="31">
         <activity
+            android:name=".PasoSalida_Activity"
+            android:exported="false" />
+        <activity
             android:name=".Consulta_Activity"
             android:exported="false" />
         <activity

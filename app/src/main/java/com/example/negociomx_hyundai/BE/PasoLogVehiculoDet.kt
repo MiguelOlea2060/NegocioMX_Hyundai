@@ -1,5 +1,7 @@
 package com.example.negociomx_hyundai.BE
 
+import com.google.android.gms.common.api.internal.StatusPendingResult
+
 data class PasoLogVehiculoDet(
     var IdPasoLogVehiculoDet: Int? = null,
     var IdPasoLogVehiculo: Int? = null,
@@ -22,4 +24,10 @@ data class PasoLogVehiculoDet(
     var FechaEnviado: String? = null,
     var IdBloque:Short?=null,
     var IdEmpleadoPosiciono:Int?=null,
+    var IdVehiculo:Int?=null,
+
+    var NombreEmpleadoPosiciono:String="",
+    var NombreEmpleadoTransporte:String="",
+    var NombreTransporte:String="",
+    var NombreStatus:String=""
 )

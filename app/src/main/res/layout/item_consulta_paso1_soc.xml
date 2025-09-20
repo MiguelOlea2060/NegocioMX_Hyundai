@@ -95,10 +95,10 @@
 
         <!-- Datos SOC -->
         <TextView
-            android:id="@+id/tvDatosSOC"
+            android:id="@+id/tvDatosPasoLogVehiculoDet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Odómetro: 0 km | Batería: 0% | Modo Transporte: No | Se Recarga: No"
+            android:text="Status actual: 0 km | Batería: 0% | Modo Transporte: No | Se Recarga: No"
             android:textSize="14sp"
             android:textColor="#FF6F00"
             android:background="#FFF3E0"
@@ -116,8 +116,8 @@
                 android:id="@+id/tvFotos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📸 0 foto(s)"
-                android:textSize="12sp"
+                android:text="0 Status(s)"
+                android:textSize="14sp"
                 android:textColor="#9C27B0"
                 android:background="#F3E5F5"
                 android:padding="4dp" />

@@ -102,7 +102,7 @@
             android:gravity="center" />
 
         <TextView
-            android:id="@+id/tvTotalFotos"
+            android:id="@+id/tvTotalStatus"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

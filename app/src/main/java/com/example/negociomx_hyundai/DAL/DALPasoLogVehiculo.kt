@@ -1,19 +1,150 @@
 package com.example.negociomx_hyundai.DAL
 
 import android.util.Log
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.Bloque
 import com.example.negociomx_hyundai.BE.BloqueColumnaFilaUso
+import com.example.negociomx_hyundai.BE.Paso1SOCItem
+import com.example.negociomx_hyundai.BE.PasoLogVehiculo
 import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
 import com.example.negociomx_hyundai.BE.PosicionBloque
 import com.example.negociomx_hyundai.BE.VehiculoPasoLog
 import com.example.negociomx_hyundai.Utils.ConexionSQLServer
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class DALPasoLogVehiculo {
+
+    suspend fun consultarPasosPorFecha(fecha: String): List<PasoLogVehiculo> = withContext(Dispatchers.IO) {
+        val registros = mutableListOf<PasoLogVehiculo>()
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            Log.d("DALConsultaPaso1SOC", "🔍 Consultando registros SOC para fecha: $fecha")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALConsultaPaso1SOC", "❌ No se pudo obtener conexión")
+                return@withContext registros
+            }
+
+            // Parsear fecha para obtener año, mes y día
+            val formatoFecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val fechaDate = formatoFecha.parse(fecha)
+            val calendar = Calendar.getInstance()
+            calendar.time = fechaDate!!
+
+            val anio = calendar.get(Calendar.YEAR)
+            val mes = calendar.get(Calendar.MONTH) + 1 // Calendar.MONTH es 0-based
+            val dia = calendar.get(Calendar.DAY_OF_MONTH)
+
+            val query = """
+            select p.IdPasoLogVehiculo, p.IdVehiculo, p.IdStatusActual, s.Nombre NombreStatus, p.IdUsuarioAlta
+                  , pd.IdPasoLogVehiculoDet, pd.IdBloque NombreBloque, pd.FechaMovimiento
+                  , pd.IdEmpleadoPosiciono, pd.IdEmpleadoTransporte, ep.Nombres, ep.ApellidoPaterno
+                  , ep.ApellidoMaterno, pd.IdEmpleadoTransporte, ce.NombreCompleto as NombreEmpleadoTransporte
+                  , pd.IdTransporte, c.Nombre as NombreTransporte, pd.IdStatus IdStatusPD, s1.Nombre 
+                  NombreStatusPD, pd.NumeroEconomico, pd.IdUsuarioMovimiento, pd.Fila, pd.Columna, v.Vin
+                  , p.FechaAlta, pd.IdBloque
+                from dbo.PasoLogVehiculo p inner join dbo.PasoLogVehiculoDet pd on p.IdPasoLogVehiculo=pd.IdPasoLogVehiculo
+                left join dbo.Vehiculo v on p.IdVehiculo=v.IdVehiculo
+                left join dbo.Status s on p.IdStatusActual=s.IdStatus
+                left join dbo.Bloque b on pd.IdBloque=b.IdBloque
+                left join dbo.Cliente c on pd.IdTransporte=c.IdCliente
+                left join dbo.Empleado ep on pd.IdEmpleadoPosiciono=ep.IdEmpleado
+                left join dbo.ClienteEmpleado ce on pd.IdEmpleadoTransporte=ce.IdClienteEmpleado
+                left join dbo.Status s1 on pd.IdStatus=s1.IdStatus
+            where DATEPART(year, pd.fechamovimiento)=?
+                  and  DATEPART(MONTH, pd.fechamovimiento)=?
+                  and  DATEPART(DAY, pd.fechamovimiento)=?
+            order by pd.FechaMovimiento asc
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setInt(1, anio)
+            statement.setInt(2, mes)
+            statement.setInt(3, dia)
+
+            resultSet = statement.executeQuery()
+
+            while (resultSet.next()) {
+
+                val registro = PasoLogVehiculo(
+                    IdVehiculo = resultSet.getInt("IdVehiculo"),
+                    Vin = resultSet.getString("Vin") ?: "",
+                    FechaAlta = resultSet.getString("FechaAlta") ?: "",
+                    IdStatusActual = resultSet.getInt("IdStatusActual"),
+                    IdPasoLogVehiculo =resultSet.getInt("IdPasoLogVehiculo")?:0,
+                    NombreStatus = resultSet.getString("NombreStatus")
+                )
+                var apellidoPaterno= resultSet.getString("ApellidoPaterno")?:""
+                var apellidoMaterno= resultSet.getString("ApellidoMaterno")?:""
+
+                var det=PasoLogVehiculoDet(
+                    IdVehiculo = registro.IdVehiculo,
+                    IdPasoLogVehiculoDet = resultSet.getInt("IdPasoLogVehiculoDet")?:0,
+                    Bloque = resultSet.getString("NombreBloque")?:"",
+                    IdBloque = resultSet.getShort("IdBloque")?:0,
+                    FechaMovimiento = resultSet.getString("FechaMovimiento"),
+                    IdEmpleadoPosiciono = resultSet.getInt("IdEmpleadoPosiciono"),
+                    IdEmpleadoTransporte = resultSet.getInt("IdEmpleadoTransporte"),
+                    IdTransporte =resultSet.getInt("IdTransporte")?:0,
+                    NombreTransporte = resultSet.getString("NombreTransporte")?:"",
+                    NombreEmpleadoTransporte = resultSet.getString("NombreEmpleadoTransporte")?:"",
+                    NumeroEconomico = resultSet.getString("NumeroEconomico")?:"",
+                    NombreEmpleadoPosiciono = resultSet.getString("Nombres")?:"",
+                    IdPasoLogVehiculo = registro.IdPasoLogVehiculo,
+                    IdUsuarioMovimiento = resultSet.getInt("IdUsuarioMovimiento")?:0,
+                    IdStatus = resultSet.getInt("IdStatusPD")?:0,
+                    NombreStatus = resultSet.getString("NombreStatusPD")?:"",
+                    Fila =resultSet.getShort("Fila")?:0,
+                    Columna = resultSet.getShort("Columna")?:0,
+                )
+                if (apellidoPaterno.isNotEmpty()) det.NombreEmpleadoPosiciono+=" "+apellidoPaterno
+                if (apellidoMaterno.isNotEmpty()) det.NombreEmpleadoPosiciono+=" "+apellidoMaterno
+
+                val find=registros.filter { it.IdPasoLogVehiculo==registro.IdPasoLogVehiculo }.firstOrNull()
+                if(find==null) {
+                    if(registro.Detalles==null)registro.Detalles= mutableListOf()
+                    registro.Detalles?.add(det)
+
+                    registros.add(registro)
+                }
+                else
+                {
+                    if(find.Detalles==null)find.Detalles= mutableListOf()
+
+                    find.Detalles?.add(det)
+                }
+            }
+
+            Log.d("DALConsultaPaso1SOC", "✅ Se obtuvieron ${registros.size} registros")
+
+        } catch (e: Exception) {
+            Log.e("DALConsultaPaso1SOC", "💥 Error consultando registros: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALConsultaPaso1SOC", "Error cerrando recursos: ${e.message}")
+            }
+        }
+
+        return@withContext registros
+    }
 
     suspend fun consultaVehiculoPorVINParaPasoLogVehiculo(vin: String): VehiculoPasoLog? = withContext(Dispatchers.IO) {
         var item: VehiculoPasoLog? = null
@@ -327,6 +458,7 @@ class DALPasoLogVehiculo {
         var conexion: Connection? = null
         var statementPrincipal: PreparedStatement? = null
         var statementDetalle: PreparedStatement? = null
+        var statementBloque: PreparedStatement? = null
 
         try {
             Log.d("DALPasoLogVehiculo", "💾 Creando registro de posicionado para vehículo ID: " +
@@ -340,7 +472,7 @@ class DALPasoLogVehiculo {
 
             conexion.autoCommit = false
             // 1. Actualizar status actual en PasoLogVehiculo
-            val queryPrincipal = """
+            var queryPrincipal = """
                 UPDATE PasoLogVehiculo  SET IdStatusActual = ?  WHERE IdPasoLogVehiculo = ?
             """.trimIndent()
 
@@ -348,6 +480,23 @@ class DALPasoLogVehiculo {
             statementPrincipal.setInt(1, paso?.IdStatus!!)
             statementPrincipal.setInt(2, paso?.IdPasoLogVehiculo!!)
             statementPrincipal.executeUpdate()
+
+            // 2. Insertar un registro en tabla dbo.BloqueColumnaFilaUso
+            //    esta tanla define que posiciones se encuentra ocupadas
+            queryPrincipal = """
+                INSERT INTO dbo.BloqueColumnaFilaUso(IdBloque, NumColumna, NumFila, Nombre, IdVehiculo, Activa) 
+                values (?, ?, ?, ?, ?, ?)
+            """.trimIndent()
+
+            statementBloque = conexion.prepareStatement(queryPrincipal)
+            statementBloque.setShort(1, paso?.IdBloque!!)
+            statementBloque.setShort(2, paso?.Columna!!)
+            statementBloque.setShort(3, paso?.Fila!!)
+            statementBloque.setString(4, "Col. -> ${paso?.Columna}  Fila-> ${paso?.Fila}")
+            statementBloque.setInt(5, paso?.IdVehiculo!!)
+            statementBloque.setBoolean(6, true)
+            statementBloque.executeUpdate()
+
 
             // 2. Insertar detalle de posicionado
             // <CHANGE> Agregar campos faltantes: IdTipoMovimiento y PersonaQueHaraMovimiento
@@ -450,6 +599,7 @@ class DALPasoLogVehiculo {
             return@withContext false
         } finally {
             try {
+                statementBloque?.close()
                 statementDetalle?.close()
                 statementPrincipal?.close()
                 conexion?.close()

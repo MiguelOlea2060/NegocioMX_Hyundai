@@ -94,7 +94,7 @@
 
         Datos de Fechas de Fotos
         <TextView
-            android:id="@+id/tvDatosSOC"
+            android:id="@+id/tvDatosPasoLogVehiculoDet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Fechas de fotos: Foto1: 2024-01-01 | Foto2: 2024-01-01"

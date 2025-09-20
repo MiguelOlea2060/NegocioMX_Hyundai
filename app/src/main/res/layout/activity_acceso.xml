@@ -199,7 +199,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Transvision International"
+                android:text="Empresa Internacional"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
@@ -208,7 +208,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Transporte Marítimo y Aéreo Internacional"
+                android:text="Patio de Almacenamiento"
                 android:textSize="12sp"
                 android:textColor="#E3F2FD" />
 

@@ -67,8 +67,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     private lateinit var timerHandler: Handler
     private lateinit var timerRunnable: Runnable
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -151,8 +149,18 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         }
 
         binding.btnSalida.setOnClickListener {
-            // TODO: Navegar a Activity de Salida
             Toast.makeText(this, "Navegar a Salida", Toast.LENGTH_SHORT).show()
+
+            val intent = Intent(this, PasoSalida_Activity::class.java)
+            intent.putExtra("IdVehiculo",vehiculoActual?.Id)
+            intent.putExtra("IdPasoLogVehiculo",vehiculoActual?.IdPasoLogVehiculo)
+            intent.putExtra("Vin",vehiculoActual?.VIN)
+            intent.putExtra("Bl",vehiculoActual?.BL)
+            intent.putExtra("Marca",vehiculoActual?.Marca)
+            intent.putExtra("Modelo",vehiculoActual?.Modelo)
+            intent.putExtra("ColorExterior",vehiculoActual?.ColorExterior)
+            intent.putExtra("ColorInterior",vehiculoActual?.ColorInterior)
+            startActivity(intent)
         }
 
         // <CHANGE> Botón para registrar VIN nuevo

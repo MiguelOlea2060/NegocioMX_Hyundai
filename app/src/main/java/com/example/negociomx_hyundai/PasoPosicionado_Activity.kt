@@ -48,6 +48,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private lateinit var tvLoadingText: TextView
     private lateinit var tvLoadingSubtext: TextView
 
+    var IdVehiculo:Int?=null
     var bllBlo:BLLBloque?=null
     // Variables para hora dinámica
     private lateinit var timerHandler: Handler
@@ -72,7 +73,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         if(intent?.extras!=null)
         {
             val idPasoLogVehiculo= intent.extras?.getInt("IdPasoLogVehiculo",0)?:0
-            val IdVehiculo= intent.extras?.getInt("IdVehiculo",0)?:0
+            IdVehiculo= intent.extras?.getInt("IdVehiculo",0)?:0
             val marca= intent.extras?.getString("Marca","")?:""
             val modelo= intent.extras?.getString("Modelo","")?:""
             val bl= intent.extras?.getString("Bl","")?:""
@@ -87,7 +88,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 VIN = vin,
                 ColorExterior = colorExterior,
                 ColorInterior = colorInterior,
-                IdPasoLogVehiculo = idPasoLogVehiculo
+                IdPasoLogVehiculo = idPasoLogVehiculo,
             )
         }
 
@@ -208,7 +209,8 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                     NumeroEconomico = "",
                     Bloque = bloque.Nombre,
                     Placa = "",
-                    PersonaQueHaraMovimiento = nombrePersonalMovimiento
+                    PersonaQueHaraMovimiento = nombrePersonalMovimiento,
+                    IdVehiculo = IdVehiculo
                 )
                 val exito = dalPasoLog.insertaStatusNuevoPasoLogVehiculo(paso)
                 ocultarCargaGuardado()
