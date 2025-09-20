@@ -5,22 +5,11 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 object ConexionSQLServer {
-/*
-    //servidornube
-    private const val SERVER = "dato"
-    private const val DATABASE = "dato"
-    private const val USERNAME = "dato"
-    private const val PASSWORD = "dato
-    private const val PORT = "1433"*/
-
-    //Servidor Nube
-
     private const val SERVER = "P3NWPLSK12SQL-v13.shr.prod.phx3.secureserver.net"
     private const val DATABASE = "NegocioMX_Concentradora"
     private const val USERNAME = "NegocioMX_Concentradora"
     private const val PASSWORD = "NITr11ziu7#"
     private const val PORT = "1433"
-
 
     fun obtenerConexion(): Connection? {
         return try {

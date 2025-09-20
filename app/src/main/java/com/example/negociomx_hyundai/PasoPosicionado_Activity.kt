@@ -23,6 +23,7 @@ import com.example.negociomx_hyundai.BE.Empleado
 import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
 import com.example.negociomx_hyundai.BE.PosicionBloque
 import com.example.negociomx_hyundai.BE.VehiculoPasoLog
+import com.example.negociomx_hyundai.BLL.BLLBloque
 import com.example.negociomx_hyundai.DAL.DALCliente
 import com.example.negociomx_hyundai.DAL.DALEmpleadoSQL
 import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
@@ -47,6 +48,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private lateinit var tvLoadingText: TextView
     private lateinit var tvLoadingSubtext: TextView
 
+    var bllBlo:BLLBloque?=null
     // Variables para hora dinámica
     private lateinit var timerHandler: Handler
     private lateinit var timerRunnable: Runnable
@@ -66,6 +68,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
             insets
         }
 
+        bllBlo=BLLBloque()
         if(intent?.extras!=null)
         {
             val idPasoLogVehiculo= intent.extras?.getInt("IdPasoLogVehiculo",0)?:0
@@ -204,6 +207,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                     FechaMovimiento = "",
                     NumeroEconomico = "",
                     Bloque = bloque.Nombre,
+                    Placa = "",
                     PersonaQueHaraMovimiento = nombrePersonalMovimiento
                 )
                 val exito = dalPasoLog.insertaStatusNuevoPasoLogVehiculo(paso)
@@ -339,8 +343,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 var bloque:Bloque=bloques[posicion]
-                posiciones = dalPasoLog.consultarPosicionesPorBloque(bloque.IdBloque,bloque.NumColumnas,
-                    bloque.NumFilas)
+                posiciones = bllBlo?.getPosicionesDisponiblesDeBloque(bloque)!!
 
                 val nombresPosiciones = mutableListOf("Seleccionar posición...")
                 posiciones.forEach {

@@ -351,27 +351,92 @@ class DALPasoLogVehiculo {
 
             // 2. Insertar detalle de posicionado
             // <CHANGE> Agregar campos faltantes: IdTipoMovimiento y PersonaQueHaraMovimiento
-            val queryDetalle = """
-                INSERT INTO PasoLogVehiculoDet (IdPasoLogVehiculo, Bloque, Fila, Columna, IdTipoMovimiento, 
-                                PersonaQueHaraMovimiento, IdStatus, FechaMovimiento, IdUsuarioMovimiento,
-                                IdEmpleadoPosiciono, IdBloque, EnviadoAInterface, NumeroEconomico
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """.trimIndent()
+            var campos=""
+            var valores=""
+            var contadorparams:Int=1
 
+            campos+="(IdPasoLogVehiculo, Bloque, Fila, Placa"
+            valores+="values(?, ?, ?, ?"
+            if(paso?.Columna!=null)
+            {
+                campos+=", Columna"
+                valores+=", ?"
+            }
+            if(paso?.IdTipoMovimiento!=null) {
+                campos+=", IdTipoMovimiento"
+                valores+=", ?"
+            }
+            campos+=", PersonaQueHaraMovimiento, IdStatus, FechaMovimiento"
+            valores+=", ?, ?, ?"
+            if(paso?.IdUsuarioMovimiento!=null) {
+                campos+=", IdUsuarioMovimiento"
+                valores+=", ?"
+            }
+            if(paso?.IdEmpleadoPosiciono!=null) {
+                campos+=", IdEmpleadoPosiciono"
+                valores+=", ?"
+            }
+            campos+=", IdBloque"
+            valores+=", ?"
+            if(paso?.EnviadoAInterface!=null) {
+                campos+=", EnviadoAInterface"
+                valores+=", ?"
+            }
+            if (paso?.NumeroEconomico!=null)
+            {
+                campos+=", NumeroEconomico"
+                valores+=", ?"
+            }
+            campos+=") "
+            valores+=") "
+            var queryDetalle = "INSERT INTO PasoLogVehiculoDet "
+            queryDetalle+=campos + valores
             statementDetalle = conexion.prepareStatement(queryDetalle)
-            statementDetalle.setInt(1, paso?.IdPasoLogVehiculo!!)
-            statementDetalle.setString(2, paso?.Bloque)
-            statementDetalle.setShort(3, paso?.Fila!!)
-            statementDetalle.setShort(4, paso?.Columna!!)
-            statementDetalle.setInt(5, paso?.IdTipoMovimiento!!)
-            statementDetalle.setString(6, paso.PersonaQueHaraMovimiento)
-            statementDetalle.setInt(7, paso?.IdStatus!!)
-            statementDetalle.setString(8, paso?.FechaMovimiento)
-            statementDetalle.setInt(9, paso?.IdUsuarioMovimiento!!)
-            statementDetalle.setInt(10, paso?.IdEmpleadoPosiciono!!)
-            statementDetalle.setShort(11, paso?.IdBloque!!)
-            statementDetalle.setBoolean(12, paso?.EnviadoAInterface!!)
-            statementDetalle.setString(13, paso?.NumeroEconomico)
+
+            statementDetalle.setInt(contadorparams, paso?.IdPasoLogVehiculo!!)
+            contadorparams++
+            statementDetalle.setString(contadorparams, paso?.Bloque)
+            contadorparams++
+            statementDetalle.setShort(contadorparams, paso?.Fila!!)
+            contadorparams++
+            statementDetalle.setString(contadorparams, paso?.Placa)
+            contadorparams++
+
+            if(paso?.Columna!=null) {
+                statementDetalle.setShort(contadorparams, paso?.Columna!!)
+                contadorparams++
+            }
+            if(paso?.IdTipoMovimiento!=null) {
+                statementDetalle.setInt(contadorparams, paso?.IdTipoMovimiento!!)
+                contadorparams++
+            }
+            statementDetalle.setString(contadorparams, paso.PersonaQueHaraMovimiento)
+            contadorparams++
+            statementDetalle.setInt(contadorparams, paso?.IdStatus!!)
+            contadorparams++
+            statementDetalle.setString(contadorparams, paso?.FechaMovimiento)
+            contadorparams++
+
+            if(paso?.IdUsuarioMovimiento!=null) {
+                statementDetalle.setInt(contadorparams, paso?.IdUsuarioMovimiento!!)
+                contadorparams++
+            }
+            if(paso?.IdEmpleadoPosiciono!=null) {
+                statementDetalle.setInt(contadorparams, paso?.IdEmpleadoPosiciono!!)
+                contadorparams++
+            }
+            statementDetalle.setShort(contadorparams, paso?.IdBloque!!)
+            contadorparams++
+
+            if(paso?.EnviadoAInterface!=null) {
+                statementDetalle.setBoolean(contadorparams, paso?.EnviadoAInterface!!)
+                contadorparams++
+            }
+            if (paso?.NumeroEconomico!=null)
+            {
+                statementDetalle.setString(contadorparams, paso?.NumeroEconomico)
+                contadorparams++
+            }
 
             statementDetalle.executeUpdate()
 
@@ -411,8 +476,10 @@ class DALPasoLogVehiculo {
             }
 
             val query = """
-                    select IdBloque, NumColumnas, NumFilas, Nombre from dbo.Bloque 
-                    where Activo=1 order by Nombre
+                    select b.IdBloque, b.NumColumnas, NumFilas, b.Nombre, bd.IdBloqueColumnaFilaUso
+                            , bd.NumColumna, bd.NumFila, bd.Activa
+                    from dbo.Bloque b left join dbo.bloquecolumnafilauso bd on b.idbloque=bd.idbloque
+                    where Activo=1  order by b.Nombre
             """.trimIndent()
 
             statement = conexion.prepareStatement(query)
@@ -425,7 +492,21 @@ class DALPasoLogVehiculo {
                     NumFilas = resultSet.getShort("NumFilas"),
                     Nombre = resultSet.getString("Nombre")
                 )
-                bloques.add(bloque)
+                var find=bloques.filter { it.IdBloque==bloque.IdBloque }.firstOrNull()
+                if (find==null)
+                    bloques.add(bloque)
+                else
+                {
+                    if(find.Ocupadas==null)find.Ocupadas= mutableListOf<BloqueColumnaFilaUso>()
+                    var item=BloqueColumnaFilaUso(
+                        IdBloque = bloque.IdBloque,
+                        IdBloqueColumnaFilaUso = resultSet.getShort("IdBloqueColumnaFilaUso")?:0,
+                        NumFila =  resultSet.getShort("NumFila")?:0,
+                        NumColumna =  resultSet.getShort("NumColumna")?:0,
+                        Activa = resultSet.getBoolean("Activa")?:false,
+                    )
+                    find.Ocupadas?.add(item)
+                }
             }
 
             Log.d("DALPasoLogVehiculo", "✅ Se obtuvieron ${bloques.size} bloques")
