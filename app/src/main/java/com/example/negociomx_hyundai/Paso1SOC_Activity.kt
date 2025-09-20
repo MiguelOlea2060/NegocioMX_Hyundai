@@ -71,7 +71,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
     private var evidencia3Capturada: Boolean = false
     private var evidencia4Capturada: Boolean = false
 
-
     // ✅ LAUNCHER PARA ESCÁNER DE CÓDIGOS
     private val barcodeLauncher = registerForActivityResult(ScanContract()) { result ->
         if (result.contents == null) {
@@ -140,14 +139,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
 
         // ✅ BOTONES DE EVIDENCIAS
-        /*binding.btnEvidencia1.setOnClickListener {
-            capturarEvidencia(1)
-        }
-
-        binding.btnEvidencia2.setOnClickListener {
-            capturarEvidencia(2)
-        }*/
-        // ✅ BOTONES DE EVIDENCIAS
         binding.btnEvidencia1.setOnClickListener {
             if (status?.FotosPosicion1!! > 0) {
                 verFotoExistente(1)
@@ -168,11 +159,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
         binding.btnGuardarSOC.setOnClickListener {
             guardarSOC()
         }
-        // Cambiar de:
-        //   btnGuardar = findViewById(R.id.btnGuardarSOC)
-
-// A: (solo si tienes esta línea, si no, ignórala)
-// Ya no necesitas esta línea porque usas binding.btnGuardarSOC
 
         loadingContainer = findViewById(R.id.loadingContainer)
         tvLoadingText = findViewById(R.id.tvLoadingText)
@@ -215,33 +201,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
     }
 
-    /* private fun consultarVehiculo(vin: String) {
-         lifecycleScope.launch {
-             try {
-                 Log.d("Paso1SOC", "🔍 Consultando vehículo con VIN: $vin")
-
-                 // Mostrar loading
-                 Toast.makeText(this@Paso1SOC_Activity, "Consultando vehículo...", Toast.LENGTH_SHORT).show()
-
-                 val vehiculo = dalVehiculo.consultarVehiculoPorVIN(vin)
-
-                 if (vehiculo != null) {
-                     vehiculoActual = vehiculo
-                     mostrarInformacionVehiculo(vehiculo)
-                     mostrarSeccionesSOC()
-                     Toast.makeText(this@Paso1SOC_Activity, "✅ Vehículo encontrado", Toast.LENGTH_SHORT).show()
-                 } else {
-                     ocultarSeccionesSOC()
-                     Toast.makeText(this@Paso1SOC_Activity, "❌ Vehículo no encontrado", Toast.LENGTH_LONG).show()
-                 }
-
-             } catch (e: Exception) {
-                 Log.e("Paso1SOC", "💥 Error consultando vehículo: ${e.message}")
-                 Toast.makeText(this@Paso1SOC_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
-             }
-         }
-     }*/
-//nueva
     private fun consultarVehiculo(vin: String) {
         lifecycleScope.launch {
             try {
@@ -253,42 +212,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     "Consultando vehículo...",
                     Toast.LENGTH_SHORT
                 ).show()
-
-                /*   vehiculo = dalVehiculo.consultarVehiculoPorVIN(vin) //Sustitucion para ver las foto y evitar modificar datos ya existentes
-                  if (vehiculo != null) {
-                      vehiculoActual = vehiculo
-
-                      // ✅ CONSULTAR FOTOS EXISTENTES
-                      status = dalVehiculo.consultarFotosExistentes(vehiculo?.Id?.toInt()!!)
-
-                      mostrarInformacionVehiculo(vehiculo!!)
-                      mostrarSeccionesSOC()
-
-                      // ✅ MOSTRAR INFORMACIÓN SOBRE FOTOS EXISTENTES
-                      if(status!=null) {
-                          fotosExistentes=status?.FotosPosicion1!!+status?.FotosPosicion2!!+
-                                  status?.FotosPosicion3!!+status?.FotosPosicion4!!
-
-                          if (fotosExistentes > 0) {
-                              Toast.makeText(
-                                  this@Paso1SOC_Activity,
-                                  "✅ Vehículo encontrado. Ya tiene $fotosExistentes foto(s) registrada(s)",
-                                  Toast.LENGTH_LONG
-                              ).show()
-                          } else {
-                              Toast.makeText(
-                                  this@Paso1SOC_Activity,
-                                  "✅ Vehículo encontrado. Sin fotos previas",
-                                  Toast.LENGTH_SHORT
-                              ).show()
-                          }
-                      }
-                      ocultarCargaConsulta()
-                  } else {
-                      ocultarSeccionesSOC()
-                      Toast.makeText(this@Paso1SOC_Activity, "❌ Vehículo no encontrado", Toast.LENGTH_LONG).show()
-                      ocultarCargaConsulta()
-                  }*/
 
                 vehiculo = dalVehiculo.consultarVehiculoPorVIN(vin)
                 if (vehiculo != null) {
@@ -318,7 +241,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
                             etOdometro.selectAll()
                         }
                     }
-
 
                     mostrarSeccionesSOC()
 
@@ -505,115 +427,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
     }
 
-    /* private fun capturarEvidencia(numeroEvidencia: Int) {
-         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-             permisoLauncher.launch(Manifest.permission.CAMERA)
-             return
-         }
-
-         try {
-             currentPhotoType = numeroEvidencia // Guardar qué evidencia estamos capturando
-             val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-             val imageFileName = "SOC_${numeroEvidencia}_${timeStamp}.jpg"
-             val storageDir = File(getExternalFilesDir(null), "SOC_Photos")
-
-             if (!storageDir.exists()) {
-                 storageDir.mkdirs()
-             }
-
-             val photoFile = File(storageDir, imageFileName)
-             fotoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
-
-             // Guardar qué evidencia estamos capturando
-             //photoFile.writeText(numeroEvidencia.toString())
-
-             camaraLauncher.launch(fotoUri)
-
-         } catch (e: Exception) {
-             Log.e("Paso1SOC", "Error creando archivo de foto: ${e.message}")
-             Toast.makeText(this, "Error preparando cámara", Toast.LENGTH_SHORT).show()
-         }
-     }*/
-
-    /*  private fun capturarEvidencia(numeroEvidencia: Int) {
-          if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-              permisoLauncher.launch(Manifest.permission.CAMERA)
-              return
-          }
-
-          // ✅ VALIDAR LÍMITE DE FOTOS
-          val totalFotosPermitidas = if (fotosExistentes == 0) 2 else 2 // Máximo 2 fotos siempre
-          val fotosActuales = fotosExistentes +
-                  (if (evidencia1NombreArchivo.isNotEmpty()) 1 else 0) +
-                  (if (evidencia2NombreArchivo.isNotEmpty()) 1 else 0)
-
-          if (fotosActuales >= totalFotosPermitidas) {
-              Toast.makeText(this,
-                  "Ya se alcanzó el límite máximo de $totalFotosPermitidas fotos para este vehículo",
-                  Toast.LENGTH_LONG).show()
-              return
-          }
-
-          try {
-              currentPhotoType = numeroEvidencia
-              val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-              val imageFileName = "SOC_${numeroEvidencia}_${timeStamp}.jpg"
-              val storageDir = File(getExternalFilesDir(null), "SOC_Photos")
-
-              if (!storageDir.exists()) {
-                  storageDir.mkdirs()
-              }
-
-              val photoFile = File(storageDir, imageFileName)
-              fotoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
-
-              camaraLauncher.launch(fotoUri)
-
-          } catch (e: Exception) {
-              Log.e("Paso1SOC", "Error creando archivo de foto: ${e.message}")
-              Toast.makeText(this, "Error preparando cámara", Toast.LENGTH_SHORT).show()
-          }
-      }
-  */
-    /* private fun capturarEvidencia(numeroEvidencia: Int) {
-         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-             permisoLauncher.launch(Manifest.permission.CAMERA)
-             return
-         }
-
-         // ✅ VALIDAR SI YA TIENE FOTO CAPTURADA
-         if (numeroEvidencia == 1 && evidencia1Capturada) {
-             Toast.makeText(this, "Ya tiene evidencia 1 capturada. Presione Guardar para confirmar.", Toast.LENGTH_SHORT).show()
-             return
-         }
-
-         if (numeroEvidencia == 2 && evidencia2Capturada) {
-             Toast.makeText(this, "Ya tiene evidencia 2 capturada. Presione Guardar para confirmar.", Toast.LENGTH_SHORT).show()
-             return
-         }
-
-         try {
-             currentPhotoType = numeroEvidencia
-             val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-             val imageFileName = "SOC_${numeroEvidencia}_${timeStamp}.jpg"
-             val storageDir = File(getExternalFilesDir(null), "SOC_Photos")
-
-             if (!storageDir.exists()) {
-                 storageDir.mkdirs()
-             }
-
-             val photoFile = File(storageDir, imageFileName)
-             fotoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
-
-             camaraLauncher.launch(fotoUri)
-
-         } catch (e: Exception) {
-             Log.e("Paso1SOC", "Error creando archivo de foto: ${e.message}")
-             Toast.makeText(this, "Error preparando cámara", Toast.LENGTH_SHORT).show()
-         }
-     }*/
-
-
     private fun capturarEvidencia(numeroEvidencia: Int) {
         if (ContextCompat.checkSelfPermission(
                 this,
@@ -708,7 +521,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
                 return tempFile
             }
-
             null
         } catch (e: Exception) {
             Log.e("Paso1SOC", "Error obteniendo archivo desde URI: ${e.message}")
@@ -722,8 +534,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
             // Calcular nuevo tamaño manteniendo proporción (máximo 2048px)
             val maxSize = 3072
-//            val maxSize = 2048
-//            val ratio = minOf(maxSize.toFloat() / bitmap.width, maxSize.toFloat() / bitmap.height)
             var ratio: Float = 1.0F
             if (bitmap.width > bitmap.height)
                 ratio = maxSize.toFloat() / bitmap.width
@@ -764,54 +574,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
             null
         }
     }
-
-
-    /*  private fun procesarFoto(uri: Uri) {
-          try {
-              Log.d("Paso1SOC", "📸 Procesando foto para evidencia $currentPhotoType")
-
-              val vehiculo = vehiculoActual
-              if (vehiculo == null) {
-                  Toast.makeText(this@Paso1SOC_Activity, "Error: No hay vehículo seleccionado", Toast.LENGTH_SHORT).show()
-                  return
-              }
-
-              // ✅ OBTENER EL ARCHIVO LOCAL DESDE LA URI
-              val archivoLocal = obtenerArchivoDesdeUri(uri)
-
-              if (archivoLocal == null || !archivoLocal.exists()) {
-                  Toast.makeText(this@Paso1SOC_Activity, "Error: Archivo de foto no encontrado", Toast.LENGTH_SHORT).show()
-                  return
-              }
-
-              // ✅ COMPRIMIR IMAGEN SI ES NECESARIO
-              val archivoFinal = if (archivoLocal.length() > 4.5 * 1024 * 1024) {
-                  Log.d("Paso1SOC", "📦 Comprimiendo imagen de ${archivoLocal.length()} bytes")
-                  comprimirImagen(archivoLocal)
-              } else {
-                  archivoLocal
-              }
-
-              // ✅ GUARDAR REFERENCIA DEL ARCHIVO SEGÚN LA EVIDENCIA
-              if (currentPhotoType == 1) {
-                  evidencia1File = archivoFinal
-                  evidencia1Capturada = true
-                  binding.tvEstadoEvidencia1.text = "📷"
-                  Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 1 capturada (sin guardar)", Toast.LENGTH_SHORT).show()
-              } else {
-                  evidencia2File = archivoFinal
-                  evidencia2Capturada = true
-                  binding.tvEstadoEvidencia2.text = "📷"
-                  Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 2 capturada (sin guardar)", Toast.LENGTH_SHORT).show()
-              }
-
-              Log.d("Paso1SOC", "✅ Evidencia $currentPhotoType lista para guardar")
-
-          } catch (e: Exception) {
-              Log.e("Paso1SOC", "💥 Error procesando foto: ${e.message}")
-              Toast.makeText(this@Paso1SOC_Activity, "Error procesando foto: ${e.message}", Toast.LENGTH_SHORT).show()
-          }
-      }*/
 
     private fun procesarFoto(uri: Uri) {
         try {
@@ -906,213 +668,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
     }
 
-    /*  private fun procesarFoto(uri: Uri) {
-          lifecycleScope.launch {
-              try {
-                  Log.d("Paso1SOC", "📸 Procesando foto para evidencia $currentPhotoType")
-
-                  val vehiculo = vehiculoActual
-                  if (vehiculo == null) {
-                      Toast.makeText(this@Paso1SOC_Activity, "Error: No hay vehículo seleccionado", Toast.LENGTH_SHORT).show()
-                      return@launch
-                  }
-
-                  // Crear nombre único para el archivo
-                  val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-                  val nombreArchivo = "SOC_${vehiculo.VIN}_EV${currentPhotoType}_${timeStamp}.jpg"
-
-                  // ✅ CORRECCIÓN: Obtener el archivo real desde la URI
-                  val archivoLocal = obtenerArchivoDesdeUri(uri)
-
-                  if (archivoLocal == null || !archivoLocal.exists()) {
-                      Toast.makeText(this@Paso1SOC_Activity, "Error: Archivo de foto no encontrado", Toast.LENGTH_SHORT).show()
-                      return@launch
-                  }
-
-                  // <CHANGE> Comprimir imagen si es mayor a 4.5MB
-                  val archivoFinal = if (archivoLocal.length() > 4.5 * 1024 * 1024) {
-                      Log.d("Paso1SOC", "📦 Comprimiendo imagen de ${archivoLocal.length()} bytes")
-                      comprimirImagen(archivoLocal)
-                  } else {
-                      archivoLocal
-                  }
-
-                  // Subir foto al servidor
-                  Toast.makeText(this@Paso1SOC_Activity, "Subiendo evidencia $currentPhotoType...", Toast.LENGTH_SHORT).show()
-
-                  val nombreArchivoSubido = FileUploadUtil.subirFotoAlServidor(
-                      archivoFoto = archivoFinal,
-                      nombreArchivo = nombreArchivo,
-                      vin = vehiculo.VIN
-                  )
-
-                  if (nombreArchivoSubido != null) {
-                      // Guardar nombre del archivo según la evidencia
-                      if (currentPhotoType == 1) {
-                          evidencia1NombreArchivo = nombreArchivoSubido
-                          binding.tvEstadoEvidencia1.text = "✅"
-                          Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 1 subida al servidor", Toast.LENGTH_SHORT).show()
-                      } else {
-                          evidencia2NombreArchivo = nombreArchivoSubido
-                          binding.tvEstadoEvidencia2.text = "✅"
-                          Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 2 subida al servidor", Toast.LENGTH_SHORT).show()
-                      }
-
-                      Log.d("Paso1SOC", "✅ Evidencia $currentPhotoType guardada como: $nombreArchivoSubido")
-                  } else {
-                      Toast.makeText(this@Paso1SOC_Activity, "❌ Error subiendo evidencia $currentPhotoType", Toast.LENGTH_LONG).show()
-                  }
-
-              } catch (e: Exception) {
-                  Log.e("Paso1SOC", "💥 Error procesando foto: ${e.message}")
-                  Toast.makeText(this@Paso1SOC_Activity, "Error procesando foto: ${e.message}", Toast.LENGTH_SHORT).show()
-              }
-          }
-      }*/
-
-
-    /* private fun procesarFoto(uri: Uri) {
-         lifecycleScope.launch {
-             try {
-                 Log.d("Paso1SOC", "📸 Procesando foto para evidencia $currentPhotoType")
-
-                 val vehiculo = vehiculoActual
-                 if (vehiculo == null) {
-                     Toast.makeText(this@Paso1SOC_Activity, "Error: No hay vehículo seleccionado", Toast.LENGTH_SHORT).show()
-                     return@launch
-                 }
-
-                 // Crear nombre único para el archivo
-                 val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-                 val nombreArchivo = "SOC_${vehiculo.VIN}_EV${currentPhotoType}_${timeStamp}.jpg"
-
-                 // Obtener el archivo local
-                 val archivoLocal = File(uri.path ?: "")
-
-                 if (!archivoLocal.exists()) {
-                     Toast.makeText(this@Paso1SOC_Activity, "Error: Archivo de foto no encontrado", Toast.LENGTH_SHORT).show()
-                     return@launch
-                 }
-
-                 // Subir foto al servidor
-                 Toast.makeText(this@Paso1SOC_Activity, "Subiendo evidencia $currentPhotoType...", Toast.LENGTH_SHORT).show()
-
-                 val nombreArchivoSubido = FileUploadUtil.subirFotoAlServidor(
-                     archivoFoto = archivoLocal,
-                     nombreArchivo = nombreArchivo,
-                     vin = vehiculo.VIN
-                 )
-
-                 if (nombreArchivoSubido != null) {
-                     // Guardar nombre del archivo según la evidencia
-                     if (currentPhotoType == 1) {
-                         evidencia1NombreArchivo = nombreArchivoSubido
-                         binding.tvEstadoEvidencia1.text = "✅"
-                         Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 1 subida al servidor", Toast.LENGTH_SHORT).show()
-                     } else {
-                         evidencia2NombreArchivo = nombreArchivoSubido
-                         binding.tvEstadoEvidencia2.text = "✅"
-                         Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 2 subida al servidor", Toast.LENGTH_SHORT).show()
-                     }
-
-                     Log.d("Paso1SOC", "✅ Evidencia $currentPhotoType guardada como: $nombreArchivoSubido")
-                 } else {
-                     Toast.makeText(this@Paso1SOC_Activity, "❌ Error subiendo evidencia $currentPhotoType", Toast.LENGTH_LONG).show()
-                 }
-
-             } catch (e: Exception) {
-                 Log.e("Paso1SOC", "💥 Error procesando foto: ${e.message}")
-                 Toast.makeText(this@Paso1SOC_Activity, "Error procesando foto: ${e.message}", Toast.LENGTH_SHORT).show()
-             }
-         }
-     }*/
-    /*  private fun procesarFoto(uri: Uri) {
-          try {
-              val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
-              val base64 = convertirBitmapABase64(bitmap)
-
-              // Determinar qué evidencia es basándose en el timestamp
-              val file = File(uri.path ?: "")
-              val numeroEvidencia = if (file.name.contains("_1_")) 1 else 2
-
-              if (numeroEvidencia == 1) {
-                  evidencia1Base64 = base64
-                  binding.tvEstadoEvidencia1.text = "✅"
-                  Toast.makeText(this, "Evidencia 1 capturada", Toast.LENGTH_SHORT).show()
-              } else {
-                  evidencia2Base64 = base64
-                  binding.tvEstadoEvidencia2.text = "✅"
-                  Toast.makeText(this, "Evidencia 2 capturada", Toast.LENGTH_SHORT).show()
-              }
-
-          } catch (e: Exception) {
-              Log.e("Paso1SOC", "Error procesando foto: ${e.message}")
-              Toast.makeText(this, "Error procesando foto", Toast.LENGTH_SHORT).show()
-          }
-      }
-  */
-    /*  private fun convertirBitmapABase64(bitmap: Bitmap): String {
-          val byteArrayOutputStream = ByteArrayOutputStream()
-          bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream)
-          val byteArray = byteArrayOutputStream.toByteArray()
-          return Base64.encodeToString(byteArray, Base64.DEFAULT)
-      }*/
-
-    /* private suspend fun subirFotosAlServidor(vehiculo: Vehiculo): Pair<String, String> {
-         var evidencia1Nombre = ""
-         var evidencia2Nombre = ""
-
-         try {
-             // ✅ SUBIR EVIDENCIA 1 SI EXISTE
-             if (evidencia1File != null && evidencia1Capturada) {
-                 val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-                 val nombreArchivo1 = "SOC_${vehiculo.VIN}_EV1_${timeStamp}.jpg"
-
-                 Toast.makeText(this@Paso1SOC_Activity, "Subiendo evidencia 1...", Toast.LENGTH_SHORT).show()
-
-                 val nombreSubido1 = FileUploadUtil.subirFotoAlServidor(
-                     archivoFoto = evidencia1File!!,
-                     nombreArchivo = nombreArchivo1,
-                     vin = vehiculo.VIN
-                 )
-
-                 if (nombreSubido1 != null) {
-                     evidencia1Nombre = nombreSubido1
-                     Log.d("Paso1SOC", "✅ Evidencia 1 subida: $nombreSubido1")
-                 } else {
-                     throw Exception("Error subiendo evidencia 1")
-                 }
-             }
-
-             // ✅ SUBIR EVIDENCIA 2 SI EXISTE
-             if (evidencia2File != null && evidencia2Capturada) {
-                 val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-                 val nombreArchivo2 = "SOC_${vehiculo.VIN}_EV2_${timeStamp}.jpg"
-
-                 Toast.makeText(this@Paso1SOC_Activity, "Subiendo evidencia 2...", Toast.LENGTH_SHORT).show()
-
-                 val nombreSubido2 = FileUploadUtil.subirFotoAlServidor(
-                     archivoFoto = evidencia2File!!,
-                     nombreArchivo = nombreArchivo2,
-                     vin = vehiculo.VIN
-                 )
-
-                 if (nombreSubido2 != null) {
-                     evidencia2Nombre = nombreSubido2
-                     Log.d("Paso1SOC", "✅ Evidencia 2 subida: $nombreSubido2")
-                 } else {
-                     throw Exception("Error subiendo evidencia 2")
-                 }
-             }
-
-         } catch (e: Exception) {
-             Log.e("Paso1SOC", "💥 Error subiendo fotos: ${e.message}")
-             throw e
-         }
-
-         return Pair(evidencia1Nombre, evidencia2Nombre)
-     }*/
-
     private fun mostrarCargaConMensajes() {
         // Mostrar loading
         loadingContainer.visibility = View.VISIBLE
@@ -1161,28 +716,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
         binding.btnConsultarVehiculo.isEnabled = false
         binding.btnConsultarVehiculo.alpha = 0.5f
 
-        // Mensajes específicos para consulta de vehículo
-        /*        val mensajes = arrayOf(
-                    "Buscando vehículo..." to "Consultando base de datos",
-                    "Verificando VIN..." to "Validando información",
-                    "Cargando datos..." to "Obteniendo detalles del vehículo",
-                    "Consultando fotos..." to "Verificando imágenes existentes"
-                )*/
-
         var mensajeIndex = 0
-        //loadingHandler = Handler(Looper.getMainLooper())
-
-        /*loadingRunnable = object : Runnable {
-            override fun run() {
-                if (mensajeIndex < mensajes.size) {
-                    tvLoadingText.text = mensajes[mensajeIndex].first
-                    tvLoadingSubtext.text = mensajes[mensajeIndex].second
-                    mensajeIndex++
-                    loadingHandler?.postDelayed(this, 2000) // Cambiar cada 2 segundos (más rápido)
-                }
-            }
-        }*/
-        //loadingRunnable?.let { loadingHandler?.post(it) }
     }
 
     private fun ocultarCargaConsulta() {

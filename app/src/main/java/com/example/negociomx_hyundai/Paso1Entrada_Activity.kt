@@ -131,7 +131,8 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         // Botones de transición
         binding.btnPosicionado.setOnClickListener {
             val intent = Intent(this, PasoPosicionado_Activity::class.java)
-            intent.putExtra("IdVehiculo",vehiculoActual?.Id)
+            val idVehiculo:Int?=vehiculoActual?.Id!!.toInt()
+            intent.putExtra("IdVehiculo",idVehiculo)
             intent.putExtra("IdPasoLogVehiculo",vehiculoActual?.IdPasoLogVehiculo)
             intent.putExtra("Vin",vehiculoActual?.VIN)
             intent.putExtra("Bl",vehiculoActual?.BL)
@@ -156,7 +157,9 @@ class Paso1Entrada_Activity : AppCompatActivity() {
             Toast.makeText(this, "Navegar a Salida", Toast.LENGTH_SHORT).show()
 
             val intent = Intent(this, PasoSalida_Activity::class.java)
-            intent.putExtra("IdVehiculo",vehiculoActual?.Id)
+
+            val idVehiculo:Int?=vehiculoActual?.Id!!.toInt()
+            intent.putExtra("IdVehiculo",idVehiculo)
             intent.putExtra("IdPasoLogVehiculo",vehiculoActual?.IdPasoLogVehiculo)
             intent.putExtra("Vin",vehiculoActual?.VIN)
             intent.putExtra("Bl",vehiculoActual?.BL)

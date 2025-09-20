@@ -27,8 +27,8 @@
             <ImageView
                 android:id="@+id/btnRegresarPosicionado"
                 android:src="@drawable/regresar_icono_64x64"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_width="50dp"
+                android:layout_height="50dp">
 
             </ImageView>
             <TextView
