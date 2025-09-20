@@ -19,14 +19,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#1565C0"
-            android:orientation="vertical"
-            android:padding="16dp"
+            android:orientation="horizontal"
+            android:padding="8dp"
             android:layout_marginBottom="16dp">
 
+            <ImageView
+                android:src="@drawable/regresar_icono_64x64"
+                android:id="@+id/btnRegresarPaso1Entrada"
+                android:layout_width="48dp"
+                android:layout_height="48dp">
+
+            </ImageView>
             <TextView
-                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="15dp"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="GESTIÓN DE ENTRADA DE VEHÍCULOS"
+                android:text="STATUS DE VEHÍCULO"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -53,6 +63,7 @@
                 android:layout_marginBottom="12dp" />
 
             <EditText
+                android:textColor="@color/azul_fuerte"
                 android:id="@+id/etVIN"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
@@ -241,23 +252,59 @@
                     android:background="@drawable/edittext_border"
                     android:layout_marginBottom="12dp" />
 
-                <EditText
-                    android:id="@+id/etPlacaTransporte"
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:hint="Placa del transporte"
-                    android:background="@drawable/edittext_border"
-                    android:padding="12dp"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_height="wrap_content">
 
-                <EditText
-                    android:id="@+id/etNumeroEconomico"
+                    <TextView
+                        android:layout_marginRight="10dp"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:text="Placa:"
+                        android:id="@+id/lblPlacaPaso1Entrada"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                    </TextView>
+                    <EditText
+                        android:maxLength="10"
+                        android:layout_weight="1"
+                        android:id="@+id/etPlacaTransporte"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:hint="Placa del transporte"
+                        android:background="@drawable/edittext_border"
+                        android:padding="12dp"
+                        android:layout_marginBottom="12dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:hint="Número económico"
-                    android:background="@drawable/edittext_border"
-                    android:padding="12dp"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:maxLength="10"
+                        android:layout_marginRight="10dp"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:text="# Economico:"
+                        android:id="@+id/lblNumEconomicoPaso1Entrada"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                    </TextView>
+                    <EditText
+                        android:layout_weight="1"
+                        android:id="@+id/etNumeroEconomico"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:hint="Número económico"
+                        android:background="@drawable/edittext_border"
+                        android:padding="12dp"
+                        android:layout_marginBottom="12dp" />
+                </LinearLayout>
 
             </LinearLayout>
 

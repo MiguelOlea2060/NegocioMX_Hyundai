@@ -20,7 +20,7 @@ class Paso3Adapter(
         val tvAnio: TextView = view.findViewById(R.id.tvAnio)
         val tvColores: TextView = view.findViewById(R.id.tvColores)
         val tvNumeroMotor: TextView = view.findViewById(R.id.tvNumeroMotor)
-        val tvDatosSOC: TextView = view.findViewById(R.id.tvDatosSOC)
+        val tvDatosSOC: TextView = view.findViewById(R.id.tvDatosPasoLogVehiculoDet)
         val tvFotos: TextView = view.findViewById(R.id.tvFotos)
         val tvFechaHora: TextView = view.findViewById(R.id.tvFechaHora)
     }

@@ -94,7 +94,7 @@
 
         Datos REPUVE
         <TextView
-            android:id="@+id/tvDatosSOC"
+            android:id="@+id/tvDatosPasoLogVehiculoDet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="REPUVE: ✅ Foto registrada | Archivo: foto.jpg"

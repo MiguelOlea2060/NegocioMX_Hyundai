@@ -10,4 +10,9 @@
     <color name="blue_normal_deep">#62daff</color>
     <color name="naranja">#FFA500</color>
     <color name="naranja_ligero">#FFC82F</color>
+    <color name="rojo">#Ff0000</color>
+    <color name="naranja_fuerte">#fe5000</color>
+    <color name="azul_cielo">#b8e2f4</color>
+    <color name="azul_medio">#062863</color>
+    <color name="azul_fuerte">#000035</color>
 </resources>

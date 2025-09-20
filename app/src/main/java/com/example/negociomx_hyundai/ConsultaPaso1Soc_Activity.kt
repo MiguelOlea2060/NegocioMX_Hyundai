@@ -16,9 +16,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.negociomx_hyundai.BE.Paso1SOCItem
-import com.example.negociomx_hyundai.DAL.DALPaso1SOC
-import com.example.negociomx_hyundai.adapters.Paso1SOCAdapter
+import com.example.negociomx_hyundai.BE.PasoLogVehiculo
+import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
+import com.example.negociomx_hyundai.adapters.PasoLogVehiculoAdapter
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -35,13 +35,14 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
     private lateinit var loadingContainer: LinearLayout
     private lateinit var tvLoadingText: TextView
     private lateinit var tvLoadingSubtext: TextView
+    private lateinit var btnRegresar:ImageView
 
     // Estadísticas
     private lateinit var tvVehiculosUnicos: TextView
     private lateinit var tvTotalFotos: TextView
 
-    private lateinit var dalConsultaSOC: DALPaso1SOC
-    private lateinit var adapter: Paso1SOCAdapter
+    private lateinit var dalConsulta: DALPasoLogVehiculo
+    private lateinit var adapter: PasoLogVehiculoAdapter
     private var fechaSeleccionada: String = ""
     private var loadingHandler: Handler? = null
     private var loadingRunnable: Runnable? = null
@@ -73,18 +74,22 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         loadingContainer = findViewById(R.id.loadingContainer)
         tvLoadingText = findViewById(R.id.tvLoadingText)
         tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
+        btnRegresar=findViewById(R.id.btnRegresarConsultaPasoLog)
 
         // Estadísticas
         tvVehiculosUnicos = findViewById(R.id.tvVehiculosUnicos)
-        tvTotalFotos = findViewById(R.id.tvTotalFotos)
+        tvTotalFotos = findViewById(R.id.tvTotalStatus)
 
-        dalConsultaSOC = DALPaso1SOC()
+        dalConsulta = DALPasoLogVehiculo()
     }
 
     private fun configurarEventos() {
         // NUEVO: Evento para mostrar/ocultar calendario al hacer clic en la fecha
         tvFechaSeleccionada.setOnClickListener {
             mostrarCalendario()
+        }
+        btnRegresar.setOnClickListener {
+            finish()
         }
 
         // Botón consultar (SIN CAMBIOS)
@@ -149,16 +154,14 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         imgCancelar.setOnClickListener {
             dialog.dismiss()
         }
-
         dialog.show()
     }
 
     private fun configurarRecyclerView() {
-        adapter = Paso1SOCAdapter(emptyList()) { registro ->
+        adapter = PasoLogVehiculoAdapter(emptyList()) { registro ->
             // Manejar clic en item
             mostrarDetalleRegistro(registro)
         }
-
         recyclerViewRegistros.layoutManager = LinearLayoutManager(this)
         recyclerViewRegistros.adapter = adapter
     }
@@ -170,9 +173,6 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
 
         fechaSeleccionada = formatoFecha.format(fechaActual.time)
         tvFechaSeleccionada.text = formatoMostrar.format(fechaActual.time)
-
-        // Establecer fecha en el calendario
-        //calendarView.date = fechaActual.timeInMillis
     }
 
     private fun realizarConsultaInicial() {
@@ -185,22 +185,23 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
             try {
                 mostrarCargando()
                 // Consultar registros
-                val registros = dalConsultaSOC.consultarPaso1SOCPorFecha(fecha)
+                val registros = dalConsulta.consultarPasosPorFecha(fecha)
 
                 // Calculas estadísticas
                 val estadisticas= mutableMapOf<String,Int>()
                 var totalVehiculos=0
-                var totalFotos=0
+                var totalStatus=0
                 if(registros!=null && registros.count()>0)
                 {
                     totalVehiculos=registros.count()
                     registros.forEach { Unit->
-                        totalFotos+= Unit.CantidadFotos
+                        if(Unit.Detalles!=null)
+                            totalStatus+= Unit.Detalles!!.size
                     }
                 }
                 estadisticas["TotalRegistros"] = 1
                 estadisticas["VehiculosUnicos"] = totalVehiculos
-                estadisticas["TotalFotos"] = totalFotos
+                estadisticas["TotalFotos"] = totalStatus
 
                 ocultarCargando()
 
@@ -219,14 +220,14 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         }
     }
 
-    private fun mostrarResultados(registros: List<Paso1SOCItem>, estadisticas: Map<String, Int>) {
+    private fun mostrarResultados(registros: List<PasoLogVehiculo>, estadisticas: Map<String, Int>) {
         // Ocultar mensaje sin resultados
         layoutSinResultados.visibility = View.GONE
 
         // Mostrar estadísticas
         layoutEstadisticas.visibility = View.VISIBLE
         tvVehiculosUnicos.text = "🚗 ${estadisticas["VehiculosUnicos"] ?: 0} vehículos"
-        tvTotalFotos.text = "📸 ${estadisticas["TotalFotos"] ?: 0} fotos"
+        tvTotalFotos.text = "📸 ${estadisticas["TotalFotos"] ?: 0} status"
 
         // Mostrar lista
         recyclerViewRegistros.visibility = View.VISIBLE
@@ -298,22 +299,22 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         loadingRunnable = null
     }
 
-    private fun mostrarDetalleRegistro(registro: Paso1SOCItem) {
+    private fun mostrarDetalleRegistro(registro: PasoLogVehiculo) {
+        var posicion=""
         val mensaje = """
             🚗 DETALLE DEL REGISTRO
             
-            VIN: ${registro.VIN}
+            VIN: ${registro.Vin}
             BL: ${registro.BL}
             Vehículo: ${registro.Marca} ${registro.Modelo} ${registro.Anio}
-            Num. de Motor: ${registro.NumeroMotor}
             
-            📊 DATOS SOC:
-            Odómetro: ${registro.Odometro} km
-            SOC: ${registro.Bateria}%
-            Modo Transporte: ${if (registro.ModoTransporte) "Sí" else "No"}
-            Requiere Recarga: ${if (registro.RequiereRecarga) "Sí" else "No"}
+            📊 DATOS Actuales:
+            Status act.: ${registro.NombreStatus} km
+            Fecha entrada: ${registro.FechaEntrada}%
+            FechaUltMov: ${(registro.FechaAlta)}
+            Posicion actual: ${posicion}
             
-            📸 Fotos: ${registro.CantidadFotos}
+            📸 Cant. Status: ${registro.CantidadStatus}
             📅 Fecha: ${registro.FechaAlta}
         """.trimIndent()
 

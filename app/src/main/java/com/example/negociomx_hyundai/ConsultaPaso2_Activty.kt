@@ -60,7 +60,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         tvLoadingText = findViewById(R.id.tvLoadingText)
         tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
         tvVehiculosUnicos = findViewById(R.id.tvVehiculosUnicos)
-        tvTotalFotos = findViewById(R.id.tvTotalFotos)
+        tvTotalFotos = findViewById(R.id.tvTotalStatus)
         tvMensajeSinResultados = findViewById(R.id.tvMensajeSinResultados)
     }
 

@@ -54,7 +54,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     private var loadingHandler: Handler? = null
     private var loadingRunnable: Runnable? = null
 
-
     // Variables para Spinners
     private val dalCliente = DALCliente()
     private var transportistas = listOf<Cliente>()
@@ -66,8 +65,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     // Variables para hora dinámica
     private lateinit var timerHandler: Handler
     private lateinit var timerRunnable: Runnable
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,6 +99,11 @@ class Paso1Entrada_Activity : AppCompatActivity() {
             false
         }
 
+        //Boton regresar para que regrese al menu principal
+        binding.btnRegresarPaso1Entrada.setOnClickListener {
+            finish()
+        }
+
         // Botón consultar vehículo
         binding.btnConsultarVehiculo.setOnClickListener {
             consultarVehiculo()
@@ -130,6 +132,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         binding.btnPosicionado.setOnClickListener {
             val intent = Intent(this, PasoPosicionado_Activity::class.java)
             intent.putExtra("IdVehiculo",vehiculoActual?.Id)
+            intent.putExtra("IdPasoLogVehiculo",vehiculoActual?.IdPasoLogVehiculo)
             intent.putExtra("Vin",vehiculoActual?.VIN)
             intent.putExtra("Bl",vehiculoActual?.BL)
             intent.putExtra("Marca",vehiculoActual?.Marca)
@@ -150,8 +153,18 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         }
 
         binding.btnSalida.setOnClickListener {
-            // TODO: Navegar a Activity de Salida
             Toast.makeText(this, "Navegar a Salida", Toast.LENGTH_SHORT).show()
+
+            val intent = Intent(this, PasoSalida_Activity::class.java)
+            intent.putExtra("IdVehiculo",vehiculoActual?.Id)
+            intent.putExtra("IdPasoLogVehiculo",vehiculoActual?.IdPasoLogVehiculo)
+            intent.putExtra("Vin",vehiculoActual?.VIN)
+            intent.putExtra("Bl",vehiculoActual?.BL)
+            intent.putExtra("Marca",vehiculoActual?.Marca)
+            intent.putExtra("Modelo",vehiculoActual?.Modelo)
+            intent.putExtra("ColorExterior",vehiculoActual?.ColorExterior)
+            intent.putExtra("ColorInterior",vehiculoActual?.ColorInterior)
+            startActivity(intent)
         }
 
         // <CHANGE> Botón para registrar VIN nuevo
@@ -315,6 +328,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                 val placa: String
                 val numeroEconomico: String?
                 val idEmpleadoTransporte: Int?
+                val idStatus:Int=168
 
                 if (tipoEntrada == 1) { // RODANDO
                     val posicionTransportista = binding.spinnerEmpresaRodando.selectedItemPosition
@@ -333,7 +347,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                 }
 
                 Log.d("Paso1Entrada", "📋 Datos a guardar: idTransporte=$idTransporte, placa=$placa, numeroEconomico=$numeroEconomico, idEmpleadoTransporte=$idEmpleadoTransporte")
-
                 val exito = dalPasoLog.crearRegistroEntrada(
                     idVehiculo = vehiculoActual!!.Id!!.toInt(),
                     idUsuario = ParametrosSistema.usuarioLogueado.Id!!.toInt(),
@@ -341,7 +354,8 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                     placa = placa,
                     numeroEconomico = numeroEconomico,
                     idTransporte = idTransporte,
-                    idEmpleadoTransporte = idEmpleadoTransporte
+                    idEmpleadoTransporte = idEmpleadoTransporte,
+                    idStatus = idStatus
                 )
 
                 if (exito) {

@@ -50,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="5dp">
+            android:layout_marginBottom="4dp">
 
             <TextView
                 android:id="@+id/tvMarcaModelo"
@@ -79,9 +79,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Colores -> Ext: Color | Int: Color"
-            android:textSize="12sp"
-            android:textColor="#666666"
-            android:layout_marginBottom="4dp" />
+            android:textSize="14sp"
+            android:textColor="@color/azul_medio"
+            android:layout_marginBottom="2dp" />
 
         <!-- Número de Motor -->
         <TextView
@@ -89,20 +89,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Numero de Motor: XXXXXXXXX"
-            android:textSize="12sp"
-            android:textColor="#666666"
-            android:layout_marginBottom="8dp" />
+            android:textSize="14sp"
+            android:textColor="@color/azul_medio"
+            android:layout_marginBottom="6dp" />
 
         <!-- Datos SOC -->
         <TextView
-            android:id="@+id/tvDatosSOC"
+            android:id="@+id/tvDatosPasoLogVehiculoDet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Odómetro: 0 km | Batería: 0% | Modo Transporte: No | Se Recarga: No"
+            android:text="Status actual: 0 km | Batería: 0% | Modo Transporte: No | Se Recarga: No"
             android:textSize="14sp"
-            android:textColor="#FF6F00"
-            android:background="#FFF3E0"
-            android:padding="6dp"
+            android:textStyle="bold"
+            android:textColor="@color/rojo"
+            android:background="@color/azul_cielo"
+            android:padding="3dp"
             android:layout_marginBottom="8dp" />
 
         <!-- Footer con fotos y fecha -->
@@ -116,9 +117,9 @@
                 android:id="@+id/tvFotos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📸 0 foto(s)"
-                android:textSize="12sp"
-                android:textColor="#9C27B0"
+                android:text="0 Status(s)"
+                android:textSize="14sp"
+                android:textColor="@color/azul_fuerte"
                 android:background="#F3E5F5"
                 android:padding="4dp" />
 
@@ -133,8 +134,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2024-01-01 12:00:00"
-                android:textSize="12sp"
-                android:textColor="#999999" />
+                android:textSize="14sp"
+                android:textColor="@color/azul_fuerte" />
 
         </LinearLayout>
 

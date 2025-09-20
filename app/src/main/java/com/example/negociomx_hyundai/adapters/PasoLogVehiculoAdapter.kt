@@ -5,13 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.negociomx_hyundai.BE.Paso1SOCItem
+import com.example.negociomx_hyundai.BE.PasoLogVehiculo
 import com.example.negociomx_hyundai.R
 
-class Paso1SOCAdapter(
-    private var registros: List<Paso1SOCItem>,
-    private val onItemClick: (Paso1SOCItem) -> Unit
-) : RecyclerView.Adapter<Paso1SOCAdapter.ViewHolder>() {
+class PasoLogVehiculoAdapter(
+    private var registros: List<PasoLogVehiculo>,
+    private val onItemClick: (PasoLogVehiculo) -> Unit
+) : RecyclerView.Adapter<PasoLogVehiculoAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvVIN: TextView = view.findViewById(R.id.tvVIN)
@@ -20,8 +20,8 @@ class Paso1SOCAdapter(
         val tvAnio: TextView = view.findViewById(R.id.tvAnio)
         val tvColores: TextView = view.findViewById(R.id.tvColores)
         val tvNumeroMotor: TextView = view.findViewById(R.id.tvNumeroMotor)
-        val tvDatosSOC: TextView = view.findViewById(R.id.tvDatosPasoLogVehiculoDet)
-        val tvFotos: TextView = view.findViewById(R.id.tvFotos)
+        val tvDatosPasoLogVehiculoDet: TextView = view.findViewById(R.id.tvDatosPasoLogVehiculoDet)
+        val tvTotalStatus: TextView = view.findViewById(R.id.tvFotos)
         val tvFechaHora: TextView = view.findViewById(R.id.tvFechaHora)
     }
 
@@ -34,18 +34,28 @@ class Paso1SOCAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val registro = registros[position]
 
-        holder.tvVIN.text = "VIN: ${registro.VIN}"
+        var fila:String=""
+        var columna:String=""
+        if(registro.Detalles!=null && registro.IdStatusActual==170)
+        {
+            var det=registro.Detalles!!.filter { it.IdStatus==170 }.firstOrNull()
+            if(det!=null)
+            {
+                fila=det.Fila.toString()
+                columna=det.Columna.toString()
+            }
+        }
+
+        holder.tvVIN.text = "VIN: ${registro.Vin}"
         holder.tvBL.text = "BL: ${registro.BL}"
         holder.tvMarcaModelo.text = "${registro.Marca} ${registro.Modelo}"
         holder.tvAnio.text = "Año: ${registro.Anio}"
-        holder.tvColores.text = "Colores -> Ext: ${registro.ColorExterior} | Int: ${registro.ColorInterior}"
-        holder.tvNumeroMotor.text = "Motor: ${registro.NumeroMotor}"
 
-        val modoTransporte = if (registro.ModoTransporte) "Sí" else "No"
-        val requiereRecarga = if (registro.RequiereRecarga) "Sí" else "No"
-        holder.tvDatosSOC.text = "Odómetro: ${registro.Odometro} km | SOC: ${registro.Bateria}% | Modo Transporte: $modoTransporte | Se Recargo: $requiereRecarga"
+//        val modoTransporte = if (registro.ModoTransporte) "Sí" else "No"
+//        val requiereRecarga = if (registro.RequiereRecarga) "Sí" else "No"
+        holder.tvDatosPasoLogVehiculoDet.text = "Status actual: ${registro.NombreStatus} | Posicion -> Columna: ${columna}, Fila: ${fila} | "
 
-        holder.tvFotos.text = "📸 ${registro.CantidadFotos} foto(s)"
+        holder.tvTotalStatus.text = "📸 ${registro.CantidadStatus} statu(s)"
         holder.tvFechaHora.text = registro.FechaAlta
 
         holder.itemView.setOnClickListener {
@@ -55,7 +65,7 @@ class Paso1SOCAdapter(
 
     override fun getItemCount() = registros.size
 
-    fun actualizarRegistros(nuevosRegistros: List<Paso1SOCItem>) {
+    fun actualizarRegistros(nuevosRegistros: List<PasoLogVehiculo>) {
         registros = nuevosRegistros
         notifyDataSetChanged()
     }

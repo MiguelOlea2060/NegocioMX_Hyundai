@@ -5,5 +5,7 @@ data class Bloque(
     var Nombre:String="",
     var Activo:Boolean=false,
     var NumColumnas:Short=0,
-    var NumFilas:Short=0
+    var NumFilas:Short=0,
+    var Ocupadas:MutableList<BloqueColumnaFilaUso>?=null
 )
+
