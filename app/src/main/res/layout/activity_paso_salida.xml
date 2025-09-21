@@ -115,11 +115,11 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="2. DATOS DE SALIDA"
+                android:text="2. DATOS DE LA SALIDA"
                 android:textColor="#1565C0"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="2dp" />
 
             <View
                 android:layout_marginTop="10dp"
@@ -128,20 +128,153 @@
                 android:layout_height="2dp"/>
 
             <TextView
-                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Conductor:"
-                android:textSize="18sp"
+                android:text="Tipo de Salida:"
+                android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
 
-            <Spinner
-                android:id="@+id/spinnerPersonalSalida"
+            <RadioGroup
+                android:id="@+id/rgTipoSalida"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/edittext_border"
-                android:layout_marginBottom="12dp" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <RadioButton
+                    android:id="@+id/rbRodandoSalida"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Rodando"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:id="@+id/rbEnMadrinaSalida"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="En Madrina" />
+
+            </RadioGroup>
+
+            <!-- CAMPOS PARA RODANDO -->
+            <LinearLayout
+                android:id="@+id/layoutRodandoSalida"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Empresa transportista:"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerEmpresaRodandoSalida"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/edittext_border"
+                    android:layout_marginBottom="12dp" />
+
+            </LinearLayout>
+
+            <!-- CAMPOS PARA EN MADRINA -->
+            <LinearLayout
+                android:id="@+id/layoutEnMadrinaSalida"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Empresa transportista:"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerEmpresaMadrinaSalida"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/edittext_border"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:layout_marginTop="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Conductor:"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerConductorSalida"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/edittext_border"
+                    android:layout_marginBottom="12dp" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_marginRight="10dp"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:text="Placa:"
+                        android:id="@+id/lblPlacaPaso1Entrada"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                    </TextView>
+
+                    <Spinner
+                        android:id="@+id/spinnerPlacaTransporteSalida"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/edittext_border"
+                        android:layout_marginBottom="12dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:maxLength="10"
+                        android:layout_marginRight="10dp"
+                        android:textStyle="bold"
+                        android:textSize="16sp"
+                        android:text="# Economico:"
+                        android:id="@+id/lblNumEconomicoPaso1Entrada"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                    </TextView>
+                    <EditText
+                        android:layout_weight="1"
+                        android:id="@+id/etNumeroEconomico"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:hint="Número económico"
+                        android:background="@drawable/edittext_border"
+                        android:padding="12dp"
+                        android:layout_marginBottom="12dp" />
+                </LinearLayout>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvEmpleadoReceptorSalida"

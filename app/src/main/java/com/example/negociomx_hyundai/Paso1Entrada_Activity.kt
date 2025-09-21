@@ -46,8 +46,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     private val dalVehiculo = DALVehiculo()
     private val dalPasoLog = DALPasoLogVehiculo()
     private var vehiculoActual: VehiculoPasoLog? = null
-    //private var statusActual: PasoLogVehiculoDet? = null
-    // <CHANGE> Agregar variables para overlay de carga
     private lateinit var loadingContainer: LinearLayout
     private lateinit var tvLoadingText: TextView
     private lateinit var tvLoadingSubtext: TextView
@@ -220,8 +218,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                     }
                     hideKeyboard()
                 } else {
-                    // <CHANGE> Mostrar opción para registrar VIN en lugar de solo mensaje
-                    mostrarOpcionRegistrarVIN()
                 }
 
             } catch (e: Exception) {
@@ -445,23 +441,12 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         binding.btnRegistrarVIN.alpha = 1.0f
     }
 
-    // <CHANGE> Métodos para manejar VIN no encontrado
-    private fun mostrarOpcionRegistrarVIN() {
-   //     binding.layoutRegistrarVIN.visibility = View.VISIBLE
-    //    binding.layoutInfoVehiculo.visibility = View.GONE
-     //   binding.layoutFormularioEntrada.visibility = View.GONE
-    //    binding.layoutOpcionesTransicion.visibility = View.GONE
-
-        Toast.makeText(this, "❌ Vehículo no encontrado", Toast.LENGTH_SHORT).show()
-    }
-
     private fun registrarNuevoVIN() {
         val vin = binding.etVIN.text.toString().trim()
         if (vin.isEmpty() || vin.length < 17) {
             Toast.makeText(this, "Ingrese un VIN válido (17 caracteres)", Toast.LENGTH_SHORT).show()
             return
         }
-
         mostrarCargaRegistro()
         lifecycleScope.launch {
             try {
@@ -509,7 +494,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
             timerHandler.removeCallbacks(timerRunnable)
         }
     }
-
 
     // MÉTODOS PARA CARGAR SPINNERS
     private fun cargarTransportistas() {
@@ -570,8 +554,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                     if(it.IdCliente==idCliente )
                        empleadosTransportista= it.Empleados!!
                 }
-//                empleadosTransportista = dalCliente.consultarEmpleadosTransportista(idCliente)
-
                 val nombresConductores = mutableListOf("Seleccionar conductor...")
                 nombresConductores.addAll(empleadosTransportista.map { it.NombreCompleto ?: "Sin nombre" })
 
@@ -601,8 +583,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         binding.spinnerConductor.adapter = adapterConductores
     }
 
-
-
     private fun limpiarFormulario() {
         // <CHANGE> Limpiar todos los campos
         binding.etVIN.setText("")
@@ -621,7 +601,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         binding.layoutOpcionesTransicion.visibility = View.GONE
 
         vehiculoActual = null
-
         // <CHANGE> Ocultar también la sección de registrar VIN
         binding.layoutRegistrarVIN.visibility = View.GONE
         binding.etVIN.requestFocus()

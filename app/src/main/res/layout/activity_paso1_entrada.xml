@@ -188,7 +188,6 @@
             </RadioGroup>
 
             <!-- CAMPOS PARA RODANDO -->
-            <!-- CAMPOS PARA RODANDO -->
             <LinearLayout
                 android:id="@+id/layoutRodando"
                 android:layout_width="match_parent"
@@ -403,8 +402,6 @@
                 android:visibility="gone" />
 
         </LinearLayout>
-
-
 
         <!-- <CHANGE> Agregar overlay de carga como en Paso1SOC -->
         <LinearLayout

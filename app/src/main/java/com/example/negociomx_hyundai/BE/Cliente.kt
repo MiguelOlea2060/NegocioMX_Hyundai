@@ -5,5 +5,6 @@ data class Cliente(
     var Nombre: String? = null,
     var Rfc: String? = null,
 
-    var Empleados:MutableList<ClienteEmpleado>?= null
+    var Empleados:MutableList<ClienteEmpleado>?= null,
+    var Placas:MutableList<VehiculoPlacasDueno>?=null
 )
