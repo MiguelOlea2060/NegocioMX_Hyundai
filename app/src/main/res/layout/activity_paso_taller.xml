@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    tools:context=".PasoTaller_Activity">
+
+    <LinearLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1565C0"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="REGISTRO DE TALLER"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- INFORMACIÓN DEL VEHÍCULO -->
+        <LinearLayout
+            android:id="@+id/layoutInfoVehiculo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="INFORMACIÓN DEL VEHÍCULO"
+                android:textColor="#1565C0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvInfoVehiculo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="VIN: KMHJ281GPMU123456\nMarca: HYUNDAI ACCENT 2023\nColor: BLANCO / NEGRO"
+                android:textSize="14sp"
+                android:textColor="#37474F" />
+
+        </LinearLayout>
+
+        <!-- FORMULARIO DE TALLER -->
+        <LinearLayout
+            android:id="@+id/layoutFormularioTaller"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="DATOS DE TALLER"
+                android:textColor="#1565C0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Personal que hará el movimiento -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Personal que hará el movimiento *"
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="8dp" />
+
+            <Spinner
+                android:id="@+id/spinnerPersonalMovimiento"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_border"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Tipo de reparación -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tipo de reparación *"
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="8dp" />
+
+            <RadioGroup
+                android:id="@+id/radioGroupTipoReparacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <RadioButton
+                    android:id="@+id/radioEnSitio"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="En sitio"
+                    android:textColor="#37474F"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:id="@+id/radioForanea"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Foránea"
+                    android:textColor="#37474F" />
+
+            </RadioGroup>
+
+            <!-- Empresa externa (solo para Foránea) -->
+            <LinearLayout
+                android:id="@+id/layoutEmpresaExterna"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Empresa externa *"
+                    android:textSize="14sp"
+                    android:textColor="#37474F"
+                    android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerEmpresaExterna"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/edittext_border"
+                    android:layout_marginBottom="16dp" />
+
+            </LinearLayout>
+
+            <!-- Empresa interna (solo para En sitio) -->
+            <LinearLayout
+                android:id="@+id/layoutEmpresaInterna"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Empresa que realizará la reparación *"
+                    android:textSize="14sp"
+                    android:textColor="#37474F"
+                    android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerEmpresaInterna"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/edittext_border"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Persona que realizará el trabajo *"
+                    android:textSize="14sp"
+                    android:textColor="#37474F"
+                    android:layout_marginBottom="8dp" />
+
+                <Spinner
+                    android:id="@+id/spinnerPersonaReparacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/edittext_border"
+                    android:layout_marginBottom="16dp" />
+
+            </LinearLayout>
+
+            <!-- Fecha de inicio -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fecha de inicio de la reparación *"
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/tvFechaInicio"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="2024-01-15 14:30"
+                    android:textSize="16sp"
+                    android:textColor="#37474F"
+                    android:background="@drawable/edittext_border"
+                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnSeleccionarFecha"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="📅"
+                    android:textSize="18sp"
+                    android:backgroundTint="#1565C0"
+                    android:textColor="#FFFFFF" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- SELECCIÓN DE PARTES DAÑADAS -->
+        <LinearLayout
+            android:id="@+id/layoutPartesDanadas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="PARTE A REPARAR *"
+                android:textColor="#1565C0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Navegación de páginas -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="16dp">
+
+                <Button
+                    android:id="@+id/btnPaginaAnterior"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="◀"
+                    android:textSize="16sp"
+                    android:backgroundTint="#757575"
+                    android:textColor="#FFFFFF"
+                    android:enabled="false" />
+
+                <TextView
+                    android:id="@+id/tvPaginaActual"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Página 1 de 3"
+                    android:textSize="14sp"
+                    android:textColor="#37474F"
+                    android:layout_marginHorizontal="16dp" />
+
+                <Button
+                    android:id="@+id/btnPaginaSiguiente"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="▶"
+                    android:textSize="16sp"
+                    android:backgroundTint="#1565C0"
+                    android:textColor="#FFFFFF" />
+
+            </LinearLayout>
+
+            <!-- Container para las partes (se llenará dinámicamente) -->
+            <LinearLayout
+                android:id="@+id/containerPartes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+
+        </LinearLayout>
+
+        <!-- DESCRIPCIÓN DETALLADA -->
+        <LinearLayout
+            android:id="@+id/layoutDescripcion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="DESCRIPCIÓN DETALLADA"
+                android:textColor="#1565C0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/etDescripcion"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:background="@drawable/edittext_border"
+                android:padding="12dp"
+                android:gravity="top"
+                android:inputType="textMultiLine"
+                android:lines="5"
+                android:hint="Describe detalladamente el trabajo a realizar..."
+                android:textSize="14sp"
+                android:textColor="#37474F" />
+
+        </LinearLayout>
+
+        <!-- BOTONES DE ACCIÓN -->
+        <LinearLayout
+            android:id="@+id/layoutBotones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/btnLimpiar"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="LIMPIAR"
+                android:backgroundTint="#757575"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnGuardar"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="GUARDAR"
+                android:backgroundTint="#FF6F00"
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+        <!-- OVERLAY DE CARGA -->
+        <LinearLayout
+            android:id="@+id/loadingContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="24dp"
+            android:layout_marginTop="16dp">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                style="?android:attr/progressBarStyleLarge"
+                android:indeterminateTint="#1565C0" />
+
+            <TextView
+                android:id="@+id/tvLoadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Procesando..."
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1565C0" />
+
+        </LinearLayout>
+
+        <!-- MENSAJE DE ERROR -->
+        <LinearLayout
+            android:id="@+id/layoutError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFEBEE"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Error: No se pudo procesar la solicitud"
+                android:textColor="#C62828"
+                android:textSize="14sp"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

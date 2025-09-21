@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Cofre del vehículo -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M20,40 L100,40 L95,70 L25,70 Z"/>
+    <path
+        android:fillColor="#0D47A1"
+        android:pathData="M25,45 L95,45 L90,65 L30,65 Z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M55,50 L65,50 L65,60 L55,60 Z"/>
+</vector>

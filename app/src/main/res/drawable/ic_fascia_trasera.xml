@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Fascia trasera -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M30,30 L90,30 L95,60 L25,60 Z"/>
+    <path
+        android:fillColor="#0D47A1"
+        android:pathData="M35,35 L85,35 L90,55 L30,55 Z"/>
+    <!-- Fixed circle syntax using path elements for taillights -->
+    <!-- Luz trasera izquierda -->
+    <path
+        android:fillColor="#FF5722"
+        android:pathData="M40,45 m-4,0 a4,4 0,1,1 8,0 a4,4 0,1,1 -8,0"/>
+    <!-- Luz trasera derecha -->
+    <path
+        android:fillColor="#FF5722"
+        android:pathData="M80,45 m-4,0 a4,4 0,1,1 8,0 a4,4 0,1,1 -8,0"/>
+</vector>
