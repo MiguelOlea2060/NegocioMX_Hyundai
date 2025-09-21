@@ -1,7 +1,6 @@
 package com.example.negociomx_hyundai.DAL
 
 import android.util.Log
-import com.example.negociomx_hyundai.BE.Empleado
 import com.example.negociomx_hyundai.BE.EmpresaTaller
 import com.example.negociomx_hyundai.BE.ParteDanno
 import com.example.negociomx_hyundai.Utils.ConexionSQLServer
@@ -30,7 +29,7 @@ class DALTaller {
             }
 
             val query = """
-                SELECT IdParteDanno, Nombre, Activa, IdTabla 
+                SELECT IdParteDanno, Nombre, Activa 
                 FROM dbo.ParteDanno 
                 WHERE Activa = 1 
                 ORDER BY Nombre
@@ -41,16 +40,13 @@ class DALTaller {
 
             while (resultSet.next()) {
                 val parte = ParteDanno(
-                    IdParteDanno = resultSet.getInt("IdParteDanno"),
+                    IdParteDanno = resultSet.getShort("IdParteDanno"),
                     Nombre = resultSet.getString("Nombre") ?: "",
                     Activa = resultSet.getBoolean("Activa"),
-                    IdTabla = resultSet.getObject("IdTabla") as? Int
                 )
                 partes.add(parte)
             }
-
             Log.d("DALTaller", "✅ Se obtuvieron ${partes.size} partes dañadas")
-
         } catch (e: Exception) {
             Log.e("DALTaller", "💥 Error consultando partes dañadas: ${e.message}")
             e.printStackTrace()
@@ -140,7 +136,7 @@ class DALTaller {
         idEmpresaExterna: Int? = null,
         idEmpresaInterna: Int? = null,
         idPersonaReparacion: Int? = null,
-        idParteDanno: Int,
+        idParteDanno: Short,
         descripcion: String,
         fechaInicio: String
     ): Boolean = withContext(Dispatchers.IO) {
@@ -192,7 +188,7 @@ class DALTaller {
             statementDetalle = conexion.prepareStatement(queryDetalle)
             statementDetalle.setInt(1, idPasoLogVehiculo)
             statementDetalle.setString(2, "ID:$idPersonalMovimiento - Tipo:$tipoReparacion")
-            statementDetalle.setInt(3, idParteDanno)
+            statementDetalle.setShort(3, idParteDanno)
             statementDetalle.setString(4, descripcion)
             statementDetalle.setString(5, fechaInicio)
             statementDetalle.setInt(6, idUsuario)

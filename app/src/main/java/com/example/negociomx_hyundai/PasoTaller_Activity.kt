@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -15,12 +14,14 @@ import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.*
 import com.example.negociomx_hyundai.DAL.DALEmpleadoSQL
 import com.example.negociomx_hyundai.DAL.DALTaller
+import com.example.negociomx_hyundai.databinding.ActivityPasoTallerBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 class PasoTaller_Activity : AppCompatActivity() {
 
+    private lateinit var binding:ActivityPasoTallerBinding
     // Variables de UI
     private lateinit var layoutInfoVehiculo: LinearLayout
     private lateinit var layoutFormularioTaller: LinearLayout
@@ -61,7 +62,7 @@ class PasoTaller_Activity : AppCompatActivity() {
 
     // Variables de paginación
     private var paginaActual = 0
-    private val partesPorPagina = 3
+    private val partesPorPagina = 2
     private var totalPaginas = 0
 
     // DALs
@@ -70,8 +71,9 @@ class PasoTaller_Activity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_paso_taller)
+
+        binding=ActivityPasoTallerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -135,6 +137,10 @@ class PasoTaller_Activity : AppCompatActivity() {
                     layoutEmpresaInterna.visibility = View.GONE
                 }
             }
+        }
+
+        binding.btnRegresarPasoTaller.setOnClickListener {
+            finish()
         }
 
         // Selector de fecha
@@ -211,7 +217,7 @@ class PasoTaller_Activity : AppCompatActivity() {
             try {
                 // Cargar empleados
                 empleados = dalEmpleado.consultarEmpleados(105)
-                configurarSpinnerPersonal()
+                configurarSpinnerConductor()
 
                 // Cargar empresas de taller
                 empresasTaller = dalTaller.consultarEmpresasTaller()
@@ -232,7 +238,7 @@ class PasoTaller_Activity : AppCompatActivity() {
         }
     }
 
-    private fun configurarSpinnerPersonal() {
+    private fun configurarSpinnerConductor() {
         val nombresEmpleados = empleados.map { "${it.NombreCompleto} (ID: ${it.IdEmpleado})" }
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, nombresEmpleados)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -294,7 +300,7 @@ class PasoTaller_Activity : AppCompatActivity() {
         val cbSeleccionarParte = itemView.findViewById<CheckBox>(R.id.cbSeleccionarParte)
 
         // Configurar imagen según la parte
-        val imagenResource = obtenerImagenParte(parte.Nombre)
+        val imagenResource = obtenerImagenParte(parte.IdParteDanno)
         ivParteDanada.setImageResource(imagenResource)
 
         tvNombreParte.text = parte.Nombre
@@ -320,19 +326,15 @@ class PasoTaller_Activity : AppCompatActivity() {
         return itemView
     }
 
-    private fun obtenerImagenParte(nombreParte: String): Int {
-        return when (nombreParte.uppercase()) {
-            "COFRE" -> R.drawable.ic_cofre
-            "CAJUELA" -> R.drawable.ic_cajuela
-            "PUERTA DELANTERA DERECHA", "PUERTA DERECHA DELANTERA" -> R.drawable.ic_puerta_delantera_derecha
-            "PUERTA DELANTERA IZQUIERDA", "PUERTA IZQUIERDA DELANTERA" -> R.drawable.ic_puerta_delantera_izquierda
-            "PUERTA TRASERA DERECHA", "PUERTA DERECHA TRASERA" -> R.drawable.ic_puerta_trasera_derecha
-            "PUERTA TRASERA IZQUIERDA", "PUERTA IZQUIERDA TRASERA" -> R.drawable.ic_puerta_trasera_izquierda
-            "TOLDO", "TECHO" -> R.drawable.ic_techo
-            "FACIA DELANTERA", "FASCIA DELANTERA" -> R.drawable.ic_fascia_delantera
-            "FACIA TRASERA", "FASCIA TRASERA" -> R.drawable.ic_fascia_trasera
-            else -> R.drawable.ic_car_part_placeholder
-        }
+    private fun obtenerImagenParte(idParte:Short): Int {
+        var id=R.drawable.ic_car_part_placeholder
+        if(idParte.toInt()==11)id= R.drawable.veh_cofre_200px
+        else if(idParte.toInt()==1)id= R.drawable.veh_cajuela_200px
+        else if(idParte.toInt()==2)id= R.drawable.veh_pd_200px
+        else if (idParte.toInt()==16)id= R.drawable.veh_pt_200px
+        else if (idParte.toInt()==10)id= R.drawable.veh_toldo_200px
+        else if (idParte.toInt()==7)id= R.drawable.veh_trasero_200px
+        return id
     }
 
     private fun actualizarBotonesPaginacion() {

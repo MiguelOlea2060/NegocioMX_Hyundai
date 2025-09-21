@@ -1,7 +1,7 @@
 package com.example.negociomx_hyundai.BE
 
 data class ParteDanno(
-    var IdParteDanno: Int = 0,
+    var IdParteDanno: Short = 0,
     var Nombre: String = "",
     var Activa: Boolean = false,
     var IdTabla: Int? = null,
