@@ -137,8 +137,6 @@ class acceso_activity : AppCompatActivity() {
                             prefs.saveUsername(nombreUsuarioEmail)
                             prefs.savePassword(pwd)
 
-                            ParametrosSistema.usuarioLogueado.IdRol="5"
-
                             mainHandler.post {
                                 val intent = Intent(applicationContext, menu_principal_activity::class.java)
                                 startForResult.launch(intent)

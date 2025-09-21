@@ -34,6 +34,7 @@ import com.example.negociomx_hyundai.DAL.DALTipoPago
 import com.example.negociomx_hyundai.DAL.DALUnidadMedida
 import com.example.negociomx_hyundai.DAL.DALUsuario
 import com.example.negociomx_hyundai.Utils.ParametrosSistema
+import com.example.negociomx_hyundai.databinding.ActivityMenuPrincipalBinding
 import com.example.negociomx_hyundai.room.BLL.BLLUtil
 import com.example.negociomx_hyundai.room.db.POSDatabase
 import com.example.negociomx_hyundai.room.entities.Admins.CfgNV
@@ -49,6 +50,8 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class menu_principal_activity : AppCompatActivity() {
+
+    lateinit var binding:ActivityMenuPrincipalBinding
 
     lateinit var bllUtil: BLLUtil
     lateinit var dalCfg: DALCfg
@@ -87,7 +90,8 @@ class menu_principal_activity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_menu_principal)
+        binding=ActivityMenuPrincipalBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         bllUtil = BLLUtil()
         base = POSDatabase.getDatabase(applicationContext)
@@ -120,7 +124,6 @@ class menu_principal_activity : AppCompatActivity() {
         val btnTipoPago = findViewById<Button>(R.id.btnTipoPago)
         val btnSincronizacion = findViewById<Button>(R.id.btnSincronizacion)
         val btnLogout = findViewById<ImageView>(R.id.imgLoginLogoutMenuPrincipal)
-        val btnUsuarios = findViewById<Button>(R.id.btnUsuarios)
         val btnEmpresas = findViewById<Button>(R.id.btnEmpresas)
         val btnConfigs = findViewById<Button>(R.id.btnConfiguraciones)
         val btnRadmin = findViewById<Button>(R.id.btnRadminVPN)
@@ -135,12 +138,19 @@ class menu_principal_activity : AppCompatActivity() {
         val vLinea2 = findViewById<View>(R.id.linea2)
         val vLinea3 = findViewById<View>(R.id.linea3)
 
+        var  privilegioAdmin:Boolean=false
+        if(ParametrosSistema.usuarioLogueado.IdRol!=null)
+            privilegioAdmin=ParametrosSistema.usuarioLogueado.IdRol?.toInt()==1
         //getEmpresaNubeCfgNubeCfgNVNube()
 
-        var visibleBtns=!ParametrosSistema.usuarioLogueado.IdRol.equals("5")
+        //var visibleBtns=!ParametrosSistema.usuarioLogueado.IdRol.equals("5")
+        var visibleBtns=false
         btnPOS.isVisible=visibleBtns
         btnCategoria.isVisible=visibleBtns
-        btnUsuarios.isVisible=visibleBtns
+
+        binding.btnUsuarios.isVisible=privilegioAdmin
+        binding.imgMenuAdminUsers.isVisible=privilegioAdmin
+
         btnUm.isVisible=visibleBtns
         btnAltaArticulo.isVisible=visibleBtns
         btnConsultaArticulo.isVisible=visibleBtns
@@ -230,7 +240,7 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, empresa_nube_activity::class.java)
             startActivity(intent)
         }
-        btnUsuarios.setOnClickListener {
+       binding.btnUsuarios.setOnClickListener {
             val intent = Intent(this, usuarios_activity::class.java)
             startActivity(intent)
         }

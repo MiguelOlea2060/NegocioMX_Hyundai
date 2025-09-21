@@ -21,19 +21,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:layout_marginLeft="10dp"
             android:layout_weight="1"
             app:srcCompat="@drawable/logo_glovis" />
-
-        <ImageView
-            android:layout_gravity="top"
-            android:id="@+id/imgLoginLogoutMenuPrincipal"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="40dp"
-            app:srcCompat="@drawable/logout_icono_64x64" />
 
     </LinearLayout>
 
@@ -113,13 +102,6 @@
 
         <Button
             android:layout_marginLeft="10dp"
-            android:id="@+id/btnUsuarios"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Usuarios" />
-
-        <Button
-            android:layout_marginLeft="10dp"
             android:id="@+id/btnSincronizacion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -184,21 +166,38 @@
             android:text="Vehículo" />
     </LinearLayout>
 
-    <TextView
-        android:textColor="@color/black"
-        android:textAlignment="textStart"
+    <LinearLayout
+        android:gravity="center_vertical"
         android:padding="5dp"
-        android:textStyle="bold"
         android:background="@color/naranja"
-        android:layout_marginLeft="10dp"
-        android:text="Opciones"
-        android:textSize="22dp"
-        android:layout_marginRight="10dp"
-        android:paddingLeft="7dp"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    </TextView>
+        <TextView
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            android:textAlignment="textStart"
+            android:textStyle="bold"
+            android:layout_marginLeft="10dp"
+            android:text="Opciones"
+            android:textSize="22dp"
+            android:layout_marginRight="10dp"
+            android:paddingLeft="7dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </TextView>
+
+        <ImageView
+            android:layout_gravity="top"
+            android:id="@+id/imgLoginLogoutMenuPrincipal"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginLeft="5dp"
+            app:srcCompat="@drawable/logout_icono_64x64" />
+    </LinearLayout>
+
     <View
         android:id="@+id/linea1"
         android:layout_marginRight="10dp"
@@ -209,28 +208,85 @@
         android:layout_height="2dp">
     </View>
     <LinearLayout
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:gravity="center_horizontal"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <Button
-            android:layout_weight="1"
-            android:id="@+id/btnMovimiento"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" Movimiento " />
+        <LinearLayout
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="15dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/movimientos_64px"
+                android:id="@+id/imgMenuMovimientos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-        <Button
-            android:layout_weight="1"
-            android:layout_marginLeft="5dp"
-            android:id="@+id/btnConsultaMovimiento"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" Consulta " />
+            </ImageView>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/btnMovimiento"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" Movimiento " />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="15dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:src="@drawable/menu_consulta_40px"
+                android:id="@+id/imgMenuConsultas"
+                android:layout_width="64dp"
+                android:layout_height="wrap_content">
+
+            </ImageView>
+
+            <Button
+                android:layout_weight="1"
+                android:layout_marginLeft="5dp"
+                android:id="@+id/btnConsultaMovimiento"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" Consulta " />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="15dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:src="@drawable/menu_adminusers_4px"
+                android:id="@+id/imgMenuAdminUsers"
+                android:layout_width="64dp"
+                android:layout_height="wrap_content">
+            </ImageView>
+
+            <Button
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:id="@+id/btnUsuarios"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Usuarios" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -279,8 +335,6 @@
         android:layout_width="match_parent"
         android:layout_height="2dp">
     </View>
-
-
 
     <LinearLayout
         android:layout_marginTop="20dp"
