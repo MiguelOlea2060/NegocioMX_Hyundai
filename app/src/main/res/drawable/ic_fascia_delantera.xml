@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Fascia delantera -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M25,60 L95,60 L90,90 L30,90 Z"/>
+    <path
+        android:fillColor="#0D47A1"
+        android:pathData="M30,65 L90,65 L85,85 L35,85 Z"/>
+    <!-- Fixed circle syntax using path elements for headlights -->
+    <!-- Faro izquierdo -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,70 m-5,0 a5,5 0,1,1 10,0 a5,5 0,1,1 -10,0"/>
+    <!-- Faro derecho -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M80,70 m-5,0 a5,5 0,1,1 10,0 a5,5 0,1,1 -10,0"/>
+</vector>

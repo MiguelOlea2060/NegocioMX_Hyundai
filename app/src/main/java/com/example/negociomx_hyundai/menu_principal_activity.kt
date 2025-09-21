@@ -124,9 +124,9 @@ class menu_principal_activity : AppCompatActivity() {
         val btnEmpresas = findViewById<Button>(R.id.btnEmpresas)
         val btnConfigs = findViewById<Button>(R.id.btnConfiguraciones)
         val btnRadmin = findViewById<Button>(R.id.btnRadminVPN)
-        val btnConsultaPaso1 = findViewById<Button>(R.id.btnConsultaMovimiento)
+        val btnConsultaMovimiento = findViewById<Button>(R.id.btnConsultaMovimiento)
         val btnConsultaPaso2 = findViewById<Button>(R.id.btnConsultaPaso2)
-        val btnPaso1SOC =findViewById<Button>(R.id.btnMovimiento)
+        val btnPasoMovimiento =findViewById<Button>(R.id.btnMovimiento)
         val btnVehiculo = findViewById<Button>(R.id.btnVehiculo)
         val btnPaso2Accesorios=findViewById<Button>(R.id.btnPaso2Accesorios)
         val btnPaso3Repuve =findViewById<Button>(R.id.btnPaso3Repuve)
@@ -242,7 +242,7 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, vpn_connect_activity::class.java)
             startActivity(intent)
         }
-        btnPaso1SOC.setOnClickListener{
+        btnPasoMovimiento.setOnClickListener{
             val intent = Intent(this, Paso1Entrada_Activity::class.java)
             startActivity(intent)
         }
@@ -254,8 +254,8 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, Paso3Repuve_Activity::class.java)
             startActivity(intent)
         }
-        btnConsultaPaso1.setOnClickListener{
-            val intent = Intent(this, ConsultaPaso1Soc_Activity::class.java)
+        btnConsultaMovimiento.setOnClickListener{
+            val intent = Intent(this, Consulta_Activity::class.java)
             startActivity(intent)
         }
         btnConsultaPaso2.setOnClickListener{

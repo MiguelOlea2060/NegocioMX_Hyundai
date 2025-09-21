@@ -147,8 +147,15 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         }
 
         binding.btnEnTaller.setOnClickListener {
-            // TODO: Navegar a Activity de En Taller
-            Toast.makeText(this, "Navegar a En Taller", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, PasoTaller_Activity::class.java)
+            intent.putExtra("VIN", vehiculoActual?.VIN)
+            intent.putExtra("ID_VEHICULO", vehiculoActual?.Id?.toInt())
+            intent.putExtra("MARCA", vehiculoActual?.Marca)
+            intent.putExtra("MODELO", vehiculoActual?.Modelo)
+            intent.putExtra("ANIO", vehiculoActual?.Anio)
+            intent.putExtra("COLOR_EXTERIOR", vehiculoActual?.ColorExterior)
+            intent.putExtra("COLOR_INTERIOR", vehiculoActual?.ColorInterior)
+            startActivity(intent)
         }
 
         binding.btnSalida.setOnClickListener {

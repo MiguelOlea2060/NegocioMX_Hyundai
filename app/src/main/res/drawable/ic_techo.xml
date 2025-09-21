@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Techo del vehículo -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M30,30 L90,30 L85,50 L35,50 Z"/>
+    <path
+        android:fillColor="#0D47A1"
+        android:pathData="M35,35 L85,35 L80,45 L40,45 Z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,38 L70,38 L70,42 L50,42 Z"/>
+</vector>

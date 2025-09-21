@@ -1,0 +1,20 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Puerta delantera derecha -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M70,30 L100,30 L100,90 L70,90 Z"/>
+    <path
+        android:fillColor="#0D47A1"
+        android:pathData="M75,35 L95,35 L95,85 L75,85 Z"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M80,50 L90,50 L90,70 L80,70 Z"/>
+    <!-- Fixed circle syntax using path element for door handle -->
+    <path
+        android:fillColor="#FF6F00"
+        android:pathData="M75,60 m-3,0 a3,3 0,1,1 6,0 a3,3 0,1,1 -6,0"/>
+</vector>
