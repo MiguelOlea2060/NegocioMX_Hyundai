@@ -491,7 +491,7 @@ class DALPasoLogVehiculo {
             statementBloque.setShort(1, paso?.IdBloque!!)
             statementBloque.setShort(2, paso?.Columna!!)
             statementBloque.setShort(3, paso?.Fila!!)
-            statementBloque.setString(4, "Col. -> ${paso?.Columna}  Fila-> ${paso?.Fila}")
+            statementBloque.setString(4, "Col-> ${paso?.Columna}, Fila-> ${paso?.Fila}")
             statementBloque.setInt(5, paso?.IdVehiculo!!)
             statementBloque.setBoolean(6, true)
             statementBloque.executeUpdate()
