@@ -140,6 +140,9 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
+                // Obtener datos del vehículo por Intent
+               obtenerDatosVehiculo()
+
                 // Cargar empleados
                 empleados = dalEmpleado.consultarEmpleados(5)
                 configurarSpinnerPersonal()
@@ -148,7 +151,9 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
                 tiposMovimiento = dalPasoLogVehiculo.consultarTiposMovimientoLocal()
                 configurarSpinnerTiposMovimiento()
 
+            //    obtenerDatosVehiculo()
                 ocultarCarga()
+                mostrarFormularios()
                 Log.d("PasoMovimientoLocal_Activity", "✅ Datos iniciales cargados correctamente")
 
             } catch (e: Exception) {
@@ -178,17 +183,54 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
     }
 
 
+    private fun obtenerDatosVehiculo() {
+        try {
+            val idVehiculo = intent.getIntExtra("IdVehiculo", 0)
+            val vin = intent.getStringExtra("Vin") ?: ""
+            val bl = intent.getStringExtra("Bl") ?: ""
+            val marca = intent.getStringExtra("Marca") ?: ""
+            val modelo = intent.getStringExtra("Modelo") ?: ""
+            val colorExterior = intent.getStringExtra("ColorExterior") ?: ""
+            val colorInterior = intent.getStringExtra("ColorInterior") ?: ""
 
-    private fun mostrarInfoVehiculo(vehiculo: VehiculoPasoLog) {
-        tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
-        tvMarcaModeloAnnio.text = "${vehiculo.Marca} - ${vehiculo.Modelo}, ${vehiculo.Anio}"
-        tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
-        tvColorInterior.text = "Color Int.: ${vehiculo.ColorInterior}"
+            if (idVehiculo > 0 && vin.isNotEmpty()) {
+                vehiculoActual = VehiculoPasoLog(
+                    Id = idVehiculo.toString(),
+                    VIN = vin,
+                    BL = bl,
+                    Marca = marca,
+                    Modelo = modelo,
+                    ColorExterior = colorExterior,
+                    ColorInterior = colorInterior
+                )
 
-        layoutInfoVehiculo.visibility = View.VISIBLE
+             //   mostrarInfoVehiculo()
+                Log.d("PasoMovimientoLocal_Activity", "✅ Datos del vehículo obtenidos: VIN=$vin")
+            } else {
+                mostrarError("No se recibieron datos válidos del vehículo")
+            }
+        } catch (e: Exception) {
+            mostrarError("Error obteniendo datos del vehículo: ${e.message}")
+            Log.e("PasoMovimientoLocal_Activity", "Error obteniendo datos: ${e.message}")
+        }
+    }
+
+
+
+    private fun mostrarInfoVehiculo() {
+        vehiculoActual?.let { vehiculo ->
+            tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
+            tvMarcaModeloAnnio.text = "${vehiculo.Marca} - ${vehiculo.Modelo}"
+            tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
+            tvColorInterior.text = "Color Int.: ${vehiculo.ColorInterior}"
+
+            layoutInfoVehiculo.visibility = View.VISIBLE
+        }
     }
 
     private fun mostrarFormularios() {
+        // <CHANGE> Mostrar información del vehículo cuando se muestran los formularios
+        mostrarInfoVehiculo()
         layoutFormularioMovimiento.visibility = View.VISIBLE
         layoutBotones.visibility = View.VISIBLE
     }

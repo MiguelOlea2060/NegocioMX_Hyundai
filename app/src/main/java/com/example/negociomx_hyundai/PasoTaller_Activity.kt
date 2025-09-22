@@ -229,8 +229,6 @@ class PasoTaller_Activity : AppCompatActivity() {
                 configurarPartesDanadas()
 
                 obtenerDatosVehiculo()
-
-
                 ocultarCarga()
                 mostrarFormularios()
 
