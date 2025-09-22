@@ -9,6 +9,7 @@ import com.example.negociomx_hyundai.BE.Paso1SOCItem
 import com.example.negociomx_hyundai.BE.PasoLogVehiculo
 import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
 import com.example.negociomx_hyundai.BE.PosicionBloque
+import com.example.negociomx_hyundai.BE.TipoMovimiento
 import com.example.negociomx_hyundai.BE.VehiculoPasoLog
 import com.example.negociomx_hyundai.Utils.ConexionSQLServer
 import kotlinx.coroutines.Dispatchers
@@ -802,5 +803,146 @@ class DALPasoLogVehiculo {
 
         return@withContext tiposMovimiento
     }
+
+
+
+    //Movimiento local
+
+    // CONSULTAR TIPOS DE MOVIMIENTO PARA MOVIMIENTO LOCAL
+    suspend fun consultarTiposMovimientoLocal(): List<TipoMovimiento> = withContext(Dispatchers.IO) {
+        val tiposMovimiento = mutableListOf<TipoMovimiento>()
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            Log.d("DALPasoLogVehiculo", "🔍 Consultando tipos de movimiento local...")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALPasoLogVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext tiposMovimiento
+            }
+
+            val query = """
+            SELECT IdTipoMovimiento, Nombre, Activo, Tabla 
+            FROM dbo.TipoMovimiento 
+            WHERE substring(Tabla, 4, 1) = '1' 
+            ORDER BY Nombre
+        """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            resultSet = statement.executeQuery()
+
+            while (resultSet.next()) {
+                val tipoMovimiento = TipoMovimiento(
+                    IdTipoMovimiento = resultSet.getInt("IdTipoMovimiento"),
+                    Nombre = resultSet.getString("Nombre") ?: "",
+                    Activo = resultSet.getBoolean("Activo"),
+                    Tabla = resultSet.getString("Tabla") ?: ""
+                )
+                tiposMovimiento.add(tipoMovimiento)
+            }
+
+            Log.d("DALPasoLogVehiculo", "✅ Se obtuvieron ${tiposMovimiento.size} tipos de movimiento")
+
+        } catch (e: Exception) {
+            Log.e("DALPasoLogVehiculo", "💥 Error consultando tipos de movimiento: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALPasoLogVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+
+        return@withContext tiposMovimiento
+    }
+
+    // CREAR REGISTRO DE MOVIMIENTO LOCAL
+    suspend fun crearRegistroMovimientoLocal(
+        idVehiculo: Int,
+        idUsuario: Int,
+        idPersonalMovimiento: Int,
+        idTipoMovimiento: Int,
+        observacion: String
+    ): Boolean = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statementPrincipal: PreparedStatement? = null
+        var statementDetalle: PreparedStatement? = null
+
+        try {
+            Log.d("DALPasoLogVehiculo", "💾 Creando registro de movimiento local para vehículo ID: $idVehiculo")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALPasoLogVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext false
+            }
+
+            conexion.autoCommit = false
+
+            // 1. Actualizar status actual en PasoLogVehiculo
+            val queryPrincipal = """
+            UPDATE PasoLogVehiculo 
+            SET IdStatusActual = 172 
+            WHERE IdVehiculo = ?
+        """.trimIndent()
+
+            statementPrincipal = conexion.prepareStatement(queryPrincipal)
+            statementPrincipal.setInt(1, idVehiculo)
+            statementPrincipal.executeUpdate()
+
+            // 2. Obtener IdPasoLogVehiculo
+            val queryObtenerID = "SELECT IdPasoLogVehiculo FROM PasoLogVehiculo WHERE IdVehiculo = ?"
+            val statementObtenerID = conexion.prepareStatement(queryObtenerID)
+            statementObtenerID.setInt(1, idVehiculo)
+            val resultSet = statementObtenerID.executeQuery()
+
+            var idPasoLogVehiculo = 0
+            if (resultSet.next()) {
+                idPasoLogVehiculo = resultSet.getInt("IdPasoLogVehiculo")
+            }
+
+            // 3. Insertar detalle de movimiento local
+            val queryDetalle = """
+            INSERT INTO PasoLogVehiculoDet (
+                IdPasoLogVehiculo, PersonaQueHaraMovimiento, IdTipoMovimiento,
+                Observacion, IdStatus, FechaMovimiento, IdUsuarioMovimiento
+            ) VALUES (?, ?, ?, ?, 172, GETDATE(), ?)
+        """.trimIndent()
+
+            statementDetalle = conexion.prepareStatement(queryDetalle)
+            statementDetalle.setInt(1, idPasoLogVehiculo)
+            statementDetalle.setString(2, "ID:$idPersonalMovimiento")
+            statementDetalle.setInt(3, idTipoMovimiento)
+            statementDetalle.setString(4, observacion)
+            statementDetalle.setInt(5, idUsuario)
+
+            statementDetalle.executeUpdate()
+
+            conexion.commit()
+            Log.d("DALPasoLogVehiculo", "✅ Registro de movimiento local creado exitosamente")
+            return@withContext true
+
+        } catch (e: Exception) {
+            Log.e("DALPasoLogVehiculo", "💥 Error creando registro de movimiento local: ${e.message}")
+            conexion?.rollback()
+            return@withContext false
+        } finally {
+            try {
+                statementDetalle?.close()
+                statementPrincipal?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALPasoLogVehiculo", "Error cerrando conexión: ${e.message}")
+            }
+        }
+    }
+
+
 
 }

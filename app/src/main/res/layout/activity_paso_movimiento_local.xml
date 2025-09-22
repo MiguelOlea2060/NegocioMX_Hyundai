@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    tools:context=".PasoMovimientoLocal_Activity">
+
+    <LinearLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1565C0"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:src="@drawable/regresar_icono_64x64"
+                android:id="@+id/btnRegresarPaso1Entrada"
+                android:layout_width="48dp"
+                android:layout_height="48dp">
+
+            </ImageView>
+            <TextView
+                android:layout_weight="1"
+                android:layout_marginLeft="15dp"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MOVIMIENTO LOCAL"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+
+        <!-- INFORMACIÓN DEL VEHÍCULO -->
+        <LinearLayout
+            android:id="@+id/layoutInfoVehiculo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="INFORMACIÓN DEL VEHÍCULO"
+                android:textColor="#1565C0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvBlVehiculo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="MBL: 12345"
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvMarcaModeloAnnio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="HYUNDAI - ACCENT, 2024"
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="4dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvColorExterior"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Color Ext.: BLANCO"
+                    android:textSize="14sp"
+                    android:textColor="#37474F" />
+
+                <TextView
+                    android:id="@+id/tvColorInterior"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Color Int.: NEGRO"
+                    android:textSize="14sp"
+                    android:textColor="#37474F" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- FORMULARIO DE MOVIMIENTO LOCAL -->
+        <LinearLayout
+            android:id="@+id/layoutFormularioMovimiento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="DATOS DEL MOVIMIENTO"
+                android:textColor="#1565C0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Personal que hace el movimiento -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Personal que hace el movimiento *"
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="8dp" />
+
+            <Spinner
+                android:id="@+id/spinnerPersonalMovimiento"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_border"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Tipo de movimiento -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tipo de movimiento *"
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="8dp" />
+
+            <Spinner
+                android:id="@+id/spinnerTipoMovimiento"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_border"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Observación -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Observación (opcional)"
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="8dp" />
+
+            <EditText
+                android:id="@+id/etObservacion"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="@drawable/edittext_border"
+                android:padding="12dp"
+                android:gravity="top"
+                android:inputType="textMultiLine"
+                android:lines="4"
+                android:hint="Escriba observaciones adicionales..."
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Fecha de movimiento -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fecha de movimiento"
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvFechaMovimiento"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="15/01/2024 14:30:25"
+                android:textSize="16sp"
+                android:textColor="#1565C0"
+                android:textStyle="bold"
+                android:background="@drawable/edittext_border"
+                android:padding="12dp"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Empleado que registra -->
+            <TextView
+                android:id="@+id/tvEmpleadoRegistra"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Empleado que registra: Juan Pérez"
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:textStyle="italic" />
+
+        </LinearLayout>
+
+
+
+        <!-- BOTONES DE ACCIÓN -->
+        <LinearLayout
+            android:id="@+id/layoutBotones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/btnLimpiar"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="LIMPIAR"
+                android:backgroundTint="#757575"
+                android:textColor="#FFFFFF"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnGuardarMovimiento"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="GUARDAR MOVIMIENTO"
+                android:backgroundTint="#FF6F00"
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+
+        <!-- OVERLAY DE CARGA -->
+        <LinearLayout
+            android:id="@+id/loadingContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="24dp"
+            android:layout_marginTop="16dp">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                style="?android:attr/progressBarStyleLarge"
+                android:indeterminateTint="#1565C0" />
+
+            <TextView
+                android:id="@+id/tvLoadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Procesando..."
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1565C0" />
+
+            <TextView
+                android:id="@+id/tvLoadingSubtext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Verificando información"
+                android:textSize="14sp"
+                android:textColor="#37474F" />
+
+        </LinearLayout>
+
+        <!-- MENSAJE DE ERROR -->
+        <LinearLayout
+            android:id="@+id/layoutError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFEBEE"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Error: No se pudo procesar la solicitud"
+                android:textColor="#C62828"
+                android:textSize="14sp"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
