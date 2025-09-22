@@ -12,27 +12,29 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="10dp">
 
         <!-- HEADER -->
         <LinearLayout
-            android:gravity="center_vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#1565C0"
             android:orientation="horizontal"
-            android:padding="6dp"
-            android:layout_marginBottom="16dp">
+            android:padding="8dp"
+            android:layout_marginBottom="12dp">
 
                 <ImageView
                     android:src="@drawable/regresar_icono_64x64"
                     android:id="@+id/btnRegresarPasoTaller"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp">
+                    android:layout_width="48dp"
+                    android:layout_height="48dp">
                 </ImageView>
+
 
                 <TextView
                     android:layout_weight="1"
+                    android:layout_marginLeft="15dp"
+                    android:layout_gravity="center_vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="REGISTRO EN TALLER"
@@ -40,17 +42,18 @@
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:gravity="center" />
+
         </LinearLayout>
 
         <!-- INFORMACIÓN DEL VEHÍCULO -->
         <LinearLayout
+            android:background="@drawable/edittext_background"
             android:id="@+id/layoutInfoVehiculo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp"
+            android:padding="8dp"
+            android:layout_marginBottom="12dp"
             android:visibility="gone">
 
             <TextView
@@ -63,14 +66,62 @@
                 android:layout_marginBottom="12dp" />
 
             <TextView
+                android:background="@drawable/edittext_background"
                 android:id="@+id/tvInfoVehiculo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="VIN: KMHJ281GPMU123456\nMarca: HYUNDAI ACCENT 2023\nColor: BLANCO / NEGRO"
-                android:textSize="14sp"
-                android:textColor="#37474F" />
+                android:textSize="16sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="4dp"
+                android:textStyle="bold"
+                android:text="Vin: "/>
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/tvBlVehiculo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#37474F"
+                android:layout_marginBottom="4dp"
+                android:text="BL: "/>
+
+            <TextView
+                android:id="@+id/tvMarcaModeloAnnio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="4dp"
+                android:text="Marca:    Modelo:     Año: "/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvColorExterior"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="14sp"
+                    android:textColor="#37474F"
+                    android:text="Color Ext: "/>
+
+                <TextView
+                    android:id="@+id/tvColorInterior"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="14sp"
+                    android:textColor="#37474F"
+                    android:text="Color Int: "/>
+
+            </LinearLayout>
+
+
+    </LinearLayout>
 
         <!-- FORMULARIO DE TALLER -->
         <LinearLayout

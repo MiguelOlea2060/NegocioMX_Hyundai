@@ -28,8 +28,8 @@
                 android:id="@+id/btnRegresarPaso1Entrada"
                 android:layout_width="48dp"
                 android:layout_height="48dp">
-
             </ImageView>
+
             <TextView
                 android:layout_weight="1"
                 android:layout_marginLeft="15dp"
