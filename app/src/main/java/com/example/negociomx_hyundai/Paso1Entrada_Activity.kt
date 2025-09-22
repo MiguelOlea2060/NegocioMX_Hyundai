@@ -142,8 +142,17 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         }
 
         binding.btnMovimientoLocal.setOnClickListener {
-            // TODO: Navegar a Activity de Movimiento Local
-            Toast.makeText(this, "Navegar a Movimiento Local", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, PasoMovimientoLocal_Activity::class.java)
+                intent.putExtra("IdVehiculo", vehiculoActual?.Id?.toInt())
+                intent.putExtra("IdPasoLogVehiculo", vehiculoActual?.IdPasoLogVehiculo)
+                intent.putExtra("Vin", vehiculoActual?.VIN)
+                intent.putExtra("Bl", vehiculoActual?.BL)
+                intent.putExtra("Marca", vehiculoActual?.Marca)
+                intent.putExtra("Modelo", vehiculoActual?.Modelo)
+                intent.putExtra("ColorExterior", vehiculoActual?.ColorExterior)
+                intent.putExtra("ColorInterior", vehiculoActual?.ColorInterior)
+                startActivity(intent)
+
         }
 
         binding.btnEnTaller.setOnClickListener {

@@ -83,8 +83,9 @@ class PasoTaller_Activity : AppCompatActivity() {
 
         inicializarComponentes()
         configurarEventos()
-        obtenerDatosVehiculo()
         cargarDatosIniciales()
+
+
     }
 
     private fun inicializarComponentes() {
@@ -226,6 +227,9 @@ class PasoTaller_Activity : AppCompatActivity() {
                 // Cargar partes dañadas
                 partesDanadas = dalTaller.consultarPartesDanno()
                 configurarPartesDanadas()
+
+                obtenerDatosVehiculo()
+
 
                 ocultarCarga()
                 mostrarFormularios()
@@ -503,8 +507,9 @@ class PasoTaller_Activity : AppCompatActivity() {
         layoutError.visibility = View.VISIBLE
     }
 
- /*   private fun ob(){
 
+    //no eliminar
+ /*   private fun ob(){
 
         // Ejemplo de cómo llamar la Activity de Taller
         val intent = Intent(this, PasoTaller_Activity::class.java)
