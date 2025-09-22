@@ -217,9 +217,9 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
         vehiculoActual?.let { vehiculo ->
             binding.tvVinVehiculoMovimiento.text="VIN: ${vehiculo.VIN}"
             tvBlVehiculo.text = "BL: ${vehiculo.BL}"
-            tvMarcaModeloAnnio.text = "Marca ${vehiculo.Marca} - Modelo ${vehiculo.Modelo} - Año ${vehiculo.Anio}"
-            tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
-            tvColorInterior.text = "Color Int.: ${vehiculo.ColorInterior}"
+            tvMarcaModeloAnnio.text = "Marca: ${vehiculo.Marca}     Modelo: ${vehiculo.Modelo}    Año: ${vehiculo.Anio}"
+            tvColorExterior.text = "Color Ext: ${vehiculo.ColorExterior}"
+            tvColorInterior.text = "Color Int: ${vehiculo.ColorInterior}"
 
             layoutInfoVehiculo.visibility = View.VISIBLE
         }
