@@ -816,8 +816,6 @@ class DALPasoLogVehiculo {
         var resultSet: ResultSet? = null
 
         try {
-            Log.d("DALPasoLogVehiculo", "🔍 Consultando tipos de movimiento local...")
-
             conexion = ConexionSQLServer.obtenerConexion()
             if (conexion == null) {
                 Log.e("DALPasoLogVehiculo", "❌ No se pudo obtener conexión")
@@ -825,9 +823,8 @@ class DALPasoLogVehiculo {
             }
 
             val query = """
-            SELECT IdTipoMovimiento, Nombre, Activo, Tabla 
-            FROM dbo.TipoMovimiento 
-            WHERE substring(Tabla, 4, 1) = '1' 
+            SELECT IdTipoMovimiento, Nombre
+            FROM dbo.TipoMovimiento  WHERE substring(Tabla, 4, 1) = '1' 
             ORDER BY Nombre
         """.trimIndent()
 
@@ -838,12 +835,10 @@ class DALPasoLogVehiculo {
                 val tipoMovimiento = TipoMovimiento(
                     IdTipoMovimiento = resultSet.getInt("IdTipoMovimiento"),
                     Nombre = resultSet.getString("Nombre") ?: "",
-                    Activo = resultSet.getBoolean("Activo"),
-                    Tabla = resultSet.getString("Tabla") ?: ""
+                    Activo = true,
                 )
                 tiposMovimiento.add(tipoMovimiento)
             }
-
             Log.d("DALPasoLogVehiculo", "✅ Se obtuvieron ${tiposMovimiento.size} tipos de movimiento")
 
         } catch (e: Exception) {

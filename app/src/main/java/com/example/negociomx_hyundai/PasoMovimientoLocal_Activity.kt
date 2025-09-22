@@ -16,15 +16,15 @@ import com.example.negociomx_hyundai.DAL.DALEmpleadoSQL
 import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
 import com.example.negociomx_hyundai.DAL.DALVehiculo
 import com.example.negociomx_hyundai.BE.TipoMovimiento
+import com.example.negociomx_hyundai.databinding.ActivityPasoMovimientoLocalBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
+    lateinit var binding:ActivityPasoMovimientoLocalBinding
     // Variables de UI
-    private lateinit var btnRegresarMovimientoLocal: ImageView
-
     private lateinit var layoutInfoVehiculo: LinearLayout
     private lateinit var layoutFormularioMovimiento: LinearLayout
     private lateinit var layoutBotones: LinearLayout
@@ -63,8 +63,8 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_paso_movimiento_local)
+        binding=ActivityPasoMovimientoLocalBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -79,10 +79,6 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
     }
 
     private fun inicializarComponentes() {
-        // Botones principales
-        btnRegresarMovimientoLocal = findViewById(R.id.btnRegresarPaso1Entrada)
-
-
         // Layouts
         layoutInfoVehiculo = findViewById(R.id.layoutInfoVehiculo)
         layoutFormularioMovimiento = findViewById(R.id.layoutFormularioMovimiento)
@@ -118,11 +114,9 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
     }
 
     private fun configurarEventos() {
-        btnRegresarMovimientoLocal.setOnClickListener {
+        binding.btnRegresarPaso1Entrada.setOnClickListener {
             finish()
         }
-
-
 
         btnLimpiar.setOnClickListener {
             limpiarFormulario()
@@ -131,8 +125,6 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
         btnGuardarMovimiento.setOnClickListener {
             guardarMovimientoLocal()
         }
-
-
     }
 
     private fun cargarDatosIniciales() {
@@ -143,13 +135,13 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
                 // Obtener datos del vehículo por Intent
                obtenerDatosVehiculo()
 
-                // Cargar empleados
-                empleados = dalEmpleado.consultarEmpleados(5)
-                configurarSpinnerPersonal()
-
                 // Cargar tipos de movimiento
                 tiposMovimiento = dalPasoLogVehiculo.consultarTiposMovimientoLocal()
                 configurarSpinnerTiposMovimiento()
+
+                // Cargar empleados
+                empleados = dalEmpleado.consultarEmpleados(105)
+                configurarSpinnerPersonal()
 
             //    obtenerDatosVehiculo()
                 ocultarCarga()
@@ -215,10 +207,10 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
         }
     }
 
-
-
     private fun mostrarInfoVehiculo() {
         vehiculoActual?.let { vehiculo ->
+            binding.tvVinVehiculoMovimiento.text="VIN: ${vehiculo.VIN}"
+            tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
             tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
             tvMarcaModeloAnnio.text = "${vehiculo.Marca} - ${vehiculo.Modelo}"
             tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"

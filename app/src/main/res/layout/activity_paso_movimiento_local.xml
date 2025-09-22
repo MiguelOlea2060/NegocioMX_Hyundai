@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="10dp">
 
         <!-- HEADER -->
         <LinearLayout
@@ -21,7 +21,7 @@
             android:background="#1565C0"
             android:orientation="horizontal"
             android:padding="8dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="12dp">
 
             <ImageView
                 android:src="@drawable/regresar_icono_64x64"
@@ -47,15 +47,14 @@
 
         <!-- INFORMACIÓN DEL VEHÍCULO -->
         <LinearLayout
+            android:background="@drawable/edittext_background"
             android:id="@+id/layoutInfoVehiculo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
             android:orientation="vertical"
             android:visibility="gone"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp"
-            >
+            android:padding="8dp"
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:layout_width="match_parent"
@@ -67,11 +66,21 @@
                 android:layout_marginBottom="12dp" />
 
             <TextView
+                android:background="@drawable/edittext_background"
+                android:id="@+id/tvVinVehiculoMovimiento"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
                 android:id="@+id/tvBlVehiculo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="MBL: 12345"
-                android:textSize="14sp"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:textColor="#37474F"
                 android:layout_marginBottom="4dp" />
 
@@ -113,10 +122,10 @@
 
         <!-- FORMULARIO DE MOVIMIENTO LOCAL -->
         <LinearLayout
+            android:background="@drawable/edittext_background"
             android:id="@+id/layoutFormularioMovimiento"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
             android:orientation="vertical"
             android:visibility="gone"
             android:padding="16dp"
@@ -132,28 +141,13 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Personal que hace el movimiento -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Personal que hace el movimiento *"
-                android:textSize="14sp"
-                android:textColor="#37474F"
-                android:layout_marginBottom="8dp" />
-
-            <Spinner
-                android:id="@+id/spinnerPersonalMovimiento"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/edittext_border"
-                android:layout_marginBottom="16dp" />
-
             <!-- Tipo de movimiento -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Tipo de movimiento *"
-                android:textSize="14sp"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:textColor="#37474F"
                 android:layout_marginBottom="8dp" />
 
@@ -164,12 +158,30 @@
                 android:background="@drawable/edittext_border"
                 android:layout_marginBottom="16dp" />
 
+            <!-- Personal que hace el movimiento -->
+            <TextView
+                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Personal que hace el movimiento *"
+                android:textSize="16sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="8dp" />
+
+            <Spinner
+                android:id="@+id/spinnerPersonalMovimiento"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/edittext_border"
+                android:layout_marginBottom="16dp" />
+
             <!-- Observación -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Observación (opcional)"
-                android:textSize="14sp"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:textColor="#37474F"
                 android:layout_marginBottom="8dp" />
 
@@ -187,27 +199,37 @@
                 android:textColor="#37474F"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Fecha de movimiento -->
-            <TextView
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Fecha de movimiento"
-                android:textSize="14sp"
-                android:textColor="#37474F"
-                android:layout_marginBottom="8dp" />
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/tvFechaMovimiento"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="15/01/2024 14:30:25"
-                android:textSize="16sp"
-                android:textColor="#1565C0"
-                android:textStyle="bold"
-                android:background="@drawable/edittext_border"
-                android:padding="12dp"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="16dp" />
+                <!-- Fecha de movimiento -->
+                <TextView
+                    android:textStyle="bold"
+                    android:layout_marginRight="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha de movimiento"
+                    android:textSize="16sp"
+                    android:textColor="#37474F"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_weight="1"
+                    android:id="@+id/tvFechaMovimiento"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="15/01/2024 14:30:25"
+                    android:textSize="16sp"
+                    android:textColor="#1565C0"
+                    android:textStyle="bold"
+                    android:background="@drawable/edittext_border"
+                    android:padding="12dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp" />
+            </LinearLayout>
+
 
             <!-- Empleado que registra -->
             <TextView
@@ -215,7 +237,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Empleado que registra: Juan Pérez"
-                android:textSize="14sp"
+                android:textSize="18sp"
                 android:textColor="#37474F"
                 android:textStyle="italic" />
 

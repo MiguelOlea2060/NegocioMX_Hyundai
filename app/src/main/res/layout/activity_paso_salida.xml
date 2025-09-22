@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="10dp">
 
         <!-- HEADER -->
         <LinearLayout
@@ -27,8 +27,8 @@
             <ImageView
                 android:id="@+id/btnRegresarSalida"
                 android:src="@drawable/regresar_icono_64x64"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_width="48dp"
+                android:layout_height="48dp">
 
             </ImageView>
             <TextView
@@ -44,12 +44,12 @@
 
         <!-- INFORMACIÓN DEL VEHÍCULO -->
         <LinearLayout
+            android:background="@drawable/edittext_background"
             android:id="@+id/layoutInfoVehiculoSalida"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
             android:orientation="vertical"
-            android:padding="16dp"
+            android:padding="8dp"
             android:layout_marginBottom="16dp"
             android:visibility="gone">
 
@@ -63,16 +63,18 @@
                 android:layout_marginBottom="12dp" />
 
             <TextView
+                android:background="@drawable/edittext_background"
                 android:id="@+id/tvVinVehiculoSalida"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textSize="16sp"
                 android:layout_marginBottom="4dp" />
             <TextView
                 android:id="@+id/tvBlVehiculoSalida"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:layout_marginBottom="4dp" />
 
             <TextView
@@ -103,10 +105,10 @@
 
         <!-- FORMULARIO DE POSICIONADO -->
         <LinearLayout
+            android:background="@drawable/edittext_background"
             android:id="@+id/layoutFormularioSalida"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
             android:orientation="vertical"
             android:padding="16dp"
             android:layout_marginBottom="16dp"
