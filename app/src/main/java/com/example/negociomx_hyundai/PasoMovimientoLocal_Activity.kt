@@ -182,8 +182,13 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
             val bl = intent.getStringExtra("Bl") ?: ""
             val marca = intent.getStringExtra("Marca") ?: ""
             val modelo = intent.getStringExtra("Modelo") ?: ""
+            val annioAux = intent.getStringExtra("Annio") ?: ""
+            var annio: Int = 0
+            if (annioAux.isNotEmpty())
+                annio=annioAux.toInt()
             val colorExterior = intent.getStringExtra("ColorExterior") ?: ""
             val colorInterior = intent.getStringExtra("ColorInterior") ?: ""
+
 
             if (idVehiculo > 0 && vin.isNotEmpty()) {
                 vehiculoActual = VehiculoPasoLog(
@@ -192,11 +197,12 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
                     BL = bl,
                     Marca = marca,
                     Modelo = modelo,
+                    Anio = annio,
                     ColorExterior = colorExterior,
                     ColorInterior = colorInterior
                 )
 
-             //   mostrarInfoVehiculo()
+                mostrarInfoVehiculo()
                 Log.d("PasoMovimientoLocal_Activity", "✅ Datos del vehículo obtenidos: VIN=$vin")
             } else {
                 mostrarError("No se recibieron datos válidos del vehículo")
@@ -210,9 +216,8 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
     private fun mostrarInfoVehiculo() {
         vehiculoActual?.let { vehiculo ->
             binding.tvVinVehiculoMovimiento.text="VIN: ${vehiculo.VIN}"
-            tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
-            tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
-            tvMarcaModeloAnnio.text = "${vehiculo.Marca} - ${vehiculo.Modelo}"
+            tvBlVehiculo.text = "BL: ${vehiculo.BL}"
+            tvMarcaModeloAnnio.text = "Marca ${vehiculo.Marca} - Modelo ${vehiculo.Modelo} - Año ${vehiculo.Anio}"
             tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
             tvColorInterior.text = "Color Int.: ${vehiculo.ColorInterior}"
 
@@ -222,7 +227,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
     private fun mostrarFormularios() {
         // <CHANGE> Mostrar información del vehículo cuando se muestran los formularios
-        mostrarInfoVehiculo()
+
         layoutFormularioMovimiento.visibility = View.VISIBLE
         layoutBotones.visibility = View.VISIBLE
     }

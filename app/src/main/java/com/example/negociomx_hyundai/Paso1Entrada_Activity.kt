@@ -149,6 +149,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                 intent.putExtra("Bl", vehiculoActual?.BL)
                 intent.putExtra("Marca", vehiculoActual?.Marca)
                 intent.putExtra("Modelo", vehiculoActual?.Modelo)
+                intent.putExtra("Annio", vehiculoActual?.Anio.toString())
                 intent.putExtra("ColorExterior", vehiculoActual?.ColorExterior)
                 intent.putExtra("ColorInterior", vehiculoActual?.ColorInterior)
                 startActivity(intent)
