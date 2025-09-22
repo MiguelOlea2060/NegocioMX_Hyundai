@@ -1,16 +1,17 @@
 package com.example.negociomx_hyundai
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.negociomx_hyundai.BE.Usuario
-import com.example.negociomx_hyundai.BE.UsuarioNube
 import com.example.negociomx_hyundai.DAL.DALEmpresa
 import com.example.negociomx_hyundai.DAL.DALUsuarioSQL
+import com.example.negociomx_hyundai.Utils.ParametrosSistema
 import com.example.negociomx_hyundai.adapters.SpinnerAdapter
-import com.example.negociomx_hyundai.adapters.UsuarioNubeAdapter
+import com.example.negociomx_hyundai.adapters.UsuarioAdapter
 import com.example.negociomx_hyundai.databinding.ActivityUsuariosBinding
 import com.example.negociomx_hyundai.room.BLL.BLLUtil
 import com.example.negociomx_hyundai.room.entities.Admins.Rol
@@ -23,7 +24,7 @@ class usuarios_activity : AppCompatActivity() {
     lateinit var dalUsu: DALUsuarioSQL
     lateinit var dalEmp: DALEmpresa
 
-    lateinit var listaUsuarios: List<UsuarioNube>
+    var listaUsuarios: List<Usuario>?=null
 
     lateinit var bllUtil: BLLUtil
 
@@ -38,23 +39,30 @@ class usuarios_activity : AppCompatActivity() {
 
         bllUtil = BLLUtil()
 
-        muestraEmpresasNube()
+/*        if (ParametrosSistema.usuarioLogueado.IdEmpresa==null ||
+            ParametrosSistema.usuarioLogueado.IdEmpresa?.toInt()==0)
+            muestraEmpresasNube()*/
 
         var listaRoles: List<Rol>
         listaRoles = arrayListOf()
 
         listaRoles.add(Rol(IdRol = 0, Nombre = "Seleccione..."))
-       // listaRoles.add(Rol(IdRol = 1, Nombre = "SA"))
         listaRoles.add(Rol(IdRol = 2, Nombre = "Admin"))
-        listaRoles.add(Rol(IdRol = 3, Nombre = "Ventas"))
-        listaRoles.add(Rol(IdRol = 4, Nombre = "Supervisor"))
-        listaRoles.add(Rol(IdRol = 5, Nombre = "Cliente"))
+        listaRoles.add(Rol(IdRol = 3, Nombre = "Supervisor"))
+        listaRoles.add(Rol(IdRol = 4, Nombre = "Empleado"))
+        listaRoles.add(Rol(IdRol = 5, Nombre = "Usuario Cliente"))
 
         var adapter: SpinnerAdapter
         adapter = bllUtil.convertListRolToListSpinner(this, listaRoles)
 
+        val visibleEmpresa=ParametrosSistema.usuarioLogueado.IdEmpresa==null
+                && ParametrosSistema.usuarioLogueado.IdEmpresa!!.toInt()>0
+
         binding.apply {
             cmbRolUsuarioUsuarios.adapter = adapter
+
+            cmbEmpresaUsuarioUsuarios.isVisible=visibleEmpresa
+            lblEmpresaUsuarioUsuarios.isVisible=visibleEmpresa
 
             progressAltaUsuario.isVisible = false
             chkActivoEmpresaNube.isChecked = true
@@ -127,20 +135,118 @@ class usuarios_activity : AppCompatActivity() {
     }
 
     private fun muestraListaUsuarios() {
-        /*dalUsu.getAllUsuarios { usuarios: List<UsuarioNube> ->
-            runOnUiThread {
-                listaUsuarios = usuarios
+        var idEmpresa:Int?=null
+        lifecycleScope.launch {
+            if (ParametrosSistema.usuarioLogueado.IdEmpresa != null)
+                idEmpresa = ParametrosSistema.usuarioLogueado.IdEmpresa!!.toInt()
 
-                val adaptador = UsuarioNubeAdapter(listaUsuarios) { usuario -> onItemSelected(usuario) }
+            listaUsuarios = dalUsu.getUsuariosByEmpresa(idEmpresa)
+            val adaptador = UsuarioAdapter(listaUsuarios) { usuario,opcion -> onItemSelected(usuario,opcion ) }
 
-                binding.rvUsuarios.layoutManager = LinearLayoutManager(applicationContext)
-                binding.rvUsuarios.adapter = adaptador
-            }
-        }*/
+            binding.rvUsuarios.layoutManager = LinearLayoutManager(applicationContext)
+            binding.rvUsuarios.adapter = adaptador
+        }
     }
 
-    private fun onItemSelected(usuario: UsuarioNube) {
-        // Implementar lógica de selección
+    private fun onItemSelected(usuario: Usuario,opcion:Int) {
+        if(opcion==1)
+        {
+
+        }
+        else if(opcion==2)
+        {
+            if (usuario.IdUsuario.toInt()==ParametrosSistema.usuarioLogueado.Id?.toInt())
+            {
+                bllUtil.MessageShow(
+                    this,
+                    "Aviso",
+                    "No es posible modificar el usuario Logueado. Favor de verificarlo"
+                ) { res ->
+                }
+
+                return
+            }
+            var cuentaVerificada=usuario.CuentaVerificada
+            var mensaje="Desea Verificar el usuario: ${usuario.NombreCompleto} con email: " +
+                    "${usuario.Email} ?"
+            var tipo="verificado"
+            if(cuentaVerificada) {
+                tipo = "desverificado"
+                mensaje="Desea Desverificar el usuario: ${usuario.NombreCompleto} con email: " +
+                        "${usuario.Email} ?"
+            }
+
+            bllUtil.MessageShow(
+                this,
+                "Pregunta",
+                mensaje
+            ) { res ->
+                if (res == 1) {
+                    usuario.CuentaVerificada = !cuentaVerificada
+                    lifecycleScope.launch {
+                        var res = dalUsu.updateUsuario(usuario)
+                        if (res) {
+                            Toast.makeText(
+                                this@usuarios_activity,
+                                "El usuario: ${usuario.NombreCompleto} se ha ${tipo} correctamente",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        muestraListaUsuarios()
+                    }
+                }
+            }
+        }
+        else if(opcion==3)
+        {
+            if (usuario.IdUsuario.toInt()==ParametrosSistema.usuarioLogueado.Id?.toInt())
+            {
+                bllUtil.MessageShow(
+                    this,
+                    "Aceptar",
+                    "",
+                    "No es posible modificar el usuario Logueado. Favor de verificarlo",
+                    "Aviso",
+                ) { res ->
+                }
+
+                return
+            }
+
+            var activado=usuario.Activo
+            var mensaje="Desea Activar el usuario: ${usuario.NombreCompleto} con email: " +
+                    "${usuario.Email} ?"
+            var tipo="activado"
+            if(activado) {
+                tipo = "desactivdo"
+                mensaje="Desea Desactivar el usuario: ${usuario.NombreCompleto} con email: " +
+                        "${usuario.Email} ?"
+            }
+
+            bllUtil.MessageShow(
+                this,
+                "Pregunta",
+                mensaje
+            ) { res ->
+                if (res == 1) {
+                    usuario.Activo = !activado
+                    lifecycleScope.launch {
+                        var res = dalUsu.updateUsuario(usuario)
+                        if (res) {
+                            Toast.makeText(
+                                this@usuarios_activity,
+                                "El usuario: ${usuario.NombreCompleto} se ha ${tipo} correctamente",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        muestraListaUsuarios()
+                    }
+                }
+            }
+
+        }
     }
 
     private fun limpiaControles() {

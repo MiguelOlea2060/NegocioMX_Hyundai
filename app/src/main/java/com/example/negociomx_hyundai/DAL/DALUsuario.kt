@@ -41,7 +41,7 @@ class DALUsuario {
                                     val firebaseData = userSnapshot.value as? Map<String, Any>
 
                                     if (firebaseData != null) {
-                                        val usuario = UsuarioNube().apply {
+                                        /*val usuario = UsuarioNube().apply {
                                             // ✅ MANEJO DUAL: camelCase Y PascalCase
                                             Id = (firebaseData["id"] ?: firebaseData["Id"]) as? String
                                             IdLocal = (firebaseData["idLocal"] ?: firebaseData["IdLocal"]) as? String
@@ -55,16 +55,9 @@ class DALUsuario {
                                             RazonSocialEmpresa = (firebaseData["razonSocialEmpresa"] ?: firebaseData["RazonSocialEmpresa"]) as? String
                                             NombreCuentaVerificada = (firebaseData["nombreCuentaVerificada"] ?: firebaseData["NombreCuentaVerificada"]) as? String
                                             RfcEmpresa = (firebaseData["rfcEmpresa"] ?: firebaseData["RfcEmpresa"]) as? String
-                                        }
+                                        }*/
 
-                                        Log.d("DALUsuario", "✅ Usuario mapeado exitosamente")
-                                        Log.d("DALUsuario", "👤 Email: ${usuario.Email}")
-                                        Log.d("DALUsuario", "🟢 Activo: ${usuario.Activo}")
-                                        Log.d("DALUsuario", "✅ Verificado: ${usuario.CuentaVerificada}")
-                                        Log.d("DALUsuario", "🆔 ID: ${usuario.Id}")
-                                        Log.d("DALUsuario", "👤 Nombre: ${usuario.NombreCompleto}")
-
-                                        onFinish(usuario)
+                                        //onFinish(usuario)
                                         return
                                     }
                                 } catch (e: Exception) {
@@ -99,9 +92,9 @@ class DALUsuario {
                                                         IdEmpresa = (firebaseData["idEmpresa"] ?: firebaseData["IdEmpresa"]) as? String
                                                         Activo = (firebaseData["activo"] ?: firebaseData["Activo"]) as? Boolean
                                                         CuentaVerificada = (firebaseData["cuentaVerificada"] ?: firebaseData["CuentaVerificada"]) as? Boolean
-                                                        RazonSocialEmpresa = (firebaseData["razonSocialEmpresa"] ?: firebaseData["RazonSocialEmpresa"]) as? String
+                                                        //RazonSocialEmpresa = (firebaseData["razonSocialEmpresa"] ?: firebaseData["RazonSocialEmpresa"]) as? String
                                                         NombreCuentaVerificada = (firebaseData["nombreCuentaVerificada"] ?: firebaseData["NombreCuentaVerificada"]) as? String
-                                                        RfcEmpresa = (firebaseData["rfcEmpresa"] ?: firebaseData["RfcEmpresa"]) as? String
+                                                        //RfcEmpresa = (firebaseData["rfcEmpresa"] ?: firebaseData["RfcEmpresa"]) as? String
                                                     }
 
                                                     Log.d("DALUsuario", "✅ Usuario PascalCase mapeado exitosamente")
@@ -223,7 +216,7 @@ class DALUsuario {
         }
     }
 
-    fun getAllUsuarios(onFinish: (List<UsuarioNube>) -> Unit) {
+/*    fun getAllUsuarios(onFinish: (List<UsuarioNube>) -> Unit) {
         Log.d("DALUsuario", "📋 === OBTENIENDO TODOS LOS USUARIOS ===")
 
         try {
@@ -296,7 +289,7 @@ class DALUsuario {
             Log.e("DALUsuario", "🔥 Excepción en getAllUsuarios: ${e.message}")
             onFinish(emptyList())
         }
-    }
+    }*/
 
     // ✅ FUNCIÓN PARA GENERAR ID NUMÉRICO ALEATORIO
     private fun generateNumericId(): String {

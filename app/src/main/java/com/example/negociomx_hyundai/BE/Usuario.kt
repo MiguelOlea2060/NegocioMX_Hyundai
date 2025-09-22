@@ -15,5 +15,10 @@ data class Usuario(
     var CuentaVerificada:Boolean=false,
     var FechaCuentaVerificada:String="",
     var IdUsuarioVerificoCuenta:Boolean=false,
-    var IdCliente:Int=0
+    var IdCliente:Int=0,
+
+    var RazonSocialEmpresa:String="",
+    var NomberComercialEmpresa:String="",
+    var RfcEmpresa:String="",
+    var FechaCuentaVeiricada:String=""
 )

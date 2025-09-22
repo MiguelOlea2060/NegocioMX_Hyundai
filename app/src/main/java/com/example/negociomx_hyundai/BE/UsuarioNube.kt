@@ -10,8 +10,10 @@ data class UsuarioNube(
     var IdEmpresa: String? = null,
     var Activo: Boolean? = null,
     var CuentaVerificada: Boolean? = null,
-    var RazonSocialEmpresa: String? = null,
     var NombreCuentaVerificada: String? = null,
-    var RfcEmpresa: String? = null
+
+    var RazonSocialEmpresa:String="",
+    var NombreComercialEmpresa:String="",
+    var RfcEmpresa:String=""
 )
 //DATA CLASE CREADA POR MIGUEL

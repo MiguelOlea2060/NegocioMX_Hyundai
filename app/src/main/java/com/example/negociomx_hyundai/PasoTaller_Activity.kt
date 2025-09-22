@@ -12,6 +12,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.*
+import com.example.negociomx_hyundai.DAL.DALCliente
+import com.example.negociomx_hyundai.DAL.DALClienteSQL
 import com.example.negociomx_hyundai.DAL.DALEmpleadoSQL
 import com.example.negociomx_hyundai.DAL.DALTaller
 import com.example.negociomx_hyundai.databinding.ActivityPasoTallerBinding
@@ -56,7 +58,7 @@ class PasoTaller_Activity : AppCompatActivity() {
     // Variables de datos
     private var vehiculoActual: VehiculoPasoLog? = null
     private var empleados = listOf<Empleado>()
-    private var empresasTaller = listOf<EmpresaTaller>()
+    private var empresasTaller = listOf<Cliente>()
     private var partesDanadas = listOf<ParteDanno>()
     private var parteSeleccionada: ParteDanno? = null
 
@@ -67,6 +69,7 @@ class PasoTaller_Activity : AppCompatActivity() {
 
     // DALs
     private val dalTaller = DALTaller()
+    private var dalEmpresaTaller=DALClienteSQL()
     private val dalEmpleado = DALEmpleadoSQL()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -220,7 +223,7 @@ class PasoTaller_Activity : AppCompatActivity() {
                 configurarSpinnerConductor()
 
                 // Cargar empresas de taller
-                empresasTaller = dalTaller.consultarEmpresasTaller()
+                empresasTaller = dalEmpresaTaller.consultarEmpresasTaller()
                 configurarSpinnersEmpresas()
 
                 // Cargar partes dañadas

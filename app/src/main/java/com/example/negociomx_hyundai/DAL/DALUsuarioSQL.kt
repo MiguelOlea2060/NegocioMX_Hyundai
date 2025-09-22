@@ -20,9 +20,9 @@ class DALUsuarioSQL {
         try {
             if (connection != null) {
                 val query = """
-                    SELECT IdUsuario, NombreCompleto, Email, IdRol, IdEmpresa, 
-                           Activo, CuentaVerificada, Contrasena
-                    FROM Usuario 
+                    SELECT u.IdUsuario, u.NombreCompleto, u.Email, u.IdRol, u.IdEmpresa, u.Activo, u.CuentaVerificada
+                        , u.Contrasena, e.razonsocial, e.nombrecomercial, e.Rfc
+                    FROM Usuario u with (nolock) left join dbo.empresa e on u.idempresa=e.idempresa 
                     WHERE Email = ? AND Contrasena = ? AND Activo = 1
                 """
 
@@ -42,6 +42,10 @@ class DALUsuarioSQL {
                         Activo = resultSet.getBoolean("Activo")
                         CuentaVerificada = resultSet.getBoolean("CuentaVerificada")
                         Password = resultSet.getString("Contrasena")
+
+                        NombreComercialEmpresa=resultSet.getString("NombreComercial")?:""
+                        RazonSocialEmpresa=resultSet.getString("RazonSocial")?:""
+                        RfcEmpresa=resultSet.getString("Rfc")?:""
                     }
                     Log.d("DALUsuarioSQL", "✅ Usuario encontrado: ${usuario.NombreCompleto}")
                 }
@@ -102,42 +106,143 @@ class DALUsuarioSQL {
         return@withContext usuario
     }
 
-    suspend fun addUsuario(usuario: Usuario): Int? = withContext(Dispatchers.IO) {
-        Log.d("DALUsuarioSQL", "🔍 Dando de alta a Usuario ${usuario.Email}")
-
-        var IdUsuario:Int=0
-        var usuario: Usuario? = null
+    suspend fun getUsuariosByEmpresa(idEmpresa: Int?): List<Usuario>? = withContext(Dispatchers.IO) {
+        var lista: MutableList<Usuario>? = null
         var connection = ConexionSQLServer.obtenerConexion()
 
         try {
             if (connection != null) {
-                val query = """
-                        INSERT INTO Usuario (NombreCompleto, Email, Contrasena, FechaUltAcceso, Domicilio, IdRol, Bloqueado, Activo, Predeterminado, NombreUsuario, UsuarioConcentrador, CuentaVerificada)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                var query = """
+                SELECT u.IdUsuario, u.NombreCompleto, u.Email, u.IdRol, u.IdEmpresa, u.Activo, u.CuentaVerificada, u.Contrasena
+                    ,e.razonsocial, e.nombrecomercial, e.Rfc, u.fechacuentaverificada
+                FROM Usuario u with (nolock) left join dbo.empresa e on u.idempresa=e.idempresa 
                 """
+                var where=""
+                if(idEmpresa!=null)
+                    where=" WHERE  u.idempresa= ?"
+
+                query+=where
 
                 val statement: PreparedStatement = connection.prepareStatement(query)
+                if(idEmpresa!=null)
+                    statement.setInt(1, idEmpresa)
+
+                val resultSet: ResultSet = statement.executeQuery()
+
+                lista= mutableListOf()
+                while(resultSet.next())
+                {
+                    var usuario = Usuario().apply {
+                        IdUsuario = resultSet.getInt("IdUsuario")
+                        NombreCompleto = resultSet.getString("NombreCompleto")
+                        Email = resultSet.getString("Email")
+                        IdRol = resultSet.getInt("IdRol")
+                        IdEmpresa = resultSet.getInt("IdEmpresa")?:0
+                        Activo = resultSet.getBoolean("Activo")
+
+                        CuentaVerificada = resultSet.getBoolean("CuentaVerificada")?:false
+                        FechaCuentaVerificada=resultSet.getString("FechaCuentaVerificada")?:""
+                    }
+
+                    lista.add(usuario)
+                }
+
+                resultSet.close()
+                statement.close()
+            }
+        } catch (e: Exception) {
+            Log.e("DALUsuarioSQL", "❌ Error: ${e.message}")
+        } finally {
+            connection?.close()
+        }
+
+        return@withContext lista
+    }
+
+    suspend fun updateUsuario(usuario: Usuario): Boolean = withContext(Dispatchers.IO) {
+        var res:Boolean=false
+        var connection = ConexionSQLServer.obtenerConexion()
+
+        try {
+            if (connection != null) {
+
+                connection.autoCommit = false
+
+                var query="UPDATE Usuario set Activo = ? ,CuentaVerificada = ? WHERE IDUSUARIO = ?"
+                val statement: PreparedStatement = connection.prepareStatement(query,
+                    PreparedStatement.RETURN_GENERATED_KEYS)
+                statement.setBoolean(1, usuario?.Activo!!)
+                statement.setBoolean(2, usuario?.CuentaVerificada!!)
+                statement.setInt(3, usuario?.IdUsuario!!)
+
+                val filasAfectadas = statement.executeUpdate()
+                if (filasAfectadas == 0) {
+                    throw Exception("No se pudo insertar el Usuario al sistema")
+                }
+                res=filasAfectadas>0
+
+                connection.commit()
+                Log.d("DALUsuarioSQL", "✅ Se genero el IdUsuario: ${res}")
+            }
+        } catch (e: Exception) {
+            Log.e("DALUsuarioSQL", "❌ Error: ${e.message}")
+        } finally {
+            connection?.close()
+        }
+
+        return@withContext res
+    }
+
+    suspend fun addUsuario(usuario: Usuario): Int? = withContext(Dispatchers.IO) {
+        Log.d("DALUsuarioSQL", "🔍 Dando de alta a Usuario ${usuario.Email}")
+
+        var IdUsuario:Int=0
+        var connection = ConexionSQLServer.obtenerConexion()
+
+        try {
+            if (connection != null) {
+
+                connection.autoCommit = false
+
+                var campos="INSERT INTO Usuario (NombreCompleto, Email, Contrasena, Domicilio, IdRol, Bloqueado, Activo, " +
+                        "NombreUsuario, UsuarioConcentrador, CuentaVerificada, Predeterminado"
+                var values=" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?"
+                var query = ""
+                if (usuario.IdEmpresa!=null) {
+                    campos+=", IdEmpresa"
+                    values += ", ?"
+                }
+                campos+=")"
+                values += ")"
+
+                query+=campos+values
+
+                val statement: PreparedStatement = connection.prepareStatement(query,
+                    PreparedStatement.RETURN_GENERATED_KEYS)
                 statement.setString(1, usuario?.NombreCompleto)
                 statement.setString(2, usuario?.Email)
                 statement.setString(3, usuario?.Contrasena)
-                statement.setString(4, "")
-                statement.setString(5, usuario?.Domicilio)
-                statement.setInt(6, usuario?.IdRol!!)
-                statement.setBoolean(7, usuario?.Bloqueado!!)
-                statement.setBoolean(8, usuario?.Activo!!)
-                statement.setBoolean(9, false)
-                statement.setString(10, usuario?.NombreUsuario)
-                statement.setBoolean(11, false)//UsuarioConsentrador
-                statement.setBoolean(12, false)
-                statement.setBoolean(13, false)
+                statement.setString(4, usuario?.Domicilio)
+                statement.setInt(5, usuario?.IdRol!!)
+                statement.setBoolean(6, usuario?.Bloqueado!!)
+                statement.setBoolean(7, usuario?.Activo!!)
+                statement.setString(8, usuario?.NombreUsuario)
+                statement.setBoolean(9, false)//UsuarioConsentrador
+                statement.setBoolean(10, false)
+                statement.setBoolean(11, false)
+                if(usuario.IdEmpresa!=null)
+                    statement.setInt(12, usuario.IdEmpresa!!)
 
-                statement.executeUpdate()
+                val filasAfectadas = statement.executeUpdate()
+                if (filasAfectadas == 0) {
+                    throw Exception("No se pudo insertar el Usuario al sistema")
+                }
 
                 val rs = statement.generatedKeys
                 if (rs.next()) {
                     IdUsuario = rs.getInt(1)
                 }
-
+                connection.commit()
                 Log.d("DALUsuarioSQL", "✅ Se genero el IdUsuario: ${IdUsuario}")
             }
         } catch (e: Exception) {

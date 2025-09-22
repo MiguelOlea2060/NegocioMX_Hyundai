@@ -32,7 +32,6 @@ import kotlinx.coroutines.withContext
 class acceso_activity : AppCompatActivity() {
     lateinit var binding: ActivityAccesoBinding
     lateinit var dal:DALDispotivioAcceso
-    //lateinit var dalUsu:DALUsuario
     lateinit var dalUsuSQL:DALUsuarioSQL
 
     lateinit var base: POSDatabase
@@ -67,7 +66,6 @@ class acceso_activity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.READ_PHONE_STATE)) {
             } else { ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_PHONE_STATE), 2) } }
-
 
         dal=DALDispotivioAcceso()
 
@@ -152,6 +150,22 @@ class acceso_activity : AppCompatActivity() {
                     }
                 }
             }
+
+            var limpiarControles:Boolean = false
+            var emailNuevo:String=""
+            if (intent?.extras != null) {
+                limpiarControles = intent.extras?.getBoolean("LimpiarCampos", false)?:false
+                emailNuevo= intent.extras?.getString("EmailNuevo", "") ?: ""
+            }
+
+            if(limpiarControles==true && emailNuevo.isNotEmpty())
+            {
+                binding.chkRecordarAcceso.isChecked=false
+                binding.txtContrasenaAcceso.setText("")
+                binding.txtUsuarioEmailAcceso.setText(emailNuevo)
+
+                binding.txtContrasenaAcceso.requestFocus()
+            }
         }
     }
 
@@ -163,6 +177,7 @@ class acceso_activity : AppCompatActivity() {
 
     private fun registrarUsuarioNuevo() {
         val intent= Intent(this,usuario_nuevo_activity::class.java)
+        intent.putExtra("IdEmpresaParaUsuario",12)// Para Patio Zacatula
         startActivity(intent)
     }
 
@@ -214,8 +229,4 @@ class acceso_activity : AppCompatActivity() {
             }
         }
     }
-
-
-
-
 }

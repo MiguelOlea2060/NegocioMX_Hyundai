@@ -12,9 +12,7 @@ import android.util.Patterns
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.Usuario
-import com.example.negociomx_hyundai.BE.UsuarioNube
 import com.example.negociomx_hyundai.DAL.DALEmpresa
-import com.example.negociomx_hyundai.DAL.DALUsuario
 import com.example.negociomx_hyundai.DAL.DALUsuarioSQL
 import com.example.negociomx_hyundai.adapters.SpinnerAdapter
 import com.example.negociomx_hyundai.databinding.ActivityUsuarioNuevoBinding
@@ -37,14 +35,19 @@ class usuario_nuevo_activity : AppCompatActivity() {
 
     lateinit var bllUtil: BLLUtil
 
+    var idEmpresaParaUsuario:Int?=null
+
     private var timeoutHandler: Handler? = null
     private var isProcessing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityUsuarioNuevoBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
+
+        val idEmpresaAux:Int?= intent.extras?.getInt("IdEmpresaParaUsuario",0)
+        if(idEmpresaAux!=null)
+            idEmpresaParaUsuario=idEmpresaAux
 
         Log.d("UsuarioNuevo", "🎬 === VERSIÓN DEFINITIVA ===")
 
@@ -58,11 +61,10 @@ class usuario_nuevo_activity : AppCompatActivity() {
         listaRoles = arrayListOf()
 
         listaRoles.add(Rol(IdRol = 0, Nombre = "Seleccione..."))
-        listaRoles.add(Rol(IdRol = 1, Nombre = "SA"))
-        listaRoles.add(Rol(IdRol = 2, Nombre = "Admin"))
-        listaRoles.add(Rol(IdRol = 3, Nombre = "Ventas"))
-        listaRoles.add(Rol(IdRol = 4, Nombre = "Supervisor"))
-        listaRoles.add(Rol(IdRol = 5, Nombre = "Cliente"))
+        listaRoles.add(Rol(IdRol = 2, Nombre = "Administrador"))
+        listaRoles.add(Rol(IdRol = 3, Nombre = "Supervisor"))
+        listaRoles.add(Rol(IdRol = 4, Nombre = "Empleado"))
+        listaRoles.add(Rol(IdRol = 5, Nombre = "Usuario Cliente"))
 
         var adapter: SpinnerAdapter
         adapter = bllUtil.convertListRolToListSpinner(this, listaRoles)
@@ -166,19 +168,13 @@ class usuario_nuevo_activity : AppCompatActivity() {
             else -> {
                 lifecycleScope.launch {
                     binding.btnEnviarSolicitudUsuarioNuevo.isEnabled=false
-                    //iniciarProcesamiento()
-                    //Log.d("UsuarioNuevo", "🔍 Verificando email con timeout largo...")
+                    iniciarProcesamiento()
 
-                    // Timeout de 15 segundos para verificación
-                    //configurarTimeoutLargo("verificación")
-
+                    configurarTimeoutLargo("verificación")
                     var find= dalUsu.getUsuarioByEmail(email)
-                    //Log.d("UsuarioNuevo", "📞 Verificación completada")
 
-                    //cancelarTimeout()
-
+                    cancelarTimeout()
                     if (find != null) {
-                        //Log.d("UsuarioNuevo", "⚠️ Email ya existe: ${find.Email}")
                         finalizarProcesamiento()
 
                         bllUtil.MessageShow(
@@ -200,7 +196,7 @@ class usuario_nuevo_activity : AppCompatActivity() {
 
     private fun procederConRegistroDefinitivo(nombreCompleto: String, email: String, contrasena: String) {
         val usuario = Usuario(
-            IdEmpresa = null,
+            IdEmpresa = idEmpresaParaUsuario,
             NombreCompleto = nombreCompleto,
             IdRol = 2,
             Email = email,
@@ -213,16 +209,13 @@ class usuario_nuevo_activity : AppCompatActivity() {
             Domicilio = ""
         )
 
-        //Log.d("UsuarioNuevo", "💾 === GUARDANDO USUARIO ===")
-
         // Timeout de 20 segundos para insert
-        //configurarTimeoutLargo("registro")
-
+        configurarTimeoutLargo("registro")
         lifecycleScope.launch {
             var idUsuario:Int?=dalUsu.addUsuario(usuario)
 
-            /*cancelarTimeout()
-            finalizarProcesamiento()*/
+            cancelarTimeout()
+            finalizarProcesamiento()
 
             if (idUsuario!=null && idUsuario>0) {
                 bllUtil.MessageShow(
@@ -287,7 +280,12 @@ class usuario_nuevo_activity : AppCompatActivity() {
         try {
             val intent = Intent(this, acceso_activity::class.java) //me dio erro y tuve que agregar r
             // Limpiar el stack de actividades para que no pueda regresar
+
+            var email=binding.txtEmailUsuarioNuevo.text
+
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            intent.putExtra("LimpiarCampos",true)
+            intent.putExtra("EmailNuevo",email)
             startActivity(intent)
             finish() // Cerrar la actividad actual
         } catch (e: Exception) {

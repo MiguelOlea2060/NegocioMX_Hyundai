@@ -129,7 +129,6 @@ class menu_principal_activity : AppCompatActivity() {
         val btnRadmin = findViewById<Button>(R.id.btnRadminVPN)
         val btnConsultaMovimiento = findViewById<Button>(R.id.btnConsultaMovimiento)
         val btnConsultaPaso2 = findViewById<Button>(R.id.btnConsultaPaso2)
-        val btnPasoMovimiento =findViewById<Button>(R.id.btnMovimiento)
         val btnVehiculo = findViewById<Button>(R.id.btnVehiculo)
         val btnPaso2Accesorios=findViewById<Button>(R.id.btnPaso2Accesorios)
         val btnPaso3Repuve =findViewById<Button>(R.id.btnPaso3Repuve)
@@ -170,7 +169,6 @@ class menu_principal_activity : AppCompatActivity() {
         vLinea1.isVisible=visibleBtns
         vLinea2.isVisible=visibleBtns
         vLinea3.isVisible=visibleBtns
-
 
         btnUm.setOnClickListener {
             val intent = Intent(this, unidadmedida_activity::class.java)
@@ -240,7 +238,11 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, empresa_nube_activity::class.java)
             startActivity(intent)
         }
-       binding.btnUsuarios.setOnClickListener {
+        binding.btnUsuarios.setOnClickListener {
+            val intent = Intent(this, usuarios_activity::class.java)
+            startActivity(intent)
+        }
+        binding.imgMenuAdminUsers.setOnClickListener {
             val intent = Intent(this, usuarios_activity::class.java)
             startActivity(intent)
         }
@@ -252,7 +254,11 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, vpn_connect_activity::class.java)
             startActivity(intent)
         }
-        btnPasoMovimiento.setOnClickListener{
+        binding.btnMenuMovimientoPasoLog.setOnClickListener{
+            val intent = Intent(this, Paso1Entrada_Activity::class.java)
+            startActivity(intent)
+        }
+        binding.imgMenuMovimientos.setOnClickListener {
             val intent = Intent(this, Paso1Entrada_Activity::class.java)
             startActivity(intent)
         }
@@ -264,8 +270,12 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, Paso3Repuve_Activity::class.java)
             startActivity(intent)
         }
+        binding.imgMenuConsultasMovimientos.setOnClickListener {
+            val intent = Intent(this,ConsultaPaso1Soc_Activity::class.java)
+            startActivity(intent)
+        }
         btnConsultaMovimiento.setOnClickListener{
-            val intent = Intent(this, Consulta_Activity::class.java)
+            val intent = Intent(this, ConsultaPaso1Soc_Activity::class.java)
             startActivity(intent)
         }
         btnConsultaPaso2.setOnClickListener{

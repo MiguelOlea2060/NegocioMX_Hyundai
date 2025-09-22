@@ -62,7 +62,11 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         realizarConsultaInicial()
 
         // AGREGAR ESTA LÍNEA:
-        Toast.makeText(this, "Estado inicial - calendarioVisible: $calendarioVisible", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            this,
+            "Estado inicial - calendarioVisible: $calendarioVisible",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun inicializarComponentes() {
