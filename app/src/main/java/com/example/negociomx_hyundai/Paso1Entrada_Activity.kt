@@ -158,13 +158,15 @@ class Paso1Entrada_Activity : AppCompatActivity() {
 
         binding.btnEnTaller.setOnClickListener {
             val intent = Intent(this, PasoTaller_Activity::class.java)
-            intent.putExtra("VIN", vehiculoActual?.VIN)
-            intent.putExtra("ID_VEHICULO", vehiculoActual?.Id?.toInt())
-            intent.putExtra("MARCA", vehiculoActual?.Marca)
-            intent.putExtra("MODELO", vehiculoActual?.Modelo)
-            intent.putExtra("ANIO", vehiculoActual?.Anio)
-            intent.putExtra("COLOR_EXTERIOR", vehiculoActual?.ColorExterior)
-            intent.putExtra("COLOR_INTERIOR", vehiculoActual?.ColorInterior)
+            intent.putExtra("IdVehiculo", vehiculoActual?.Id?.toInt())
+            intent.putExtra("IdPasoLogVehiculo", vehiculoActual?.IdPasoLogVehiculo)
+            intent.putExtra("Vin", vehiculoActual?.VIN)
+            intent.putExtra("Bl", vehiculoActual?.BL)
+            intent.putExtra("Marca", vehiculoActual?.Marca)
+            intent.putExtra("Modelo", vehiculoActual?.Modelo)
+            intent.putExtra("Annio", vehiculoActual?.Anio.toString())
+            intent.putExtra("ColorExterior", vehiculoActual?.ColorExterior)
+            intent.putExtra("ColorInterior", vehiculoActual?.ColorInterior)
             startActivity(intent)
         }
 

@@ -52,9 +52,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:visibility="gone"
             android:padding="8dp"
-            android:layout_marginBottom="12dp"
-            android:visibility="gone">
+            android:layout_marginBottom="12dp">
+
 
             <TextView
                 android:layout_width="match_parent"
@@ -68,32 +69,34 @@
             <TextView
                 android:background="@drawable/edittext_background"
                 android:id="@+id/tvInfoVehiculo"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="#37474F"
-                android:layout_marginBottom="4dp"
+                android:text="Vin: "
                 android:textStyle="bold"
-                android:text="Vin: "/>
+                android:textSize="16sp"
+                android:layout_marginBottom="4dp"
+                />
 
             <TextView
                 android:id="@+id/tvBlVehiculo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="BL: "
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#37474F"
                 android:layout_marginBottom="4dp"
-                android:text="BL: "/>
+                />
 
             <TextView
                 android:id="@+id/tvMarcaModeloAnnio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="Marca:    Modelo:     Año: "
                 android:textSize="14sp"
                 android:textColor="#37474F"
                 android:layout_marginBottom="4dp"
-                android:text="Marca:    Modelo:     Año: "/>
+               />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -105,18 +108,20 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:text="Color Ext: "
                     android:textSize="14sp"
                     android:textColor="#37474F"
-                    android:text="Color Ext: "/>
+                    />
 
                 <TextView
                     android:id="@+id/tvColorInterior"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:text="Color Int: "
                     android:textSize="14sp"
                     android:textColor="#37474F"
-                    android:text="Color Int: "/>
+                   />
 
             </LinearLayout>
 

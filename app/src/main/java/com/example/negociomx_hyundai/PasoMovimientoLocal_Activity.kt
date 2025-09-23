@@ -143,7 +143,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
                 empleados = dalEmpleado.consultarEmpleados(105)
                 configurarSpinnerPersonal()
 
-            //    obtenerDatosVehiculo()
+
                 ocultarCarga()
                 mostrarFormularios()
                 Log.d("PasoMovimientoLocal_Activity", "✅ Datos iniciales cargados correctamente")
