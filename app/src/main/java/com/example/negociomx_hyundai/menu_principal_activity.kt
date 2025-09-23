@@ -169,6 +169,8 @@ class menu_principal_activity : AppCompatActivity() {
         vLinea1.isVisible=visibleBtns
         vLinea2.isVisible=visibleBtns
         vLinea3.isVisible=visibleBtns
+        binding.btnUbicacionVehiculos.isVisible=false
+        binding.imgUbicacionVehiculos.isVisible=false
 
         btnUm.setOnClickListener {
             val intent = Intent(this, unidadmedida_activity::class.java)
@@ -248,6 +250,14 @@ class menu_principal_activity : AppCompatActivity() {
         }
         binding.btnUbicacionVehiculos.setOnClickListener{
             val intent = Intent(this,UbicacionVehiculosActivity::class.java)
+            startActivity(intent)
+        }
+        binding.imgCargaMasivaVINs.setOnClickListener {
+            val intent = Intent(this,CargaMasivaVinsActivity::class.java)
+            startActivity(intent)
+        }
+        binding.btnCargaMasivaVINs.setOnClickListener {
+            val intent = Intent(this, CargaMasivaVinsActivity::class.java)
             startActivity(intent)
         }
         btnConfigs.setOnClickListener {

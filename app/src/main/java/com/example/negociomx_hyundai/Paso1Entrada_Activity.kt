@@ -100,6 +100,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
             else -> {}
         }
     }
+
     private fun configurarEventos() {
         // <CHANGE> Configurar eventos de la interfaz
         binding.etVIN.requestFocus()

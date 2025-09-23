@@ -1,10 +1,313 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CargaMasivaVinsActivity">
+    android:background="#F5F5F5"
+    tools:context=".Paso1Entrada_Activity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1565C0"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:src="@drawable/regresar_icono_64x64"
+                android:id="@+id/btnRegresarCargaMasiva"
+                android:layout_width="48dp"
+                android:layout_height="48dp">
+
+            </ImageView>
+            <TextView
+                android:layout_weight="1"
+                android:layout_marginLeft="15dp"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CARGA MASIVA VINs"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- SECCIÓN ESCANEO VIN -->
+        <LinearLayout
+            android:background="@drawable/edittext_border"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1. Abrir archivo excel"
+                android:textColor="#1565C0"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btnExaminarArchivosXls"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="Examinar..."
+                android:backgroundTint="#1565C0"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:background="@drawable/edittext_border"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2. Columnas de los Datos del VIN"
+                android:textColor="#1565C0"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:padding="5dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_weight="1"
+                    android:layout_marginRight="10dp"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:text="# Celda VIN:"
+                    android:id="@+id/lblCeldaVinCargaMasiva"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                </TextView>
+
+                <EditText
+                    android:maxLength="2"
+                    android:textSize="18dp"
+                    android:id="@+id/etCeldaVinCarga"
+                    android:layout_height="48dp"
+                    android:hint="Celda VIN"
+                    android:background="@drawable/edittext_border"
+                    android:padding="10dp"
+                    android:text="1"
+                    android:layout_width="100dp">
+
+                </EditText>
+            </LinearLayout>
+            <LinearLayout
+                android:padding="5dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_weight="1"
+                    android:layout_marginRight="10dp"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:text="# Celda Modelo:"
+                    android:id="@+id/lblCeldaModeloCargaMasiva"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                </TextView>
+
+                <EditText
+                    android:maxLength="2"
+                    android:textSize="18dp"
+                    android:id="@+id/etCeldaModeloCarga"
+                    android:layout_height="48dp"
+                    android:hint="Celda Modelo"
+                    android:background="@drawable/edittext_border"
+                    android:padding="10dp"
+                    android:text="2"
+                    android:layout_width="100dp">
+
+                </EditText>
+            </LinearLayout>
+
+            <LinearLayout
+                android:padding="5dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_weight="1"
+                    android:layout_marginRight="10dp"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:text="# Celda Especif.:"
+                    android:id="@+id/lblCeldaEspecificacionesCargaMasiva"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                </TextView>
+
+                <EditText
+                    android:maxLength="2"
+                    android:textSize="18dp"
+                    android:id="@+id/etCeldaEspecificacionesCarga"
+                    android:layout_height="48dp"
+                    android:hint="Celda VIN"
+                    android:background="@drawable/edittext_border"
+                    android:padding="10dp"
+                    android:text="3"
+                    android:layout_width="100dp">
+
+                </EditText>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- FORMULARIO DE ENTRADA -->
+        <LinearLayout
+            android:id="@+id/layoutFormularioCargaMasiva"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_border"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/lblDetallesArchivoCarga"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="3. Datos leidos del archivo: "
+                android:textColor="#1565C0"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="25dp" />
+
+            <!-- CAMPOS COMUNES -->
+            <Button
+                android:drawablePadding="5dp"
+                android:drawableTint="@color/azul_fuerte"
+                android:drawableLeft="@android:drawable/ic_menu_add"
+                android:id="@+id/btnGuardarCargaMasiva"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Guarda Carga"
+                android:textSize="18dp"
+                android:backgroundTint="#FF6F00"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
+        <!-- OVERLAY DE CARGA -->
+        <LinearLayout
+            android:id="@+id/loadingContainerEntrada"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="24dp"
+            android:layout_marginTop="16dp">
+
+            <ProgressBar
+                android:id="@+id/progressBarEntrada"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                style="?android:attr/progressBarStyleLarge"
+                android:indeterminateTint="#1565C0" />
+
+            <TextView
+                android:id="@+id/tvLoadingTextEntrada"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Consultando vehículo..."
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1565C0" />
+
+            <TextView
+                android:id="@+id/tvLoadingSubtextEntrada"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Verificando información en base de datos"
+                android:textSize="12sp"
+                android:textColor="#37474F" />
+
+        </LinearLayout>
+
+
+        <!-- <CHANGE> Agregar overlay de carga como en Paso1SOC -->
+        <LinearLayout
+            android:id="@+id/loadingContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="24dp"
+            android:layout_marginTop="16dp">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                style="?android:attr/progressBarStyleLarge"
+                android:indeterminateTint="#1565C0" />
+
+            <TextView
+                android:id="@+id/tvLoadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Consultando vehículo..."
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1565C0" />
+
+            <TextView
+                android:id="@+id/tvLoadingSubtext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Verificando información en base de datos"
+                android:textSize="12sp"
+                android:textColor="#37474F" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

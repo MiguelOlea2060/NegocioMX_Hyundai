@@ -80,6 +80,6 @@ dependencies {
 
     // Read data Excel
     //implementation ("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation ("org.apache.poi:poi:5.2.0")
-    implementation ("org.apache.poi:poi-ooxml:5.2.0")
+    implementation ("org.apache.poi:poi:5.2.3")
+    implementation ("org.apache.poi:poi-ooxml:5.2.3")
 }
