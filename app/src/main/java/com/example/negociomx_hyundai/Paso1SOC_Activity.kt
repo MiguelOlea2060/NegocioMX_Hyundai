@@ -34,6 +34,7 @@ import android.os.Looper
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Button
+import android.widget.EditText
 
 
 class Paso1SOC_Activity : AppCompatActivity() {

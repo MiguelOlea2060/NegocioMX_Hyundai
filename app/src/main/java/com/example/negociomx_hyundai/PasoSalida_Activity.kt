@@ -1,28 +1,34 @@
 package com.example.negociomx_hyundai
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.Cliente
-import com.example.negociomx_hyundai.BE.ClienteEmpleado
 import com.example.negociomx_hyundai.BE.Empleado
 import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
 import com.example.negociomx_hyundai.BE.VehiculoPasoLog
+import com.example.negociomx_hyundai.BE.VehiculoPlacas
+import com.example.negociomx_hyundai.BE.VehiculoPlacasDueno
 import com.example.negociomx_hyundai.DAL.DALCliente
 import com.example.negociomx_hyundai.DAL.DALEmpleadoSQL
 import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
+import com.example.negociomx_hyundai.DAL.DALVehiculo
 import com.example.negociomx_hyundai.Utils.ParametrosSistema
 import com.example.negociomx_hyundai.databinding.ActivityPasoSalidaBinding
 import kotlinx.coroutines.launch
@@ -34,9 +40,9 @@ class PasoSalida_Activity : AppCompatActivity() {
 
     private lateinit var binding:ActivityPasoSalidaBinding
     private var empleados = listOf<Empleado>()
-    private var empleadosTransportista = listOf<ClienteEmpleado>()
     private val dalEmp= DALEmpleadoSQL()
     private val dalPasoLog = DALPasoLogVehiculo()
+    var transportistaSeleccionado :Cliente?=null
 
     private var transportistas = listOf<Cliente>()
     private var vehiculoActual: VehiculoPasoLog? = null
@@ -46,7 +52,9 @@ class PasoSalida_Activity : AppCompatActivity() {
     private lateinit var adapterTransportistasRodando: ArrayAdapter<String>
     private lateinit var adapterTransportistasMadrina: ArrayAdapter<String>
     private lateinit var adapterConductores: ArrayAdapter<String>
+    private lateinit var adapterPlacas: ArrayAdapter<String>
 
+    var dalVeh:DALVehiculo?=null
     // Variables para hora dinámica
     private lateinit var timerHandler: Handler
     private lateinit var timerRunnable: Runnable
@@ -58,6 +66,8 @@ class PasoSalida_Activity : AppCompatActivity() {
         binding= ActivityPasoSalidaBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        dalVeh=DALVehiculo()
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -67,6 +77,10 @@ class PasoSalida_Activity : AppCompatActivity() {
         if(intent?.extras!=null)
         {
             val idPasoLogVehiculo= intent.extras?.getInt("IdPasoLogVehiculo",0)?:0
+            val annioCad=intent.extras?.getString("Annio","")
+            var annio:Short=0
+            if(annioCad.toString().isNotEmpty())
+                annio=annioCad.toString().toShort()
             IdVehiculo= intent.extras?.getInt("IdVehiculo",0)?:0
             val marca= intent.extras?.getString("Marca","")?:""
             val modelo= intent.extras?.getString("Modelo","")?:""
@@ -83,6 +97,7 @@ class PasoSalida_Activity : AppCompatActivity() {
                 ColorExterior = colorExterior,
                 ColorInterior = colorInterior,
                 IdPasoLogVehiculo = idPasoLogVehiculo,
+                Anio = annio.toInt()
             )
         }
 
@@ -225,11 +240,160 @@ class PasoSalida_Activity : AppCompatActivity() {
         binding.spinnerEmpresaMadrinaSalida.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (position > 0) { // No es "Seleccionar empresa..."
-                    val transportistaSeleccionado = transportistas[position - 1]
-                    cargarConductores(transportistaSeleccionado.IdCliente!!)
-                    cargarPlacasYNumeros(transportistaSeleccionado.IdCliente!!)
+                    transportistaSeleccionado = transportistas[position - 1]
+                    cargarConductores(transportistaSeleccionado?.IdCliente!!)
+                    cargarPlacasYNumeros(transportistaSeleccionado?.IdCliente!!,null)
                 } else {
+                    transportistaSeleccionado=null
                     limpiarSpinnerConductores()
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        binding.spinnerPlacaTransporteSalida.onItemSelectedListener = object :AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if(transportistaSeleccionado==null)
+                {
+                    limpiarSpinnerPlacas()
+                }
+                else
+                {
+                    val placasTransportista=transportistaSeleccionado?.Placas
+                    if((placasTransportista==null && position==1) ||
+                        (placasTransportista!=null && position==(placasTransportista?.count()!!+1))) {
+                        val dialog= Dialog(this@PasoSalida_Activity)
+                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                        dialog.setContentView(R.layout.item_placa_numeco)
+
+                        val btnGuardar=dialog.findViewById<ImageView>(R.id.btnGuardarItemPlacaEco)
+                        val btnRegresar=dialog.findViewById<ImageView>(R.id.btnRegresarItemPlacaEco)
+                        val txtPlaca = dialog.findViewById<EditText>(R.id.txtItemPlaca)
+                        val txtNumEco = dialog.findViewById<EditText>(R.id.txtItemNumeroEconomico)
+
+                        // Configurar diálogo
+                        btnGuardar.setOnClickListener {
+                            var cadena:String=""
+                            var numeroEconomico=txtNumEco.text.toString()
+                            var placas=txtPlaca.text.toString()
+
+                            var posicion=binding.spinnerEmpresaMadrinaSalida.selectedItemPosition
+                            var transportista= transportistas[posicion-1]
+
+                            var vp=VehiculoPlacas(IdVehiculo=vehiculoActual?.Id!!.toInt(),
+                                IdVehiculoPlacas = 0,
+                                NumeroEconomico = numeroEconomico,
+                                Placas = placas,
+                                Annio = vehiculoActual?.Anio!!.toShort(),
+                                Activo = true,
+                                IdPersona = transportista.IdCliente!!
+                                )
+
+                            btnRegresar.isEnabled=false
+                            btnGuardar.isEnabled=false
+
+                            lifecycleScope.launch {
+                                val respuesta = dalVeh?.insertarVehiculoPlacas(vp)
+                                if (respuesta == null) {
+                                    Toast.makeText(
+                                        this@PasoSalida_Activity,
+                                        "Ocurrio un error en el Sistema",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+
+                                    dialog.dismiss()
+                                } else if (respuesta?.TieneError == true) {
+                                    Log.e("Paso1Entrada", respuesta.Mensaje)
+                                    Toast.makeText(
+                                        this@PasoSalida_Activity, "${respuesta?.Mensaje}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+
+                                    if (transportistaSeleccionado != null && transportistaSeleccionado?.Placas != null) {
+                                        var posicion = -1
+                                        var contador = 0
+                                        transportistaSeleccionado?.Placas!!.forEach {
+                                            if (it.Placas.equals(placas))
+                                                posicion = contador
+                                            contador++
+                                        }
+                                        if (posicion >= 0)
+                                            binding.spinnerPlacaTransporteSalida.setSelection(posicion + 1)
+                                        else
+                                            binding.spinnerPlacaTransporteSalida.setSelection(0)
+                                        binding.etNumeroEconomico.setText(numeroEconomico)
+                                    }
+
+                                    dialog.dismiss()
+                                }
+                                else {
+
+                                    val valor = respuesta?.Data?.split("|")
+                                    var idVehiculoPlacas = 0
+                                    var idVehiculoPlacasDueno = 0
+                                    if (valor != null) {
+                                        idVehiculoPlacas = valor[0].toInt()
+                                        idVehiculoPlacasDueno = valor[1].toInt()
+                                    }
+                                    cadena = id.toString()
+
+                                    btnRegresar.isEnabled = true
+                                    btnGuardar.isEnabled = true
+
+                                    if (id!! > 0) {
+                                        if (transportistaSeleccionado?.Placas == null) transportista.Placas =
+                                            mutableListOf()
+
+                                        val vpd = VehiculoPlacasDueno(
+                                            IdVehiculoPlacas = idVehiculoPlacas,
+                                            IdVehiculoPlacasDueno = idVehiculoPlacasDueno,
+                                            IdPersona = transportista.IdCliente!!,
+                                            Placas = placas,
+                                            NumeroEconomico = numeroEconomico,
+                                            IdTipoPersonaDueno = 1
+                                        )
+                                        transportistaSeleccionado?.Placas!!.add(vpd)
+
+                                        dialog.dismiss()
+
+                                        var posicionNueva =0
+                                        var contador=0
+                                        var lista=transportista.Placas?.sortedBy {a -> a.Placas } as MutableList<VehiculoPlacasDueno>
+                                        transportistaSeleccionado?.Placas= mutableListOf()
+                                        lista.forEach {
+                                            transportistaSeleccionado?.Placas!!.add(it)
+                                            if(it.Placas.equals(placas))
+                                                posicionNueva=contador
+                                            contador++
+                                        }
+                                        binding.etNumeroEconomico.setText(numeroEconomico)
+
+                                        cargarPlacasYNumeros(transportista.IdCliente!!,null)
+
+                                        binding.spinnerPlacaTransporteSalida.setSelection(posicionNueva+1)
+                                    }
+                                }
+                            }
+                        }
+                        btnRegresar.setOnClickListener {
+                            if(position==binding.spinnerPlacaTransporteSalida.count-1)
+                                binding.spinnerPlacaTransporteSalida.setSelection(0)
+                            else
+                                binding.spinnerPlacaTransporteSalida.setSelection(position)
+                            dialog.dismiss()
+                        }
+
+                        dialog.show()
+                        txtPlaca.requestFocus()
+
+                        // Ajustar tamaño del diálogo
+                        val window = dialog.window
+                        window?.setLayout(
+                            (resources.displayMetrics.widthPixels * 0.9).toInt(),
+                            (resources.displayMetrics.heightPixels * 0.7).toInt()
+                        )
+
+                    }
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -247,15 +411,22 @@ class PasoSalida_Activity : AppCompatActivity() {
         binding.spinnerConductorSalida.adapter = adapterConductores
     }
 
+    private fun limpiarSpinnerPlacas() {
+        val placaVacia = listOf("Seleccionar...")
+        adapterPlacas = ArrayAdapter(
+            this@PasoSalida_Activity,
+            android.R.layout.simple_spinner_item,
+            placaVacia
+        )
+        adapterPlacas.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerPlacaTransporteSalida.adapter = adapterPlacas
+    }
+
     private fun cargarConductores(idCliente: Int) {
         try {
-            empleadosTransportista= listOf(ClienteEmpleado())
-            transportistas.forEach {
-                if(it.IdCliente==idCliente )
-                    empleadosTransportista= it.Empleados!!
-            }
+            var empleadosTransportista= transportistaSeleccionado?.Empleados
             val nombresConductores = mutableListOf("Seleccionar conductor...")
-            nombresConductores.addAll(empleadosTransportista.map { it.NombreCompleto ?: "Sin nombre" })
+            nombresConductores.addAll(empleadosTransportista!!.map { it.NombreCompleto ?: "Sin nombre" })
 
             adapterConductores = ArrayAdapter(
                 this@PasoSalida_Activity,
@@ -271,24 +442,27 @@ class PasoSalida_Activity : AppCompatActivity() {
         }
     }
 
-    private fun cargarPlacasYNumeros(idCliente: Int) {
+    private fun cargarPlacasYNumeros(idCliente: Int,posicionSeleccionada:Int?) {
         try {
-            empleadosTransportista= listOf(ClienteEmpleado())
-            transportistas.forEach {
-                if(it.IdCliente==idCliente )
-                    empleadosTransportista= it.Empleados!!
-            }
-            val nombresConductores = mutableListOf("Seleccionar conductor...")
-            nombresConductores.addAll(empleadosTransportista.map { it.NombreCompleto ?: "Sin nombre" })
+            val transporte= transportistas.filter {it.IdCliente==idCliente }.firstOrNull()
+            var placasTransportista:MutableList<VehiculoPlacasDueno>?=null
+            if(transporte!=null && transporte.Placas!=null) placasTransportista=transporte?.Placas!!
 
-            adapterConductores = ArrayAdapter(
+            var placas = mutableListOf("Seleccionar...")
+            if(placasTransportista!=null) {
+                placasTransportista?.forEach {
+                    if(it.IdVehiculoPlacasDueno>0)
+                        placas.add(it.Placas)
+                }
+            }
+            placas.add("Nueva Placa")
+            adapterPlacas = ArrayAdapter(
                 this@PasoSalida_Activity,
                 android.R.layout.simple_spinner_item,
-                nombresConductores
+                placas
             )
-            adapterConductores.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            binding.spinnerConductorSalida.adapter = adapterConductores
-
+            adapterPlacas.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.spinnerPlacaTransporteSalida.adapter = adapterPlacas
         } catch (e: Exception) {
             Log.e("Paso1Entrada", "Error cargando conductores: ${e.message}")
             Toast.makeText(this@PasoSalida_Activity, "Error cargando conductores", Toast.LENGTH_SHORT).show()

@@ -90,7 +90,7 @@
                         android:inputType="textEmailAddress"
                         android:textSize="16sp"
                         android:textColor="#333333"
-                        android:padding="16dp"
+                        android:padding="18dp"
                         android:drawableLeft="@android:drawable/ic_dialog_email"
                         android:drawableTint="#1565C0"
                         android:drawablePadding="12dp" />
@@ -114,7 +114,7 @@
                         android:layout_height="wrap_content"
                         android:hint="Contraseña"
                         android:inputType="textPassword"
-                        android:textSize="16sp"
+                        android:textSize="18sp"
                         android:textColor="#333333"
                         android:padding="16dp"
                         android:drawableLeft="@android:drawable/ic_lock_idle_lock"
@@ -125,6 +125,7 @@
 
                 <!-- Checkbox Recordar -->
                 <CheckBox
+                    android:textStyle="bold"
                     android:id="@+id/chkRecordarAcceso"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -161,12 +162,13 @@
 
                 <!-- Texto Registro -->
                 <TextView
+                    android:gravity="center_vertical"
                     android:id="@+id/lblRegistrarUsuarioAcceso"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="¿No tienes cuenta? Regístrate aquí"
                     android:textSize="14sp"
-                    android:textColor="#FF9800"
+                    android:textColor="@color/rojo"
                     android:textStyle="bold"
                     android:layout_gravity="center"
                     android:clickable="true"
@@ -174,7 +176,7 @@
                     android:padding="12dp"
                     android:background="?android:attr/selectableItemBackground"
                     android:drawableLeft="@android:drawable/ic_menu_add"
-                    android:drawableTint="#FF9800"
+                    android:drawableTint="@color/azul_fuerte"
                     android:drawablePadding="8dp" />
 
             </LinearLayout>

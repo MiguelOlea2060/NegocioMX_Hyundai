@@ -113,12 +113,13 @@ class DALCliente {
             if(conEmpleados)
             {
 
-                query = "SSELECT c.idcliente, Nombre, Rfc, ce.IdClienteEmpleado, ce.NombreCompleto, ce.Celular, vpd.idvehiculoplacasdueno, vp.IdVehiculoPlacas\n" +
-                        ", vp.Placas, vp.NumeroEconomico " +
+                query = "SELECT c.idcliente, c.Nombre, Rfc, ce.IdClienteEmpleado, ce.NombreCompleto, ce.Celular" +
+                        ", vpd.idvehiculoplacasdueno, vp.IdVehiculoPlacas, vp.Placas, vp.NumeroEconomico " +
                         "FROM dbo.Cliente c left join dbo.ClienteEmpleado ce on c.IdCliente=ce.IdCliente " +
                         "left join dbo.VehiculoPlacasDueno vpd on vpd.idtipopersonadueno=1 and c.IdCliente=vpd.idpersona " +
                         "left join dbo.VehiculoPlacas vp on vpd.idvehiculoplacas=vp.IdVehiculoPlacas " +
-                        "WHERE substring(c.Tabla,5,1)='1'"
+                        "WHERE substring(c.Tabla,5,1)='1' " +
+                        "ORDER BY c.Nombre, vp.Placas"
             }
             statement = conexion.prepareStatement(query)
             resultSet = statement.executeQuery()
@@ -157,25 +158,26 @@ class DALCliente {
                 }
                 if(!existe) {
                     if(conEmpleados && ce!=null) {
-                        cliente.Empleados= mutableListOf<ClienteEmpleado>()
+                        cliente.Empleados= mutableListOf()
                         cliente.Empleados?.add(ce)
                     }
                     transportistas.add(cliente)
-                    if(vp!=null)
-                    {
-                        cliente.Placas= mutableListOf()
-                    }
+                    if(vp!=null) cliente.Placas= mutableListOf()
                 }
                 else
                 {
                     if(ce!=null) {
-                        if (cliente?.Empleados == null) cliente?.Empleados =
-                            mutableListOf<ClienteEmpleado>()
-                        cliente?.Empleados!!.add(ce)
+                        if (cliente?.Empleados == null) cliente?.Empleados = mutableListOf()
+
+                        var existeCE=cliente?.Empleados!!.filter { it.IdClienteEmpleado==ce.IdClienteEmpleado }.firstOrNull()!=null
+                        if(!existeCE) cliente?.Empleados!!.add(ce)
                     }
                     if(vp!=null)
                     {
-                        cliente.Placas?.add(vp)
+                        var existePlaca:Boolean=false
+                        if(cliente.Placas!=null)
+                            existePlaca=cliente!!.Placas?.filter { it.IdVehiculoPlacasDueno==vp.IdVehiculoPlacasDueno }!!.firstOrNull()!=null
+                        if(!existePlaca)  cliente.Placas?.add(vp)
                     }
                 }
             }
