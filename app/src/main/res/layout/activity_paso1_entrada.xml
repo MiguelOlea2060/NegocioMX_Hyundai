@@ -267,6 +267,7 @@
 
                     </TextView>
                     <EditText
+                        android:inputType="textCapCharacters"
                         android:maxLength="10"
                         android:layout_weight="1"
                         android:id="@+id/etPlacaTransporte"
@@ -317,6 +318,7 @@
                 android:layout_marginBottom="12dp" />
 
             <TextView
+                android:textStyle="bold"
                 android:id="@+id/tvFechaEntrada"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

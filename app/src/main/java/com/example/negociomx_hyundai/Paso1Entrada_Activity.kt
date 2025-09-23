@@ -63,6 +63,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     // Variables para hora dinámica
     private lateinit var timerHandler: Handler
     private lateinit var timerRunnable: Runnable
+    var fechaActual:String=""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -203,6 +204,16 @@ class Paso1Entrada_Activity : AppCompatActivity() {
 
         // Cargar transportistas
         cargarTransportistas()
+
+        if(intent.extras!=null)
+        {
+            val refrescar= intent?.extras!!.getBoolean("RefrescarVin")
+            val vin= intent?.extras!!.getString("Vin")
+            if(refrescar) {
+                binding.etVIN.setText(vin)
+                consultarVehiculo()
+            }
+        }
     }
 
     private fun consultarVehiculo() {
@@ -365,6 +376,8 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                     numeroEconomico = binding.etNumeroEconomico.text.toString().trim()
                 }
 
+                var annio=vehiculoActual?.Anio!!.toShort()
+
                 Log.d("Paso1Entrada", "📋 Datos a guardar: idTransporte=$idTransporte, placa=$placa, numeroEconomico=$numeroEconomico, idEmpleadoTransporte=$idEmpleadoTransporte")
                 val exito = dalPasoLog.crearRegistroEntrada(
                     idVehiculo = vehiculoActual!!.Id!!.toInt(),
@@ -374,7 +387,9 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                     numeroEconomico = numeroEconomico,
                     idTransporte = idTransporte,
                     idEmpleadoTransporte = idEmpleadoTransporte,
-                    idStatus = idStatus
+                    idStatus = idStatus,
+                    fechaMovimiento = fechaActual,
+                    annio = annio,
                 )
 
                 if (exito) {
@@ -501,8 +516,9 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         timerHandler = Handler(Looper.getMainLooper())
         timerRunnable = object : Runnable {
             override fun run() {
-                val fechaActual = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
-                binding.tvFechaEntrada.text = "Fecha de entrada: $fechaActual"
+                fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                var fechaActualAux = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
+                binding.tvFechaEntrada.text = "Fecha de entrada: $fechaActualAux"
                 timerHandler.postDelayed(this, 1000) // Actualizar cada segundo
             }
         }

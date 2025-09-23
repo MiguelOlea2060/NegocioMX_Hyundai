@@ -3,6 +3,7 @@ package com.example.negociomx_hyundai
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -58,7 +59,7 @@ class PasoSalida_Activity : AppCompatActivity() {
     // Variables para hora dinámica
     private lateinit var timerHandler: Handler
     private lateinit var timerRunnable: Runnable
-
+    var fechaActual:String=""
     var IdVehiculo:Int?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -121,7 +122,7 @@ class PasoSalida_Activity : AppCompatActivity() {
             binding.tvVinVehiculoSalida.setText(vehiculoActual?.VIN)
         }
         mostrarInformacionVehiculo(vehiculoActual!!)
-        mostrarFormularioPosicionado()
+        mostrarFormularioStatusSalida()
     }
 
     // MÉTODOS PARA CARGAR SPINNERS
@@ -170,10 +171,10 @@ class PasoSalida_Activity : AppCompatActivity() {
         }
     }
 
-    private fun mostrarFormularioPosicionado() {
+    private fun mostrarFormularioStatusSalida() {
         binding.layoutFormularioSalida.visibility = View.VISIBLE
         binding.layoutErrorSalida.visibility = View.GONE
-        Toast.makeText(this, "✅ Vehículo válido para posicionado", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "✅ Vehículo válido para status->Salida", Toast.LENGTH_SHORT).show()
     }
 
     // MÉTODOS PARA CARGAR PERSONAL
@@ -194,8 +195,8 @@ class PasoSalida_Activity : AppCompatActivity() {
                 binding.spinnerConductorSalida.adapter = adapter
 
             } catch (e: Exception) {
-                Log.e("PasoPosicionado", "Error cargando personal: ${e.message}")
-                Toast.makeText(this@PasoSalida_Activity, "Error cargando personal", Toast.LENGTH_SHORT).show()
+                Log.e("PasoSalida", "Error cargando empleado: ${e.message}")
+                Toast.makeText(this@PasoSalida_Activity, "Error cargando empleado", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -209,7 +210,7 @@ class PasoSalida_Activity : AppCompatActivity() {
     }
 
     private fun configurarEventos() {
-        // Botón guardar posicionado
+        // Botón guardar Guardar status->Salida
         binding.btnGuardarSalida.setOnClickListener {
             guardarStatusSalida()
         }
@@ -528,7 +529,7 @@ class PasoSalida_Activity : AppCompatActivity() {
                     EnviadoAInterface = null,
                     FechaEnviado = null,
                     Observacion = null,
-                    FechaMovimiento = "",
+                    FechaMovimiento = fechaActual,
                     NumeroEconomico = "",
                     Bloque = "",
                     Placa = placas,
@@ -540,15 +541,20 @@ class PasoSalida_Activity : AppCompatActivity() {
                 ocultarCargaGuardado()
 
                 if (exito) {
-                    Toast.makeText(this@PasoSalida_Activity, "✅ Vehículo posicionado exitosamente", Toast.LENGTH_SHORT).show()
-                    limpiarFormulario()
+                    Toast.makeText(this@PasoSalida_Activity, "✅ Vehículo con Status->Salida exitosamente", Toast.LENGTH_SHORT).show()
+
+                    val intentA = Intent(this@PasoSalida_Activity, Paso1Entrada_Activity::class.java) //me dio erro y tuve que agregar r
+                    intentA.putExtra("RefrescarVin",true)
+                    intentA.putExtra("Vin",vehiculoActual?.VIN)
+                    startActivity(intentA)
+                    finish() // Cerrar la actividad actual
                 } else {
-                    Toast.makeText(this@PasoSalida_Activity, "❌ Error guardando posicionado", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@PasoSalida_Activity, "❌ Error guardando status -> Salida", Toast.LENGTH_SHORT).show()
                 }
 
             } catch (e: Exception) {
                 ocultarCargaGuardado()
-                Log.e("PasoPosicionado", "💥 Error guardando posicionado: ${e.message}")
+                Log.e("PasoSalida", "💥 Error guardando status->Salida: ${e.message}")
                 Toast.makeText(this@PasoSalida_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
@@ -585,7 +591,7 @@ class PasoSalida_Activity : AppCompatActivity() {
         binding.btnGuardarSalida.isEnabled = false
         binding.btnGuardarSalida.alpha = 0.5f
 
-        binding.tvLoadingTextSalida.text = "Guardando posicionado..."
+        binding.tvLoadingTextSalida.text = "Guardando status->Salida..."
        binding.tvLoadingSubtextSalida.text = "Actualizando status del vehículo"
     }
 
@@ -605,10 +611,9 @@ class PasoSalida_Activity : AppCompatActivity() {
         timerHandler = Handler(Looper.getMainLooper())
         timerRunnable = object : Runnable {
             override fun run() {
-                val fechaActual = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(
-                    Date()
-                )
-                binding.tvFechaMovimientoSalida.text = "Fecha de movimiento: $fechaActual"
+                fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                var fechaActualAux = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
+                binding.tvFechaMovimientoSalida.text = "Fecha de movimiento: $fechaActualAux"
                 timerHandler.postDelayed(this, 1000)
             }
         }

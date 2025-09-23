@@ -199,8 +199,10 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
                 {
                     totalVehiculos=registros.count()
                     registros.forEach { Unit->
-                        if(Unit.Detalles!=null)
-                            totalStatus+= Unit.Detalles!!.size
+                        if(Unit.Detalles!=null) {
+                            totalStatus += Unit.Detalles!!.size
+                            Unit.CantidadStatus=Unit.Detalles?.count()?.toShort()!!
+                        }
                     }
                 }
                 estadisticas["TotalRegistros"] = 1
@@ -313,7 +315,7 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
             Vehículo: ${registro.Marca} ${registro.Modelo} ${registro.Anio}
             
             📊 DATOS Actuales:
-            Status act.: ${registro.NombreStatus} km
+            Status act.: ${registro.NombreStatus}
             Fecha entrada: ${registro.FechaEntrada}%
             FechaUltMov: ${(registro.FechaAlta)}
             Posicion actual: ${posicion}

@@ -56,7 +56,7 @@ class DALPasoLogVehiculo {
                   , ep.ApellidoMaterno, pd.IdEmpleadoTransporte, ce.NombreCompleto as NombreEmpleadoTransporte
                   , pd.IdTransporte, c.Nombre as NombreTransporte, pd.IdStatus IdStatusPD, s1.Nombre 
                   NombreStatusPD, pd.NumeroEconomico, pd.IdUsuarioMovimiento, pd.Fila, pd.Columna, v.Vin
-                  , p.FechaAlta, pd.IdBloque
+                  , p.FechaAlta, pd.IdBloque, v.Annio
                 from dbo.PasoLogVehiculo p inner join dbo.PasoLogVehiculoDet pd on p.IdPasoLogVehiculo=pd.IdPasoLogVehiculo
                 left join dbo.Vehiculo v on p.IdVehiculo=v.IdVehiculo
                 left join dbo.Status s on p.IdStatusActual=s.IdStatus
@@ -86,7 +86,8 @@ class DALPasoLogVehiculo {
                     FechaAlta = resultSet.getString("FechaAlta") ?: "",
                     IdStatusActual = resultSet.getInt("IdStatusActual"),
                     IdPasoLogVehiculo =resultSet.getInt("IdPasoLogVehiculo")?:0,
-                    NombreStatus = resultSet.getString("NombreStatus")
+                    NombreStatus = resultSet.getString("NombreStatus"),
+                    Anio =  resultSet.getShort("Annio")
                 )
                 var apellidoPaterno= resultSet.getString("ApellidoPaterno")?:""
                 var apellidoMaterno= resultSet.getString("ApellidoMaterno")?:""
@@ -227,11 +228,15 @@ class DALPasoLogVehiculo {
         numeroEconomico: String? = null,
         idTransporte: Int? = null,
         idEmpleadoTransporte: Int? = null,
-        idStatus:Int=0
+        idStatus:Int=0,
+        fechaMovimiento:String="",
+        annio:Short=0
     ): Boolean = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statementPrincipal: PreparedStatement? = null
         var statementDetalle: PreparedStatement? = null
+        var statementVp: PreparedStatement? = null
+        var statementVpd: PreparedStatement? = null
 
         try {
             Log.d("DALPasoLogVehiculo", "💾 Creando registro de entrada para vehículo ID: $idVehiculo")
@@ -243,16 +248,73 @@ class DALPasoLogVehiculo {
             }
             conexion.autoCommit = false
 
+
+            var queryPrincipal = """
+            select vpd.IdVehiculoPlacas from dbo.Vehiculo v inner join dbo.VehiculoPlacas vp on v.IdVehiculo=vp.IdVehiculo
+            inner join dbo.VehiculoPlacasDueno vpd on vp.IdVehiculoPlacas=vpd.IdVehiculoPlacasDueno
+                    where vp.Placas= ? and vpd.IdTipoPersonaDueno=1 and vpd.IdPersona=?
+            """.trimIndent()
+            statementPrincipal = conexion.prepareStatement(queryPrincipal)
+            statementPrincipal.setString(1, placa)
+            statementPrincipal.setInt(2, idTransporte!!)
+            val resultSet = statementPrincipal.executeQuery()
+
+            var idVehiculoPlacas:Int?=null
+            var idVehiculoPlacasDueno:Int? = null
+            if(resultSet.next())
+                idVehiculoPlacas = resultSet.getInt(1)
+            else
+            {
+                queryPrincipal = """
+                    INSERT INTO DBO.VEHICULOPLACAS(IdVehiculo, Placas, IdEstado, Annio, FechaModificacion, Activo, NumeroEconomico)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """.trimIndent()
+                statementVp = conexion.prepareStatement(queryPrincipal, PreparedStatement.RETURN_GENERATED_KEYS)
+                statementVp.setInt(1, idVehiculo)
+                statementVp.setString(2, placa)
+                statementVp.setInt(3, 1)
+                statementVp.setShort(4, annio)
+                statementVp.setString(5, fechaMovimiento)
+                statementVp.setBoolean(6, true)
+                statementVp.setString(7, numeroEconomico)
+                statementVp.executeUpdate()
+
+                var generatedKeys = statementVp.generatedKeys
+                idVehiculoPlacas = 0
+                if (generatedKeys.next()) {
+                    idVehiculoPlacas = generatedKeys.getInt(1)
+                }
+
+                queryPrincipal = """
+                    INSERT INTO DBO.VEHICULOPLACASDUENO(IDVEHICULOPLACAS, IdTipoPersonaDueno, IdPersona, Activo, FechaAlta)
+                    VALUES (?, ?, ?, ?, ?)
+                """.trimIndent()
+                statementVpd = conexion.prepareStatement(queryPrincipal, PreparedStatement.RETURN_GENERATED_KEYS)
+                statementVpd.setInt(1, idVehiculoPlacas)
+                statementVpd.setShort(2, 1)
+                statementVpd.setInt(3, idTransporte)
+                statementVpd.setBoolean(4, true)
+                statementVpd.setString(5, fechaMovimiento)
+
+                statementVpd.executeUpdate()
+                generatedKeys = statementVpd.generatedKeys
+                idVehiculoPlacasDueno = 0
+                if (generatedKeys.next()) {
+                    idVehiculoPlacasDueno = generatedKeys.getInt(1)
+                }
+            }
+
             // 1. Insertar registro principal
-            val queryPrincipal = """
+            queryPrincipal = """
                 INSERT INTO PasoLogVehiculo (IdVehiculo, IdStatusActual, FechaAlta, IdUsuarioAlta)
-                VALUES (?, ?, GETDATE(), ?)
+                VALUES (?, ?, ?, ?)
             """.trimIndent()
 
             statementPrincipal = conexion.prepareStatement(queryPrincipal, PreparedStatement.RETURN_GENERATED_KEYS)
             statementPrincipal.setInt(1, idVehiculo)
             statementPrincipal.setInt(2, idStatus)
-            statementPrincipal.setInt(3, idUsuario)
+            statementPrincipal.setString(3, fechaMovimiento)
+            statementPrincipal.setInt(4, idUsuario)
 
             val filasAfectadas = statementPrincipal.executeUpdate()
             if (filasAfectadas == 0) {
@@ -270,7 +332,7 @@ class DALPasoLogVehiculo {
             val queryDetalle = """
                 INSERT INTO PasoLogVehiculoDet (IdPasoLogVehiculo, IdTransporte, Placa, NumeroEconomico, 
                     IdEmpleadoTransporte, IdTipoEntradaSalida, IdStatus, FechaMovimiento, IdUsuarioMovimiento
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, GETDATE(), ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent()
 
             statementDetalle = conexion.prepareStatement(queryDetalle)
@@ -281,7 +343,8 @@ class DALPasoLogVehiculo {
             statementDetalle.setObject(5, idEmpleadoTransporte)
             statementDetalle.setInt(6, tipoEntrada)
             statementDetalle.setInt(7, idStatus)
-            statementDetalle.setInt(8, idUsuario)
+            statementDetalle.setString(8, fechaMovimiento)
+            statementDetalle.setInt(9, idUsuario)
 
             statementDetalle.executeUpdate()
 
@@ -682,19 +745,25 @@ class DALPasoLogVehiculo {
                     NumFilas = resultSet.getShort("NumFilas"),
                     Nombre = resultSet.getString("Nombre")
                 )
+
+                var item=BloqueColumnaFilaUso(
+                    IdBloque = bloque.IdBloque,
+                    IdBloqueColumnaFilaUso = resultSet.getShort("IdBloqueColumnaFilaUso")?:0,
+                    NumFila =  resultSet.getShort("NumFila")?:0,
+                    NumColumna =  resultSet.getShort("NumColumna")?:0,
+                    Activa = resultSet.getBoolean("Activa")?:false,
+                )
+
                 var find=bloques.filter { it.IdBloque==bloque.IdBloque }.firstOrNull()
-                if (find==null)
+                if (find==null) {
+                    bloque.Ocupadas= mutableListOf()
+                    bloque.Ocupadas?.add(item)
                     bloques.add(bloque)
+                }
                 else
                 {
-                    if(find.Ocupadas==null)find.Ocupadas= mutableListOf<BloqueColumnaFilaUso>()
-                    var item=BloqueColumnaFilaUso(
-                        IdBloque = bloque.IdBloque,
-                        IdBloqueColumnaFilaUso = resultSet.getShort("IdBloqueColumnaFilaUso")?:0,
-                        NumFila =  resultSet.getShort("NumFila")?:0,
-                        NumColumna =  resultSet.getShort("NumColumna")?:0,
-                        Activa = resultSet.getBoolean("Activa")?:false,
-                    )
+                    var existe=find.Ocupadas?.filter { it.IdBloqueColumnaFilaUso==item.IdBloqueColumnaFilaUso }?.firstOrNull()!=null
+                    if(!existe)
                     find.Ocupadas?.add(item)
                 }
             }

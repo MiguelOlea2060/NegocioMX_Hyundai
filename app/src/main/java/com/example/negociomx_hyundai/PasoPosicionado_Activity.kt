@@ -2,6 +2,7 @@ package com.example.negociomx_hyundai
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -54,12 +55,12 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private lateinit var timerHandler: Handler
     private lateinit var timerRunnable: Runnable
 
+    var fechaActual:String =""
     private lateinit var bloques : List<Bloque>
     private var posiciones = listOf<PosicionBloque>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         binding = ActivityPasoPosicionadoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -106,7 +107,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private fun configurarEventos() {
         // Botón guardar posicionado
         binding.btnGuardarPosicionado.setOnClickListener {
-            guardarPosicionado()
+            guardarStatusPosicionado()
         }
 
         binding.btnRegresarPosicionado.setOnClickListener {
@@ -158,7 +159,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         Toast.makeText(this, "✅ Vehículo válido para posicionado", Toast.LENGTH_SHORT).show()
     }
 
-    private fun guardarPosicionado() {
+    private fun guardarStatusPosicionado() {
         if (!validarFormularioPosicionado()) {
             return
         }
@@ -166,7 +167,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         mostrarCargaGuardado()
         lifecycleScope.launch {
             try {
-                Log.d("PasoPosicionado", "💾 Guardando posicionado del vehículo")
+                Log.d("PasoPosicionado", "💾 Guardando Status->Posicionado del vehículo")
 
                 val posicionBloque = binding.spinnerBloque.selectedItemPosition
                 val bloque=bloques[posicionBloque-1]
@@ -201,7 +202,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                     EnviadoAInterface = null,
                     FechaEnviado = null,
                     Observacion = null,
-                    FechaMovimiento = "",
+                    FechaMovimiento = fechaActual,
                     NumeroEconomico = "",
                     Bloque = bloque.Nombre,
                     Placa = "",
@@ -213,11 +214,15 @@ class PasoPosicionado_Activity : AppCompatActivity() {
 
                 if (exito) {
                     Toast.makeText(this@PasoPosicionado_Activity, "✅ Vehículo posicionado exitosamente", Toast.LENGTH_SHORT).show()
-                    limpiarFormulario()
+
+                    val intentA = Intent(this@PasoPosicionado_Activity, Paso1Entrada_Activity::class.java) //me dio erro y tuve que agregar r
+                    intentA.putExtra("RefrescarVin",true)
+                    intentA.putExtra("Vin",vehiculoActual?.VIN)
+                    startActivity(intentA)
+                    finish() // Cerrar la actividad actual
                 } else {
                     Toast.makeText(this@PasoPosicionado_Activity, "❌ Error guardando posicionado", Toast.LENGTH_SHORT).show()
                 }
-
             } catch (e: Exception) {
                 ocultarCargaGuardado()
                 Log.e("PasoPosicionado", "💥 Error guardando posicionado: ${e.message}")
@@ -247,8 +252,9 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         timerHandler = Handler(Looper.getMainLooper())
         timerRunnable = object : Runnable {
             override fun run() {
-                val fechaActual = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
-                binding.tvFechaMovimiento.text = "Fecha de movimiento: $fechaActual"
+                fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                val fechaActualAux = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
+                binding.tvFechaMovimiento.text = "Fecha actual: $fechaActualAux"
                 timerHandler.postDelayed(this, 1000)
             }
         }
@@ -340,7 +346,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private fun cargarPosiciones(posicion: Int) {
         lifecycleScope.launch {
             try {
-                var bloque:Bloque=bloques[posicion]
+                var bloque:Bloque=bloques[posicion-1]
                 posiciones = bllBlo?.getPosicionesDisponiblesDeBloque(bloque)!!
 
                 val nombresPosiciones = mutableListOf("Seleccionar posición...")

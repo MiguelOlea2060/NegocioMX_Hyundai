@@ -198,6 +198,7 @@
                 android:layout_marginBottom="12dp" />
 
             <TextView
+                android:textStyle="bold"
                 android:id="@+id/tvFechaMovimiento"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
