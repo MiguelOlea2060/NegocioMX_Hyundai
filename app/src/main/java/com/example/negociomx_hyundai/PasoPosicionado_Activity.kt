@@ -215,10 +215,15 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 if (exito) {
                     Toast.makeText(this@PasoPosicionado_Activity, "✅ Vehículo posicionado exitosamente", Toast.LENGTH_SHORT).show()
 
-                    val intentA = Intent(this@PasoPosicionado_Activity, Paso1Entrada_Activity::class.java) //me dio erro y tuve que agregar r
+                    /*val intentA = Intent(this@PasoPosicionado_Activity, Paso1Entrada_Activity::class.java) //me dio erro y tuve que agregar r
                     intentA.putExtra("RefrescarVin",true)
                     intentA.putExtra("Vin",vehiculoActual?.VIN)
-                    startActivity(intentA)
+                    startActivity(intentA)*/
+
+                    val data = Intent()
+                    data.putExtra("Refrescar", true);
+                    data.putExtra("Vin", vehiculoActual?.VIN);
+                    setResult(Activity.RESULT_OK,data)
                     finish() // Cerrar la actividad actual
                 } else {
                     Toast.makeText(this@PasoPosicionado_Activity, "❌ Error guardando posicionado", Toast.LENGTH_SHORT).show()

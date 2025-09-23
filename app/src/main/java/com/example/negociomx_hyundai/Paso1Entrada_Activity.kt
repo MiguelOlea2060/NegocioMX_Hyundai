@@ -1,5 +1,6 @@
 package com.example.negociomx_hyundai
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -13,8 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
-import com.example.negociomx_hyundai.BE.Vehiculo
 import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
 import com.example.negociomx_hyundai.DAL.DALVehiculo
 import com.example.negociomx_hyundai.Utils.ParametrosSistema
@@ -32,8 +31,6 @@ import android.widget.TextView
 import com.example.negociomx_hyundai.BE.VehiculoPasoLog
 
 
-
-import android.widget.Spinner
 import android.widget.ArrayAdapter
 import android.widget.AdapterView
 import com.example.negociomx_hyundai.BE.Cliente
@@ -85,6 +82,24 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         inicializarFormulario()
     }
 
+    @SuppressLint("MissingSuperCall")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(resultCode != Activity.RESULT_OK) return
+        when(requestCode) {
+            101 -> {
+                val refrescar=data?.getBooleanExtra("Refrescar",false)
+                val vin= data?.getStringExtra("Vin")
+
+                if(refrescar==true) {
+                    binding.etVIN.setText(vin)
+
+                    consultarVehiculo()
+                }
+            }
+            // Other result codes
+            else -> {}
+        }
+    }
     private fun configurarEventos() {
         // <CHANGE> Configurar eventos de la interfaz
         binding.etVIN.requestFocus()
@@ -129,6 +144,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
 
         // Botones de transición
         binding.btnPosicionado.setOnClickListener {
+            val codigoRespuesta=101
             val intent = Intent(this, PasoPosicionado_Activity::class.java)
             val idVehiculo:Int?=vehiculoActual?.Id!!.toInt()
             intent.putExtra("IdVehiculo",idVehiculo)
@@ -139,25 +155,26 @@ class Paso1Entrada_Activity : AppCompatActivity() {
             intent.putExtra("Modelo",vehiculoActual?.Modelo)
             intent.putExtra("ColorExterior",vehiculoActual?.ColorExterior)
             intent.putExtra("ColorInterior",vehiculoActual?.ColorInterior)
-            startActivity(intent)
+            startActivityForResult(intent,codigoRespuesta)
         }
 
         binding.btnMovimientoLocal.setOnClickListener {
-                val intent = Intent(this, PasoMovimientoLocal_Activity::class.java)
-                intent.putExtra("IdVehiculo", vehiculoActual?.Id?.toInt())
-                intent.putExtra("IdPasoLogVehiculo", vehiculoActual?.IdPasoLogVehiculo)
-                intent.putExtra("Vin", vehiculoActual?.VIN)
-                intent.putExtra("Bl", vehiculoActual?.BL)
-                intent.putExtra("Marca", vehiculoActual?.Marca)
-                intent.putExtra("Modelo", vehiculoActual?.Modelo)
-                intent.putExtra("Annio", vehiculoActual?.Anio.toString())
-                intent.putExtra("ColorExterior", vehiculoActual?.ColorExterior)
-                intent.putExtra("ColorInterior", vehiculoActual?.ColorInterior)
-                startActivity(intent)
-
+            val codigoRespuesta=101
+            val intent = Intent(this, PasoMovimientoLocal_Activity::class.java)
+            intent.putExtra("IdVehiculo", vehiculoActual?.Id?.toInt())
+            intent.putExtra("IdPasoLogVehiculo", vehiculoActual?.IdPasoLogVehiculo)
+            intent.putExtra("Vin", vehiculoActual?.VIN)
+            intent.putExtra("Bl", vehiculoActual?.BL)
+            intent.putExtra("Marca", vehiculoActual?.Marca)
+            intent.putExtra("Modelo", vehiculoActual?.Modelo)
+            intent.putExtra("Annio", vehiculoActual?.Anio.toString())
+            intent.putExtra("ColorExterior", vehiculoActual?.ColorExterior)
+            intent.putExtra("ColorInterior", vehiculoActual?.ColorInterior)
+            startActivityForResult(intent,codigoRespuesta)
         }
 
         binding.btnEnTaller.setOnClickListener {
+            val codigoRespuesta=101
             val intent = Intent(this, PasoTaller_Activity::class.java)
             intent.putExtra("IdVehiculo", vehiculoActual?.Id?.toInt())
             intent.putExtra("IdPasoLogVehiculo", vehiculoActual?.IdPasoLogVehiculo)
@@ -168,7 +185,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
             intent.putExtra("Annio", vehiculoActual?.Anio.toString())
             intent.putExtra("ColorExterior", vehiculoActual?.ColorExterior)
             intent.putExtra("ColorInterior", vehiculoActual?.ColorInterior)
-            startActivity(intent)
+            startActivityForResult(intent,codigoRespuesta)
         }
 
         binding.btnSalida.setOnClickListener {
@@ -176,6 +193,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
 
             val intent = Intent(this, PasoSalida_Activity::class.java)
 
+            val codigoRespuesta=101
             val idVehiculo:Int?=vehiculoActual?.Id!!.toInt()
             intent.putExtra("IdVehiculo",idVehiculo)
             intent.putExtra("IdPasoLogVehiculo",vehiculoActual?.IdPasoLogVehiculo)
@@ -186,7 +204,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
             intent.putExtra("Annio", vehiculoActual?.Anio.toString())
             intent.putExtra("ColorExterior",vehiculoActual?.ColorExterior)
             intent.putExtra("ColorInterior",vehiculoActual?.ColorInterior)
-            startActivity(intent)
+            startActivityForResult(intent,codigoRespuesta)
         }
 
         // <CHANGE> Botón para registrar VIN nuevo
@@ -244,7 +262,6 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                         mostrarFormularioEntrada()
                     } else {
                         // Ya tiene registros, consultar status actual
-                        //statusActual = dalPasoLog.consultarStatusActual(vehiculoActual!!.Id!!.toInt())
                         mostrarOpcionesTransicion()
                     }
                     hideKeyboard()
@@ -342,11 +359,21 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         }
     }
 
+    private fun mostrarCargaGuardado() {
+        binding.loadingContainerEntrada.visibility = View.VISIBLE
+        binding.btnGuardarEntrada.isEnabled = false
+        binding.btnGuardarEntrada.alpha = 0.5f
+
+        binding.tvLoadingTextEntrada.text = "Guardando status->Entrada..."
+        binding.tvLoadingSubtextEntrada.text = "Actualizando status del vehículo"
+    }
+
     private fun guardarEntrada() {
         if (!validarFormularioEntrada()) {
             return
         }
 
+        mostrarCargaGuardado()
         lifecycleScope.launch {
             try {
                 Log.d("Paso1Entrada", "💾 Guardando entrada del vehículo")
@@ -391,6 +418,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                     fechaMovimiento = fechaActual,
                     annio = annio,
                 )
+                ocultarCargaGuardado()
 
                 if (exito) {
                     Toast.makeText(this@Paso1Entrada_Activity, "✅ Entrada registrada exitosamente", Toast.LENGTH_SHORT).show()
@@ -405,6 +433,12 @@ class Paso1Entrada_Activity : AppCompatActivity() {
                 Toast.makeText(this@Paso1Entrada_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun ocultarCargaGuardado() {
+        binding.loadingContainerEntrada.visibility = View.GONE
+        binding.btnGuardarEntrada.isEnabled = true
+        binding.btnGuardarEntrada.alpha = 1.0f
     }
 
     private fun validarFormularioEntrada(): Boolean {

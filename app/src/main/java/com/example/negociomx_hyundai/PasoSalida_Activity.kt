@@ -543,10 +543,10 @@ class PasoSalida_Activity : AppCompatActivity() {
                 if (exito) {
                     Toast.makeText(this@PasoSalida_Activity, "✅ Vehículo con Status->Salida exitosamente", Toast.LENGTH_SHORT).show()
 
-                    val intentA = Intent(this@PasoSalida_Activity, Paso1Entrada_Activity::class.java) //me dio erro y tuve que agregar r
-                    intentA.putExtra("RefrescarVin",true)
-                    intentA.putExtra("Vin",vehiculoActual?.VIN)
-                    startActivity(intentA)
+                    val data = Intent()
+                    data.putExtra("Refrescar", true);
+                    data.putExtra("Vin", vehiculoActual?.VIN);
+                    setResult(Activity.RESULT_OK,data)
                     finish() // Cerrar la actividad actual
                 } else {
                     Toast.makeText(this@PasoSalida_Activity, "❌ Error guardando status -> Salida", Toast.LENGTH_SHORT).show()

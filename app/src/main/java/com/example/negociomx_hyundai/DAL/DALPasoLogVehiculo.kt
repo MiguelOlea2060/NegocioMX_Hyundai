@@ -972,7 +972,9 @@ class DALPasoLogVehiculo {
         idUsuario: Int,
         idPersonalMovimiento: Int,
         idTipoMovimiento: Int,
-        observacion: String
+        observacion: String,
+        fechaMovimiento: String,
+        placa: String
     ): Boolean = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statementPrincipal: PreparedStatement? = null
@@ -996,7 +998,7 @@ class DALPasoLogVehiculo {
             WHERE IdVehiculo = ?
         """.trimIndent()
 
-            statementPrincipal = conexion.prepareStatement(queryPrincipal)
+            statementPrincipal = conexion.prepareStatement(queryPrincipal,PreparedStatement.RETURN_GENERATED_KEYS)
             statementPrincipal.setInt(1, idVehiculo)
             statementPrincipal.executeUpdate()
 
@@ -1013,10 +1015,9 @@ class DALPasoLogVehiculo {
 
             // 3. Insertar detalle de movimiento local
             val queryDetalle = """
-            INSERT INTO PasoLogVehiculoDet (
-                IdPasoLogVehiculo, PersonaQueHaraMovimiento, IdTipoMovimiento,
-                Observacion, IdStatus, FechaMovimiento, IdUsuarioMovimiento
-            ) VALUES (?, ?, ?, ?, 172, GETDATE(), ?)
+            INSERT INTO PasoLogVehiculoDet (IdPasoLogVehiculo, PersonaQueHaraMovimiento, IdTipoMovimiento,
+                Observacion, IdStatus, FechaMovimiento, IdUsuarioMovimiento, Placa) 
+             VALUES (?, ?, ?, ?, 172, ?, ?, ?)
         """.trimIndent()
 
             statementDetalle = conexion.prepareStatement(queryDetalle)
@@ -1024,7 +1025,9 @@ class DALPasoLogVehiculo {
             statementDetalle.setString(2, "ID:$idPersonalMovimiento")
             statementDetalle.setInt(3, idTipoMovimiento)
             statementDetalle.setString(4, observacion)
-            statementDetalle.setInt(5, idUsuario)
+            statementDetalle.setString(5, fechaMovimiento)
+            statementDetalle.setInt(6, idUsuario)
+            statementDetalle.setString(7, placa)
 
             statementDetalle.executeUpdate()
 

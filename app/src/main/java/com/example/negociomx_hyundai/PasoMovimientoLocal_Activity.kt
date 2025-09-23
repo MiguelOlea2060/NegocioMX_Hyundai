@@ -1,12 +1,13 @@
 package com.example.negociomx_hyundai
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.*
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -56,7 +57,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
     private val dalVehiculo = DALVehiculo()
     private val dalEmpleado = DALEmpleadoSQL()
     private val dalPasoLogVehiculo = DALPasoLogVehiculo()
-
+    var fechaActual:String=""
     // Handler para actualizar fecha en tiempo real
     private lateinit var handlerFecha: Handler
     private lateinit var runnableFecha: Runnable
@@ -123,7 +124,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
         }
 
         btnGuardarMovimiento.setOnClickListener {
-            guardarMovimientoLocal()
+            guardarStatusMovimientoLocal()
         }
     }
 
@@ -242,18 +243,19 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
         handlerFecha = Handler(Looper.getMainLooper())
         runnableFecha = object : Runnable {
             override fun run() {
-                val formatoFechaHora = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-                tvFechaMovimiento.text = formatoFechaHora.format(Date())
+                fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                val fechaActualAux = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+                tvFechaMovimiento.text = fechaActualAux.format(Date())
                 handlerFecha.postDelayed(this, 1000) // Actualizar cada segundo
             }
         }
         handlerFecha.post(runnableFecha)
     }
 
-    private fun guardarMovimientoLocal() {
+    private fun guardarStatusMovimientoLocal() {
         if (!validarFormulario()) return
 
-        mostrarCarga("Guardando movimiento local...", "Registrando en base de datos")
+        mostrarCarga("Guardando status->Movimiento local...", "Registrando en base de datos")
 
         lifecycleScope.launch {
             try {
@@ -262,20 +264,28 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
                 val idPersonalMovimiento = empleados[spinnerPersonalMovimiento.selectedItemPosition - 1].IdEmpleado
                 val idTipoMovimiento = tiposMovimiento[spinnerTipoMovimiento.selectedItemPosition - 1].IdTipoMovimiento
                 val observacion = etObservacion.text.toString().trim()
+                val placa=""
 
                 val resultado = dalPasoLogVehiculo.crearRegistroMovimientoLocal(
                     idVehiculo = idVehiculo,
                     idUsuario = idUsuario,
                     idPersonalMovimiento = idPersonalMovimiento,
                     idTipoMovimiento = idTipoMovimiento,
-                    observacion = observacion
+                    observacion = observacion,
+                    fechaMovimiento = fechaActual,
+                    placa = placa
                 )
 
                 ocultarCarga()
 
                 if (resultado) {
                     Toast.makeText(this@PasoMovimientoLocal_Activity, "Movimiento local registrado exitosamente", Toast.LENGTH_LONG).show()
-                    limpiarFormulario()
+
+                    val data = Intent()
+                    data.putExtra("Refrescar", true);
+                    data.putExtra("Vin", vehiculoActual?.VIN);
+                    setResult(Activity.RESULT_OK,data)
+                    finish()
                 } else {
                     mostrarError("Error al guardar el movimiento local")
                 }
