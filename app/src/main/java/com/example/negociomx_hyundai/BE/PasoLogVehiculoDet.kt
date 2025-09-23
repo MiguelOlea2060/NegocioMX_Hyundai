@@ -6,6 +6,7 @@ data class PasoLogVehiculoDet(
     var IdPasoLogVehiculoDet: Int? = null,
     var IdPasoLogVehiculo: Int? = null,
     var IdTransporte: Int? = null,
+    var IdVehiculoPlacas:Int?=null,
     var Placa: String? = null,
     var NumeroEconomico: String? = null,
     var Bloque: String? = null,

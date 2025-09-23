@@ -200,7 +200,6 @@ class PasoSalida_Activity : AppCompatActivity() {
         }
     }
 
-
     fun Activity.hideKeyboard() {
         hideKeyboard(currentFocus ?: View(this))
     }
@@ -212,7 +211,7 @@ class PasoSalida_Activity : AppCompatActivity() {
     private fun configurarEventos() {
         // Botón guardar posicionado
         binding.btnGuardarSalida.setOnClickListener {
-            guardarPosicionado()
+            guardarStatusSalida()
         }
 
         binding.btnRegresarSalida.setOnClickListener {
@@ -394,6 +393,20 @@ class PasoSalida_Activity : AppCompatActivity() {
                         )
 
                     }
+                    else
+                    {
+                        if(position>0) {
+                            val placa = placasTransportista!![position-1]
+                            if (placa != null && placa.NumeroEconomico.isNotEmpty()) {
+                                binding.etNumeroEconomico.setText(placa.NumeroEconomico)
+                                binding.etNumeroEconomico.requestFocus()
+                            } else {
+                                binding.etNumeroEconomico.setText("")
+                            }
+                        }
+                        else
+                            binding.etNumeroEconomico.setText("")
+                    }
                 }
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -469,21 +482,28 @@ class PasoSalida_Activity : AppCompatActivity() {
         }
     }
 
-
-    private fun guardarPosicionado() {
-        if (!validarFormularioPosicionado()) {
+    private fun guardarStatusSalida() {
+        if (!validarFormularioStatusSalida()) {
             return
         }
 
         mostrarCargaGuardado()
         lifecycleScope.launch {
             try {
-                Log.d("PasoPosicionado", "💾 Guardando posicionado del vehículo")
+                Log.d("Status->Salida de Vehiculo", "💾 Guardando Status->Salida del vehículo")
+
+                val posicionTransporte=binding.spinnerEmpresaMadrinaSalida.selectedItemPosition
+                val transporte= transportistas[posicionTransporte-1]
+                val idTransporteSalida=transporte.IdCliente
 
                 val posicionEmpleado=binding.spinnerConductorSalida.selectedItemPosition
                 val empleado= empleados[posicionEmpleado-1]
-                val idEmpleadoPosiciono=empleado.IdEmpleado
-                val nombrePersonalMovimiento = empleado.NombreCompleto
+                val idEmpleadoTransporteSalida=empleado.IdEmpleado
+
+                val posicionPlaca=binding.spinnerPlacaTransporteSalida.selectedItemPosition
+                val placa= transportistaSeleccionado?.Placas!![posicionPlaca-1]
+                val idVehiculoPlacas=placa.IdVehiculoPlacas
+                var placas=placa.Placas
 
                 val idBloque:Short? =  null
                 val fila:Short? =  null
@@ -493,13 +513,13 @@ class PasoSalida_Activity : AppCompatActivity() {
 
                 val paso=PasoLogVehiculoDet(
                     IdPasoLogVehiculo = vehiculoActual?.IdPasoLogVehiculo,
-                    IdEmpleadoTransporte =null,
-                    IdEmpleadoPosiciono = idEmpleadoPosiciono,
+                    IdEmpleadoTransporte =idEmpleadoTransporteSalida,
+                    IdEmpleadoPosiciono = null,
                     Fila = fila,
                     Columna = columna,
                     IdBloque = idBloque,
-                    IdStatus = 170,
-                    IdTransporte = null,
+                    IdStatus = 169,
+                    IdTransporte = idTransporteSalida,
                     IdTipoMovimiento = null,
                     IdUsuarioMovimiento = idUsuario,
                     IdPasoLogVehiculoDet = 0,
@@ -511,9 +531,10 @@ class PasoSalida_Activity : AppCompatActivity() {
                     FechaMovimiento = "",
                     NumeroEconomico = "",
                     Bloque = "",
-                    Placa = "",
-                    PersonaQueHaraMovimiento = nombrePersonalMovimiento,
-                    IdVehiculo = IdVehiculo
+                    Placa = placas,
+                    PersonaQueHaraMovimiento = "",
+                    IdVehiculo = IdVehiculo,
+                    IdVehiculoPlacas = idVehiculoPlacas,
                 )
                 val exito = dalPasoLog.insertaStatusNuevoPasoLogVehiculo(paso)
                 ocultarCargaGuardado()
@@ -539,9 +560,21 @@ class PasoSalida_Activity : AppCompatActivity() {
         binding.btnGuardarSalida.alpha = 1.0f
     }
 
-    private fun validarFormularioPosicionado(): Boolean {
-        if (binding.spinnerConductorSalida.selectedItemPosition == 0) {
-            Toast.makeText(this, "Seleccione el personal que lo manejará", Toast.LENGTH_SHORT).show()
+    private fun validarFormularioStatusSalida(): Boolean {
+        if (binding.spinnerEmpresaMadrinaSalida.selectedItemPosition == 0) {
+            Toast.makeText(this, "Seleccione el el transporte que se llevara el Vehiculo", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        else if (binding.spinnerConductorSalida.selectedItemPosition == 0) {
+            Toast.makeText(this, "Seleccione el conductor que manejará el Transporte", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        else if (binding.spinnerPlacaTransporteSalida.selectedItemPosition == 0) {
+            Toast.makeText(this, "Seleccione las placas del Transporte", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        else if (binding.etNumeroEconomico.text.isEmpty()) {
+            Toast.makeText(this, "Suministre el numero economico del Transporte", Toast.LENGTH_SHORT).show()
             return false
         }
         return true

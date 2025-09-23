@@ -461,8 +461,10 @@ class DALPasoLogVehiculo {
         var statementBloque: PreparedStatement? = null
 
         try {
-            Log.d("DALPasoLogVehiculo", "💾 Creando registro de posicionado para vehículo ID: " +
-                    "${paso.IdPasoLogVehiculo}")
+            Log.d(
+                "DALPasoLogVehiculo", "💾 Creando registro de posicionado para vehículo ID: " +
+                        "${paso.IdPasoLogVehiculo}"
+            )
 
             conexion = ConexionSQLServer.obtenerConexion()
             if (conexion == null) {
@@ -481,81 +483,108 @@ class DALPasoLogVehiculo {
             statementPrincipal.setInt(2, paso?.IdPasoLogVehiculo!!)
             statementPrincipal.executeUpdate()
 
-            // 2. Insertar un registro en tabla dbo.BloqueColumnaFilaUso
+            // 2. Insertar un registro en tabla dbo.BloqueColumnaFilaUso si el status es diferente de Salida -> 169
             //    esta tanla define que posiciones se encuentra ocupadas
             queryPrincipal = """
                 INSERT INTO dbo.BloqueColumnaFilaUso(IdBloque, NumColumna, NumFila, Nombre, IdVehiculo, Activa) 
                 values (?, ?, ?, ?, ?, ?)
             """.trimIndent()
+            if (paso?.IdStatus == 169) {
+                queryPrincipal = """
+                DELETE from dbo.BloqueColumnaFilaUso where IDVEHICULO =  ?
+            """.trimIndent()
 
-            statementBloque = conexion.prepareStatement(queryPrincipal)
-            statementBloque.setShort(1, paso?.IdBloque!!)
-            statementBloque.setShort(2, paso?.Columna!!)
-            statementBloque.setShort(3, paso?.Fila!!)
-            statementBloque.setString(4, "Col-> ${paso?.Columna}, Fila-> ${paso?.Fila}")
-            statementBloque.setInt(5, paso?.IdVehiculo!!)
-            statementBloque.setBoolean(6, true)
+                statementBloque = conexion.prepareStatement(queryPrincipal)
+                statementBloque.setInt(1, paso?.IdVehiculo!!)
+            } else {
+                statementBloque = conexion.prepareStatement(queryPrincipal)
+                statementBloque.setShort(1, paso?.IdBloque!!)
+                statementBloque.setShort(2, paso?.Columna!!)
+                statementBloque.setShort(3, paso?.Fila!!)
+                statementBloque.setString(4, "Col-> ${paso?.Columna}, Fila-> ${paso?.Fila}")
+                statementBloque.setInt(5, paso?.IdVehiculo!!)
+                statementBloque.setBoolean(6, true)
+            }
             statementBloque.executeUpdate()
-
 
             // 2. Insertar detalle de posicionado
             // <CHANGE> Agregar campos faltantes: IdTipoMovimiento y PersonaQueHaraMovimiento
-            var campos=""
-            var valores=""
-            var contadorparams:Int=1
+            var campos = ""
+            var valores = ""
+            var contadorparams: Int = 1
 
-            campos+="(IdPasoLogVehiculo, Bloque, Fila, Placa"
-            valores+="values(?, ?, ?, ?"
-            if(paso?.Columna!=null)
-            {
-                campos+=", Columna"
-                valores+=", ?"
+            campos += "(IdPasoLogVehiculo, Placa"
+            valores += "values(?, ?"
+            if (paso?.Bloque != null) {
+                campos += ", Bloque"
+                valores += ", ?"
             }
-            if(paso?.IdTipoMovimiento!=null) {
-                campos+=", IdTipoMovimiento"
-                valores+=", ?"
+            if (paso?.Fila != null) {
+                campos += ", Fila"
+                valores += ", ?"
             }
-            campos+=", PersonaQueHaraMovimiento, IdStatus, FechaMovimiento"
-            valores+=", ?, ?, ?"
-            if(paso?.IdUsuarioMovimiento!=null) {
-                campos+=", IdUsuarioMovimiento"
-                valores+=", ?"
+            if (paso?.Columna != null) {
+                campos += ", Columna"
+                valores += ", ?"
             }
-            if(paso?.IdEmpleadoPosiciono!=null) {
-                campos+=", IdEmpleadoPosiciono"
-                valores+=", ?"
+            if (paso?.IdTipoMovimiento != null) {
+                campos += ", IdTipoMovimiento"
+                valores += ", ?"
             }
-            campos+=", IdBloque"
-            valores+=", ?"
-            if(paso?.EnviadoAInterface!=null) {
-                campos+=", EnviadoAInterface"
-                valores+=", ?"
+            campos += ", PersonaQueHaraMovimiento, IdStatus, FechaMovimiento"
+            valores += ", ?, ?, ?"
+            if (paso?.IdUsuarioMovimiento != null) {
+                campos += ", IdUsuarioMovimiento"
+                valores += ", ?"
             }
-            if (paso?.NumeroEconomico!=null)
-            {
-                campos+=", NumeroEconomico"
-                valores+=", ?"
+            if (paso?.IdEmpleadoPosiciono != null) {
+                campos += ", IdEmpleadoPosiciono"
+                valores += ", ?"
             }
-            campos+=") "
-            valores+=") "
+            if(paso?.IdBloque!=null) {
+                campos += ", IdBloque"
+                valores += ", ?"
+            }
+            if (paso?.EnviadoAInterface != null) {
+                campos += ", EnviadoAInterface"
+                valores += ", ?"
+            }
+            if (paso?.NumeroEconomico != null) {
+                campos += ", NumeroEconomico"
+                valores += ", ?"
+            }
+            if (paso?.IdVehiculoPlacas != null) {
+                campos += ", IdVehiculoPlacas"
+                valores += ", ?"
+            }
+            if (paso?.IdEmpleadoTransporte != null) {
+                campos += ", IdEmpleadoTransporte"
+                valores += ", ?"
+            }
+            campos += ") "
+            valores += ") "
             var queryDetalle = "INSERT INTO PasoLogVehiculoDet "
-            queryDetalle+=campos + valores
+            queryDetalle += campos + valores
             statementDetalle = conexion.prepareStatement(queryDetalle)
 
             statementDetalle.setInt(contadorparams, paso?.IdPasoLogVehiculo!!)
             contadorparams++
-            statementDetalle.setString(contadorparams, paso?.Bloque)
-            contadorparams++
-            statementDetalle.setShort(contadorparams, paso?.Fila!!)
-            contadorparams++
+            if (paso?.Bloque != null) {
+                statementDetalle.setString(contadorparams, paso?.Bloque)
+                contadorparams++
+            }
+            if (paso?.Fila != null) {
+                statementDetalle.setShort(contadorparams, paso?.Fila!!)
+                contadorparams++
+            }
             statementDetalle.setString(contadorparams, paso?.Placa)
             contadorparams++
 
-            if(paso?.Columna!=null) {
+            if (paso?.Columna != null) {
                 statementDetalle.setShort(contadorparams, paso?.Columna!!)
                 contadorparams++
             }
-            if(paso?.IdTipoMovimiento!=null) {
+            if (paso?.IdTipoMovimiento != null) {
                 statementDetalle.setInt(contadorparams, paso?.IdTipoMovimiento!!)
                 contadorparams++
             }
@@ -566,17 +595,18 @@ class DALPasoLogVehiculo {
             statementDetalle.setString(contadorparams, paso?.FechaMovimiento)
             contadorparams++
 
-            if(paso?.IdUsuarioMovimiento!=null) {
+            if (paso?.IdUsuarioMovimiento != null) {
                 statementDetalle.setInt(contadorparams, paso?.IdUsuarioMovimiento!!)
                 contadorparams++
             }
-            if(paso?.IdEmpleadoPosiciono!=null) {
+            if (paso?.IdEmpleadoPosiciono != null) {
                 statementDetalle.setInt(contadorparams, paso?.IdEmpleadoPosiciono!!)
                 contadorparams++
             }
-            statementDetalle.setShort(contadorparams, paso?.IdBloque!!)
-            contadorparams++
-
+            if (paso?.IdBloque != null) {
+                statementDetalle.setShort(contadorparams, paso?.IdBloque!!)
+                contadorparams++
+            }
             if(paso?.EnviadoAInterface!=null) {
                 statementDetalle.setBoolean(contadorparams, paso?.EnviadoAInterface!!)
                 contadorparams++
@@ -584,6 +614,16 @@ class DALPasoLogVehiculo {
             if (paso?.NumeroEconomico!=null)
             {
                 statementDetalle.setString(contadorparams, paso?.NumeroEconomico)
+                contadorparams++
+            }
+            if (paso?.IdVehiculoPlacas!=null)
+            {
+                statementDetalle.setInt(contadorparams, paso?.IdVehiculoPlacas!!)
+                contadorparams++
+            }
+            if (paso?.IdEmpleadoTransporte!=null)
+            {
+                statementDetalle.setInt(contadorparams, paso?.IdEmpleadoTransporte!!)
                 contadorparams++
             }
 
