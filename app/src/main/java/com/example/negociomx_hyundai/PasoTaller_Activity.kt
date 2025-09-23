@@ -23,6 +23,15 @@ import java.util.*
 
 class PasoTaller_Activity : AppCompatActivity() {
 
+
+
+    private lateinit var tvVinVehiculoMovimiento: TextView
+    private lateinit var tvBlVehiculo: TextView
+    private lateinit var  tvMarcaModeloAnnio: TextView
+    private lateinit var tvColorExterior: TextView
+    private lateinit var tvColorInterior: TextView
+
+
     private lateinit var binding:ActivityPasoTallerBinding
     // Variables de UI
     private lateinit var layoutInfoVehiculo: LinearLayout
@@ -72,6 +81,9 @@ class PasoTaller_Activity : AppCompatActivity() {
     private var dalEmpresaTaller=DALClienteSQL()
     private val dalEmpleado = DALEmpleadoSQL()
 
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -92,6 +104,12 @@ class PasoTaller_Activity : AppCompatActivity() {
     }
 
     private fun inicializarComponentes() {
+
+
+
+
+
+
         // Layouts principales
         layoutInfoVehiculo = findViewById(R.id.layoutInfoVehiculo)
         layoutFormularioTaller = findViewById(R.id.layoutFormularioTaller)
@@ -102,7 +120,11 @@ class PasoTaller_Activity : AppCompatActivity() {
         loadingContainer = findViewById(R.id.loadingContainer)
 
         // Componentes de UI
-        tvInfoVehiculo = findViewById(R.id.tvInfoVehiculo)
+        tvVinVehiculoMovimiento = findViewById(R.id.tvInfoVehiculo)
+        tvBlVehiculo = findViewById(R.id.tvBlVehiculo)
+        tvMarcaModeloAnnio = findViewById(R.id.tvMarcaModeloAnnio)
+        tvColorExterior = findViewById(R.id.tvColorExterior)
+        tvColorInterior = findViewById(R.id.tvColorInterior)
         spinnerPersonalMovimiento = findViewById(R.id.spinnerPersonalMovimiento)
         radioGroupTipoReparacion = findViewById(R.id.radioGroupTipoReparacion)
         radioEnSitio = findViewById(R.id.radioEnSitio)
@@ -123,6 +145,7 @@ class PasoTaller_Activity : AppCompatActivity() {
         btnGuardar = findViewById(R.id.btnGuardar)
         tvLoadingText = findViewById(R.id.tvLoadingText)
         tvError = findViewById(R.id.tvError)
+
 
         // Inicializar fecha actual
         inicializarFechaActual()
@@ -180,7 +203,7 @@ class PasoTaller_Activity : AppCompatActivity() {
     }
 
     private fun obtenerDatosVehiculo() {
-        // Obtener datos del vehículo desde Intent
+ /*       // Obtener datos del vehículo desde Intent
         val vinVehiculo = intent.getStringExtra("VIN") ?: ""
         val idVehiculo = intent.getIntExtra("ID_VEHICULO", 0)
 
@@ -199,26 +222,69 @@ class PasoTaller_Activity : AppCompatActivity() {
             mostrarInfoVehiculo()
         } else {
             mostrarError("No se recibieron datos del vehículo")
+        }*/
+
+        try {
+            val idVehiculo = intent.getIntExtra("IdVehiculo", 0)
+            val vin = intent.getStringExtra("Vin") ?: ""
+            val bl = intent.getStringExtra("Bl") ?: ""
+            val marca = intent.getStringExtra("Marca") ?: ""
+            val modelo = intent.getStringExtra("Modelo") ?: ""
+            val annioAux = intent.getStringExtra("Annio") ?: ""
+            var annio: Int = 0
+            if (annioAux.isNotEmpty())
+                annio=annioAux.toInt()
+            val colorExterior = intent.getStringExtra("ColorExterior") ?: ""
+            val colorInterior = intent.getStringExtra("ColorInterior") ?: ""
+
+
+            if (idVehiculo > 0 && vin.isNotEmpty()) {
+                vehiculoActual = VehiculoPasoLog(
+                    Id = idVehiculo.toString(),
+                    VIN = vin,
+                    BL = bl,
+                    Marca = marca,
+                    Modelo = modelo,
+                    Anio = annio,
+                    ColorExterior = colorExterior,
+                    ColorInterior = colorInterior
+                )
+
+                mostrarInfoVehiculo()
+
+                Log.d("PasoTaller_Activity", "✅ Datos del vehículo obtenidos: VIN=$vin")
+            } else {
+                mostrarError("No se recibieron datos válidos del vehículo")
+            }
+        } catch (e: Exception) {
+            mostrarError("Error obteniendo datos del vehículo: ${e.message}")
+            Log.e("PasoTaller_Activity", "Error obteniendo datos: ${e.message}")
         }
+
+
+
     }
 
     private fun mostrarInfoVehiculo() {
         vehiculoActual?.let { vehiculo ->
-            val info = buildString {
-                append("VIN: ${vehiculo.VIN}\n")
-                append("Marca: ${vehiculo.Marca} ${vehiculo.Modelo} ${vehiculo.Anio}\n")
-                append("Color: ${vehiculo.ColorExterior} / ${vehiculo.ColorInterior}")
-            }
-            tvInfoVehiculo.text = info
+            tvVinVehiculoMovimiento.text = "VIN: ${vehiculo.VIN}"
+            tvBlVehiculo.text = "BL: ${vehiculo.BL}"
+            tvMarcaModeloAnnio.text = "Marca: ${vehiculo.Marca}     Modelo: ${vehiculo.Modelo}    Año: ${vehiculo.Anio}"
+            tvColorExterior.text = "Color Ext: ${vehiculo.ColorExterior}"
+            tvColorInterior.text = "Color Int: ${vehiculo.ColorInterior}"
+
             layoutInfoVehiculo.visibility = View.VISIBLE
         }
     }
+
 
     private fun cargarDatosIniciales() {
         mostrarCarga("Cargando datos iniciales...")
 
         lifecycleScope.launch {
             try {
+                obtenerDatosVehiculo()
+
                 // Cargar empleados
                 empleados = dalEmpleado.consultarEmpleados(105)
                 configurarSpinnerConductor()
@@ -231,9 +297,11 @@ class PasoTaller_Activity : AppCompatActivity() {
                 partesDanadas = dalTaller.consultarPartesDanno()
                 configurarPartesDanadas()
 
-                obtenerDatosVehiculo()
+
                 ocultarCarga()
                 mostrarFormularios()
+
+                Log.d("PasoTaller_Activity", "✅ Datos iniciales cargados correctamente")
 
             } catch (e: Exception) {
                 ocultarCarga()
