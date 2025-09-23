@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#1565C0"
+        android:orientation="horizontal"
+        android:padding="4dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_weight="1"
+            android:text="Datos nuevos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center">
+
+        </TextView>
+        <ImageView
+            android:src="@drawable/regresar_icono_64x64"
+            android:id="@+id/btnRegresarItemPlacaEco"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="5dp"
+            android:src="@drawable/save_14949"
+            android:id="@+id/btnGuardarItemPlacaEco"
+            android:layout_width="50dp"
+            android:layout_height="50dp"/>
+    </LinearLayout>
+
+    <View
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/deep_blue"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"/>
+
+    <LinearLayout
+        android:layout_marginBottom="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_marginRight="10dp"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:text="Placa:"
+            android:id="@+id/lblItemPlaca"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </TextView>
+
+        <EditText
+            android:inputType="textCapCharacters"
+            android:padding="12dp"
+            android:maxLength="10"
+            android:layout_weight="1"
+            android:id="@+id/txtItemPlaca"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:background="@drawable/edittext_border"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_marginRight="10dp"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:text="# Economico:"
+            android:id="@+id/lblItemNumEconomico"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </TextView>
+        <EditText
+            android:inputType="textCapCharacters"
+            android:maxLength="10"
+            android:layout_weight="1"
+            android:id="@+id/txtItemNumeroEconomico"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:hint="Número económico"
+            android:background="@drawable/edittext_border"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+    </LinearLayout>
+    <View
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/deep_blue"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"/>
+
+</LinearLayout>

@@ -1,15 +1,19 @@
 package com.example.negociomx_hyundai.DAL
 
+import android.provider.ContactsContract.Data
 import android.util.Log
 import com.example.negociomx_hyundai.BE.DireccionVehiculo
 import com.example.negociomx_hyundai.BE.Marca
 import com.example.negociomx_hyundai.BE.Modelo
 import com.example.negociomx_hyundai.BE.Paso2LogVehiculo
 import com.example.negociomx_hyundai.BE.Paso3LogVehiculo
+import com.example.negociomx_hyundai.BE.Respuesta
 import com.example.negociomx_hyundai.BE.StatusFotoVehiculo
 import com.example.negociomx_hyundai.BE.Transmision
 import com.example.negociomx_hyundai.BE.Vehiculo
+import com.example.negociomx_hyundai.BE.VehiculoPlacas
 import com.example.negociomx_hyundai.Utils.ConexionSQLServer
+import com.google.android.gms.common.internal.Objects
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.sql.Connection
@@ -33,7 +37,6 @@ class DALVehiculo {
             false
         }
     }
-
 
     // ✅ INSERTAR NUEVO VEHÍCULO
     suspend fun insertarVehiculo(
@@ -95,6 +98,102 @@ class DALVehiculo {
                 Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
             }
         }
+    }
+
+    // ✅ INSERTAR NUEVO VEHÍCULO
+    suspend fun insertarVehiculoPlacas(vp:VehiculoPlacas):Respuesta = withContext(Dispatchers.IO) {
+        var res=Respuesta(TieneError = false, Mensaje = "", Data="")
+        var idVehiculoPlacas=0
+        var idVehiculoPlacasDueno=0
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var statementDetalle: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            Log.d("DALVehiculo", "💾 Insertando nueva Placa: ${vp.Placas}")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                res.Mensaje="❌ No se pudo obtener conexión"
+                res.TieneError=true
+
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext res
+            }
+            conexion.autoCommit=false
+            var query = """
+                    select vp.idvehiculoplacas from dbo.VehiculoPlacas vp inner join dbo.VehiculoPlacasDueno vpd on vp.IdVehiculoPlacas=vpd.IdVehiculoplacas
+                    where vp.Placas = ? and vpd.IdTipoPersonaDueno=1 and vpd.IdPersona= ?
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setString(1, vp?.Placas)
+            statement.setInt(2, vp.IdPersona)
+            resultSet= statement.executeQuery()
+            if(resultSet.next())
+            {
+                res.TieneError=true
+                res.Mensaje="La placa suministrada ya se encuentra repetida con el Transportista"
+                return@withContext res
+            }
+
+            query = """
+                INSERT INTO VehiculoPlacas (IdVehiculo, Placas, IdEstado, Annio, FechaModificacion, Activo, NumeroEconomico)
+                VALUES (?, ?, ?, ?, getdate(), ?, ?)
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query,PreparedStatement.RETURN_GENERATED_KEYS)
+            statement.setInt(1, vp?.IdVehiculo!!)
+            statement.setString(2, vp.Placas)
+            statement.setInt(3, 1)
+            statement.setShort(4, vp?.Annio!!)
+            statement.setBoolean(5, vp?.Activo!!)
+            statement.setString(6, vp.NumeroEconomico)
+
+            statement.executeUpdate()
+            var rs = statement.generatedKeys
+            if (rs.next()) {
+                idVehiculoPlacas = rs.getInt(1)
+            }
+
+            // 3. Insertar en tabla: dbo.VehiculoPlacasDueno
+            val queryDetalle = """
+            INSERT INTO VehiculoPlacasDueno (IdVehiculoPlacas, IdTipoPersonaDueno, IdPersona, Activo, FechaAlta) 
+            VALUES (?, ?, ?, ?, GETDATE())
+        """.trimIndent()
+
+            statementDetalle = conexion.prepareStatement(queryDetalle, PreparedStatement.RETURN_GENERATED_KEYS)
+            statementDetalle.setInt(1, idVehiculoPlacas)
+            statementDetalle.setInt(2, 1)
+            statementDetalle.setInt(3, vp.IdPersona)
+            statementDetalle.setBoolean(4, true)
+
+            statementDetalle.executeUpdate()
+            rs = statementDetalle.generatedKeys
+            if (rs.next()) {
+                idVehiculoPlacasDueno = rs.getInt(1)
+            }
+
+            conexion.commit()
+
+            res.Data=idVehiculoPlacas.toString()+"|"+idVehiculoPlacasDueno.toString()
+            Log.d("DALVehiculo", "✅ Vehículo insertado exitosamente")
+        } catch (e: Exception) {
+            res.TieneError=true
+            res.Mensaje="💥 Error insertando vehículo: ${e.message}"
+            Log.e("DALVehiculo", "💥 Error insertando vehículo: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                statement?.close()
+                statementDetalle?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+        return@withContext res
     }
 
 
@@ -487,10 +586,6 @@ class DALVehiculo {
         }
     }
 
-
-
-    // ✅ MÉTODOS PARA PASO 2 - EVIDENCIA FINAL
-
     // ✅ INSERTAR REGISTRO EN PASO2LOGVEHICULO
     suspend fun insertarPaso2LogVehiculo(
         idVehiculo: Int,
@@ -541,10 +636,6 @@ class DALVehiculo {
             }
         }
     }
-
-
-
-
 
     // ✅ ACTUALIZAR FOTO EN PASO2LOGVEHICULO
     suspend fun actualizarFotoPaso2(
@@ -724,9 +815,6 @@ class DALVehiculo {
     }
 
 
-
-    // ✅ MÉTODOS PARA PASO 3 - REPUVE
-
     // ✅ INSERTAR REGISTRO EN PASO3LOGVEHICULO
     suspend fun insertarPaso3LogVehiculo(
         idVehiculo: Int,
@@ -873,9 +961,6 @@ class DALVehiculo {
         return@withContext null
     }
 
-
-
-
     // ✅ INSERTAR DATOS DE FOTOS EN LA NUEVA TABLA
     suspend fun insertarPaso1LogVehiculoFotos(
         idPaso1LogVehiculo: Int,
@@ -1014,7 +1099,6 @@ class DALVehiculo {
     }
 
 
-
     suspend fun consultarDatosSOCExistentes(idVehiculo: Int): Vehiculo? = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
@@ -1056,7 +1140,6 @@ class DALVehiculo {
         return@withContext vehiculoSOC
     }
 
-
     suspend fun obtenerFotoBase64(idVehiculo: Int, posicion: Int): String? = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
@@ -1092,7 +1175,6 @@ class DALVehiculo {
 
         return@withContext null
     }
-
 
     suspend fun registrarVINBasico(vin: String): Boolean = withContext(Dispatchers.IO) {
         return@withContext insertarVehiculo(

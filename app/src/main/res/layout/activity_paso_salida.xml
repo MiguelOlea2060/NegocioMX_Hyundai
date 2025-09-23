@@ -226,6 +226,8 @@
                     android:layout_marginBottom="12dp" />
 
                 <LinearLayout
+                    android:layout_marginBottom="8dp"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -242,11 +244,11 @@
                     </TextView>
 
                     <Spinner
+                        android:layout_weight="1"
                         android:id="@+id/spinnerPlacaTransporteSalida"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="48dp"
-                        android:background="@drawable/edittext_border"
-                        android:layout_marginBottom="12dp" />
+                        android:background="@drawable/edittext_border"/>
 
                 </LinearLayout>
 
@@ -256,7 +258,6 @@
                     android:layout_height="wrap_content">
 
                     <TextView
-                        android:maxLength="10"
                         android:layout_marginRight="10dp"
                         android:textStyle="bold"
                         android:textSize="16sp"
