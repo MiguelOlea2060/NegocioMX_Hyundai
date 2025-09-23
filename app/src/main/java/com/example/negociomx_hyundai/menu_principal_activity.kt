@@ -246,6 +246,10 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, usuarios_activity::class.java)
             startActivity(intent)
         }
+        binding.btnUbicacionVehiculos.setOnClickListener{
+            val intent = Intent(this,UbicacionVehiculosActivity::class.java)
+            startActivity(intent)
+        }
         btnConfigs.setOnClickListener {
             val intent = Intent(this, configs_activity::class.java)
             startActivity(intent)
