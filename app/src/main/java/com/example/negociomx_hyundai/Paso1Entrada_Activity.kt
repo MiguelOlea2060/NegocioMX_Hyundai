@@ -156,6 +156,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
             intent.putExtra("Modelo",vehiculoActual?.Modelo)
             intent.putExtra("ColorExterior",vehiculoActual?.ColorExterior)
             intent.putExtra("ColorInterior",vehiculoActual?.ColorInterior)
+            intent.putExtra("Especificaciones",vehiculoActual?.Especificaciones)
             startActivityForResult(intent,codigoRespuesta)
         }
 
@@ -171,6 +172,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
             intent.putExtra("Annio", vehiculoActual?.Anio.toString())
             intent.putExtra("ColorExterior", vehiculoActual?.ColorExterior)
             intent.putExtra("ColorInterior", vehiculoActual?.ColorInterior)
+            intent.putExtra("Especificaciones",vehiculoActual?.Especificaciones)
             startActivityForResult(intent,codigoRespuesta)
         }
 
@@ -186,6 +188,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
             intent.putExtra("Annio", vehiculoActual?.Anio.toString())
             intent.putExtra("ColorExterior", vehiculoActual?.ColorExterior)
             intent.putExtra("ColorInterior", vehiculoActual?.ColorInterior)
+            intent.putExtra("Especificaciones",vehiculoActual?.Especificaciones)
             startActivityForResult(intent,codigoRespuesta)
         }
 
@@ -205,6 +208,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
             intent.putExtra("Annio", vehiculoActual?.Anio.toString())
             intent.putExtra("ColorExterior",vehiculoActual?.ColorExterior)
             intent.putExtra("ColorInterior",vehiculoActual?.ColorInterior)
+            intent.putExtra("Especificaciones",vehiculoActual?.Especificaciones)
             startActivityForResult(intent,codigoRespuesta)
         }
 
@@ -290,7 +294,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         // <CHANGE> Mostrar información del vehículo (copiado de Paso1SOC)
         binding.apply {
             tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
-            tvMarcaModeloAnnio.text = "${vehiculo.Marca} - ${vehiculo.Modelo}, ${vehiculo.Anio}"
+            tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones} , Año -> ${vehiculo.Anio}"
             tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
             tvColorInterior.text = "Color Int.: ${vehiculo.ColorInterior}"
 

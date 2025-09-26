@@ -166,7 +166,7 @@ class DALPasoLogVehiculo {
             val query = """
                 select  v.vin, v.idmarca, v.idmodelo, marcaauto.nombre Marca, modelo.nombre Modelo, v.Annio, Motor, 
                         v.idvehiculo, ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, 
-                        tv.Nombre TipoVehiculo, bl, pl.IdStatusActual, pl.IdPasoLogVehiculo 
+                        tv.Nombre TipoVehiculo, bl, pl.IdStatusActual, pl.IdPasoLogVehiculo, v.Especificaciones 
                 from vehiculo v left join dbo.PasoLogVehiculo pl on v.IdVehiculo=pl.IdVehiculo 
 						inner join dbo.MarcaAuto on v.IdMarca=MarcaAuto.IdMarcaAuto
                         inner join dbo.Modelo on v.IdModelo=modelo.IdModelo
@@ -200,7 +200,8 @@ class DALPasoLogVehiculo {
                     Activo = true, // Asumimos que está activo si existe
                     FechaCreacion = "", // No existe en el esquema actual
                     IdPasoLogVehiculo = resultSet.getInt("IdPasoLogVehiculo")?:0,
-                    IdStatusActual = resultSet.getInt("IdStatusActual")?:0
+                    IdStatusActual = resultSet.getInt("IdStatusActual")?:0,
+                    Especificaciones = resultSet.getString("Especificaciones")?:""
                 )
                 Log.d("DALPasoLogVehiculo", "✅ Status actual encontrado: ${resultSet.getString("NombreStatus")}")
             }
