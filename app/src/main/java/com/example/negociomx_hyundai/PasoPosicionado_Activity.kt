@@ -175,7 +175,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private fun mostrarInformacionVehiculo(vehiculo: VehiculoPasoLog) {
         binding.apply {
             tvVinVehiculo.text = "VIN: ${vehiculo.VIN}"
-            tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
+            tvBlVehiculo.text = "BL: ${vehiculo.BL}"
             tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones}, Año: ${vehiculo.Anio}"
             tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
             tvColorInteriorVehiculo.text = "Color Int.: ${vehiculo.ColorInterior}"

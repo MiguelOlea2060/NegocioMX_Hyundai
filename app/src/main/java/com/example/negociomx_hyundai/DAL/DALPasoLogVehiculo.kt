@@ -192,7 +192,7 @@ class DALPasoLogVehiculo {
                     Anio = resultSet.getInt("Annio"),
                     ColorExterior = resultSet.getString("ColorExterior") ?: "",
                     ColorInterior = resultSet.getString("ColorInterior") ?: "",
-                    BL = resultSet.getString("ColorInterior") ?: "",
+                    BL = resultSet.getString("BL") ?: "",
                     NumeroSerie = resultSet.getString("BL") ?: "",
                     TipoVehiculo = resultSet.getString("TipoVehiculo") ?: "",
                     TipoCombustible = resultSet.getString("TipoCombustible") ?: "",
