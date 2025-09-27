@@ -58,6 +58,10 @@
             android:name=".PasoPosicionado_Activity"
             android:exported="false" />
         <activity
+            android:name=".PosicionGrafica_Activity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".Paso1Entrada_Activity"
             android:exported="false" />
         <activity

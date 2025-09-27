@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.activity.result.contract.ActivityResultContracts
 import com.example.negociomx_hyundai.BE.Bloque
 import com.example.negociomx_hyundai.BE.Empleado
 import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
@@ -58,6 +59,24 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     var fechaActual:String =""
     private lateinit var bloques : List<Bloque>
     private var posiciones = listOf<PosicionBloque>()
+
+
+    // Variable para manejar resultado de selección de posición
+    private val seleccionPosicionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val posicionSeleccionada = result.data?.getSerializableExtra("posicion_seleccionada") as? PosicionBloque
+            val nombrePosicion = result.data?.getStringExtra("nombre_posicion")
+
+            if (posicionSeleccionada != null && nombrePosicion != null) {
+                // Actualizar spinner con la posición seleccionada
+                actualizarSpinnerConPosicionSeleccionada(posicionSeleccionada, nombrePosicion)
+            }
+        }
+    }
+
+    private var posicionSeleccionadaManual: PosicionBloque? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -178,10 +197,16 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 val idEmpleadoPosiciono=empleado.IdEmpleado
                 val nombrePersonalMovimiento = empleado.NombreCompleto
 
-                val posicionPosicion = binding.spinnerPosicion.selectedItemPosition
-                val posicionSeleccionada = posiciones[posicionPosicion-1]
-                val fila =  posicionSeleccionada.Fila
-                val columna =  posicionSeleccionada.Columna
+                // Usar la posición seleccionada manualmente
+                if (posicionSeleccionadaManual == null) {
+                    Toast.makeText(this@PasoPosicionado_Activity, "Debe seleccionar una posición", Toast.LENGTH_SHORT).show()
+                    ocultarCargaGuardado()
+                    return@launch
+                }
+
+                val posicionSeleccionada = posicionSeleccionadaManual!!
+                val fila = posicionSeleccionada.Fila
+                val columna = posicionSeleccionada.Columna
 
                 var idUsuario=ParametrosSistema.usuarioLogueado.Id?.toInt()
 
@@ -241,7 +266,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
             Toast.makeText(this, "Seleccione el bloque", Toast.LENGTH_SHORT).show()
             return false
         }
-        if (binding.spinnerPosicion.selectedItemPosition == 0) {
+        if (posicionSeleccionadaManual == null) {
             Toast.makeText(this, "Seleccione la posición", Toast.LENGTH_SHORT).show()
             return false
         }
@@ -333,9 +358,11 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 binding.spinnerBloque.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                         if (position > 0) {
-                            cargarPosiciones(position )
+                            // Abrir pantalla gráfica de posiciones
+                            abrirPantallaPosicionGrafica(position - 1)
                         } else {
                             binding.spinnerPosicion.adapter = null
+                            posicionSeleccionadaManual = null
                         }
                     }
                     override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -348,7 +375,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         }
     }
 
-    private fun cargarPosiciones(posicion: Int) {
+  /*  private fun cargarPosiciones(posicion: Int) {
         lifecycleScope.launch {
             try {
                 var bloque:Bloque=bloques[posicion-1]
@@ -372,7 +399,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 Toast.makeText(this@PasoPosicionado_Activity, "Error cargando posiciones", Toast.LENGTH_SHORT).show()
             }
         }
-    }
+    }*/
 
     private fun limpiarFormulario() {
         binding.spinnerBloque.setSelection(0)
@@ -386,6 +413,46 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         vehiculoActual = null
         statusActual = null
     }
+
+
+
+    private fun abrirPantallaPosicionGrafica(indiceBloqueSeleccionado: Int) {
+        try {
+            val bloqueSeleccionado = bloques[indiceBloqueSeleccionado]
+
+            val intent = Intent(this, PosicionGrafica_Activity::class.java)
+            intent.putExtra("bloque", bloqueSeleccionado)
+
+            seleccionPosicionLauncher.launch(intent)
+
+        } catch (e: Exception) {
+            Log.e("PasoPosicionado", "Error abriendo pantalla gráfica: ${e.message}")
+            Toast.makeText(this, "Error abriendo selección de posiciones", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun actualizarSpinnerConPosicionSeleccionada(posicion: PosicionBloque, nombrePosicion: String) {
+        // Guardar la posición seleccionada
+        posicionSeleccionadaManual = posicion
+
+        // Crear adapter con la posición seleccionada
+        val nombresPosiciones = mutableListOf("Seleccionar posición...", nombrePosicion)
+
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            nombresPosiciones
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerPosicion.adapter = adapter
+
+        // Seleccionar la posición
+        binding.spinnerPosicion.setSelection(1)
+
+        Toast.makeText(this, "Posición seleccionada: $nombrePosicion", Toast.LENGTH_SHORT).show()
+    }
+
+
     override fun onDestroy() {
         super.onDestroy()
         detenerHoraDinamica()
