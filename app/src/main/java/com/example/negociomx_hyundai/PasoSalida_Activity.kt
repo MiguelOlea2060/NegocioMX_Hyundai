@@ -163,7 +163,7 @@ class PasoSalida_Activity : AppCompatActivity() {
         binding.apply {
             tvVinVehiculoSalida.text = "VIN: ${vehiculo.VIN}"
             tvBlVehiculoSalida.text = "MBL: ${vehiculo.BL}"
-            tvMarcaModeloAnnioSalida.text = "${vehiculo.Marca} - ${vehiculo.Modelo}, ${vehiculo.Anio}"
+            tvMarcaModeloAnnioSalida.text = "${vehiculo.Especificaciones}, Año: ${vehiculo.Anio}"
             tvColorExteriorSalida.text = "Color Ext.: ${vehiculo.ColorExterior}"
             tvColorInteriorVehiculoSalida.text = "Color Int.: ${vehiculo.ColorInterior}"
 

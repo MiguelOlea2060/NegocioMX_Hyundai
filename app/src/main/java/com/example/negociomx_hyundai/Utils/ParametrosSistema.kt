@@ -3,6 +3,7 @@ package com.example.negociomx_hyundai.Utils
 import com.example.negociomx_hyundai.BE.CfgNVNube
 import com.example.negociomx_hyundai.BE.CfgNube
 import com.example.negociomx_hyundai.BE.EmpresaNube
+import com.example.negociomx_hyundai.BE.MarcaAuto
 import com.example.negociomx_hyundai.BE.UsuarioNube
 import com.example.negociomx_hyundai.room.entities.Admins.CfgNV
 import com.example.negociomx_hyundai.room.entities.Admins.Config
@@ -23,5 +24,6 @@ class ParametrosSistema {
         lateinit var cfgNV:CfgNVNube
         var cfgNVLocal:CfgNV?=null
         val NombreBD:String="NEGOCIOMX-FB"
+        var marcaAutoPre=MarcaAuto(IdMarcaAuto = 35, Nombre = "Hyundai")
     }
 }

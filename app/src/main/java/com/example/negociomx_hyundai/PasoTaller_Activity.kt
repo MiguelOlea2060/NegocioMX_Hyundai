@@ -22,9 +22,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class PasoTaller_Activity : AppCompatActivity() {
-
-
-
     private lateinit var tvVinVehiculoMovimiento: TextView
     private lateinit var tvBlVehiculo: TextView
     private lateinit var  tvMarcaModeloAnnio: TextView
@@ -82,8 +79,6 @@ class PasoTaller_Activity : AppCompatActivity() {
     private val dalEmpleado = DALEmpleadoSQL()
 
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -99,17 +94,9 @@ class PasoTaller_Activity : AppCompatActivity() {
         inicializarComponentes()
         configurarEventos()
         cargarDatosIniciales()
-
-
     }
 
     private fun inicializarComponentes() {
-
-
-
-
-
-
         // Layouts principales
         layoutInfoVehiculo = findViewById(R.id.layoutInfoVehiculo)
         layoutFormularioTaller = findViewById(R.id.layoutFormularioTaller)
@@ -145,7 +132,6 @@ class PasoTaller_Activity : AppCompatActivity() {
         btnGuardar = findViewById(R.id.btnGuardar)
         tvLoadingText = findViewById(R.id.tvLoadingText)
         tvError = findViewById(R.id.tvError)
-
 
         // Inicializar fecha actual
         inicializarFechaActual()
@@ -203,27 +189,6 @@ class PasoTaller_Activity : AppCompatActivity() {
     }
 
     private fun obtenerDatosVehiculo() {
- /*       // Obtener datos del vehículo desde Intent
-        val vinVehiculo = intent.getStringExtra("VIN") ?: ""
-        val idVehiculo = intent.getIntExtra("ID_VEHICULO", 0)
-
-        if (vinVehiculo.isNotEmpty() || idVehiculo > 0) {
-            // Crear objeto vehiculo temporal (en implementación real, consultar BD)
-            vehiculoActual = VehiculoPasoLog(
-                Id = idVehiculo.toString(),
-                VIN = vinVehiculo,
-                Marca = intent.getStringExtra("MARCA") ?: "HYUNDAI",
-                Modelo = intent.getStringExtra("MODELO") ?: "ACCENT",
-                Anio = intent.getIntExtra("ANIO", 2024),
-                ColorExterior = intent.getStringExtra("COLOR_EXTERIOR") ?: "BLANCO",
-                ColorInterior = intent.getStringExtra("COLOR_INTERIOR") ?: "NEGRO"
-            )
-
-            mostrarInfoVehiculo()
-        } else {
-            mostrarError("No se recibieron datos del vehículo")
-        }*/
-
         try {
             val idVehiculo = intent.getIntExtra("IdVehiculo", 0)
             val vin = intent.getStringExtra("Vin") ?: ""
@@ -236,6 +201,7 @@ class PasoTaller_Activity : AppCompatActivity() {
                 annio=annioAux.toInt()
             val colorExterior = intent.getStringExtra("ColorExterior") ?: ""
             val colorInterior = intent.getStringExtra("ColorInterior") ?: ""
+            val especificaciones = intent.getStringExtra("Especificaciones") ?: ""
 
 
             if (idVehiculo > 0 && vin.isNotEmpty()) {
@@ -247,7 +213,8 @@ class PasoTaller_Activity : AppCompatActivity() {
                     Modelo = modelo,
                     Anio = annio,
                     ColorExterior = colorExterior,
-                    ColorInterior = colorInterior
+                    ColorInterior = colorInterior,
+                    Especificaciones = especificaciones
                 )
 
                 mostrarInfoVehiculo()
@@ -260,23 +227,19 @@ class PasoTaller_Activity : AppCompatActivity() {
             mostrarError("Error obteniendo datos del vehículo: ${e.message}")
             Log.e("PasoTaller_Activity", "Error obteniendo datos: ${e.message}")
         }
-
-
-
     }
 
     private fun mostrarInfoVehiculo() {
         vehiculoActual?.let { vehiculo ->
             tvVinVehiculoMovimiento.text = "VIN: ${vehiculo.VIN}"
             tvBlVehiculo.text = "BL: ${vehiculo.BL}"
-            tvMarcaModeloAnnio.text = "Marca: ${vehiculo.Marca}     Modelo: ${vehiculo.Modelo}    Año: ${vehiculo.Anio}"
+            tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones}  Año: ${vehiculo.Anio}"
             tvColorExterior.text = "Color Ext: ${vehiculo.ColorExterior}"
             tvColorInterior.text = "Color Int: ${vehiculo.ColorInterior}"
 
             layoutInfoVehiculo.visibility = View.VISIBLE
         }
     }
-
 
     private fun cargarDatosIniciales() {
         mostrarCarga("Cargando datos iniciales...")
@@ -296,7 +259,6 @@ class PasoTaller_Activity : AppCompatActivity() {
                 // Cargar partes dañadas
                 partesDanadas = dalTaller.consultarPartesDanno()
                 configurarPartesDanadas()
-
 
                 ocultarCarga()
                 mostrarFormularios()
@@ -446,7 +408,6 @@ class PasoTaller_Activity : AppCompatActivity() {
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         )
-
         datePickerDialog.show()
     }
 

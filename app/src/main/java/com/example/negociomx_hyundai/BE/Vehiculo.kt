@@ -25,7 +25,7 @@ data class Vehiculo(
     var RequiereRecarga: Boolean = false,
     var Evidencia1: String = "",
     var Evidencia2: String = "",
-    var FechaActualizacion: String = ""
-
+    var FechaActualizacion: String = "",
+    var Especificaciones:String=""
 )
 //DARA CLASE CREADA POR MIGUEL

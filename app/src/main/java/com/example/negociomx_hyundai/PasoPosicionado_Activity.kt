@@ -100,6 +100,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
             val vin= intent.extras?.getString("Vin","")?:""
             val colorExterior= intent.extras?.getString("ColorExterior","")?:""
             val colorInterior= intent.extras?.getString("ColorInterior","")?:""
+            val especificaciones= intent.extras?.getString("Especificaciones","")?:""
             vehiculoActual=VehiculoPasoLog(
                 Id =IdVehiculo.toString(),
                 Marca = marca,
@@ -109,6 +110,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 ColorExterior = colorExterior,
                 ColorInterior = colorInterior,
                 IdPasoLogVehiculo = idPasoLogVehiculo,
+                Especificaciones = especificaciones
             )
         }
 
@@ -164,7 +166,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         binding.apply {
             tvVinVehiculo.text = "VIN: ${vehiculo.VIN}"
             tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
-            tvMarcaModeloAnnio.text = "${vehiculo.Marca} - ${vehiculo.Modelo}, ${vehiculo.Anio}"
+            tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones}, Año: ${vehiculo.Anio}"
             tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
             tvColorInteriorVehiculo.text = "Color Int.: ${vehiculo.ColorInterior}"
 
@@ -239,11 +241,6 @@ class PasoPosicionado_Activity : AppCompatActivity() {
 
                 if (exito) {
                     Toast.makeText(this@PasoPosicionado_Activity, "✅ Vehículo posicionado exitosamente", Toast.LENGTH_SHORT).show()
-
-                    /*val intentA = Intent(this@PasoPosicionado_Activity, Paso1Entrada_Activity::class.java) //me dio erro y tuve que agregar r
-                    intentA.putExtra("RefrescarVin",true)
-                    intentA.putExtra("Vin",vehiculoActual?.VIN)
-                    startActivity(intentA)*/
 
                     val data = Intent()
                     data.putExtra("Refrescar", true);

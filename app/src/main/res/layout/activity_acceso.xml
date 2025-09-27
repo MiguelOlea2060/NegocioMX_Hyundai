@@ -14,23 +14,42 @@
         android:gravity="center">
 
         <!-- Espaciador superior -->
-        <View
+        <TextView
+            android:layout_marginBottom="15dp"
+            android:textColor="@color/blue_white"
+            android:gravity="center_horizontal"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            android:text="Administración de Patios"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:minHeight="0dp" />
+            android:layout_height="wrap_content">
 
+        </TextView>
         <!-- Logo de la empresa -->
-        <ImageView
-            android:layout_width="300dp"
-            android:layout_height="120dp"
-            android:src="@drawable/logo_glovis"
-            android:scaleType="fitCenter"
-            android:layout_marginBottom="12dp"
-            android:contentDescription="Transvision" />
+        <LinearLayout
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:background="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/softsystem_logo_200x64"
+                android:contentDescription="Transvision" />
+            <ImageView
+                android:layout_marginLeft="15dp"
+                android:background="@color/white"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/eiaservices_2025_150px"
+                android:contentDescription="Transvision" />
+        </LinearLayout>
 
         <!-- Título de bienvenida -->
         <TextView
+            android:layout_marginTop="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Bienvenido"
@@ -40,11 +59,12 @@
             android:layout_marginBottom="1dp" />
 
         <TextView
+            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="______________________________"
-            android:textSize="20sp"
-            android:textColor="#E3F2FD"
+            android:text="_______________________________________________________________________________________"
+            android:textSize="6sp"
+            android:textColor="@color/blue_white"
             android:layout_marginBottom="6dp" />
 
         <!-- Card contenedor del formulario -->

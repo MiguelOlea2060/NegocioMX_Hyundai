@@ -1,8 +1,8 @@
 package com.example.negociomx_hyundai.DAL
 
-import android.provider.ContactsContract.Data
 import android.util.Log
 import com.example.negociomx_hyundai.BE.DireccionVehiculo
+import com.example.negociomx_hyundai.BE.Hyundai.VehiculoA
 import com.example.negociomx_hyundai.BE.Marca
 import com.example.negociomx_hyundai.BE.Modelo
 import com.example.negociomx_hyundai.BE.Paso2LogVehiculo
@@ -13,7 +13,6 @@ import com.example.negociomx_hyundai.BE.Transmision
 import com.example.negociomx_hyundai.BE.Vehiculo
 import com.example.negociomx_hyundai.BE.VehiculoPlacas
 import com.example.negociomx_hyundai.Utils.ConexionSQLServer
-import com.google.android.gms.common.internal.Objects
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.sql.Connection
@@ -98,6 +97,105 @@ class DALVehiculo {
                 Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
             }
         }
+    }
+
+    // ✅ INSERTAR NUEVO VEHÍCULO
+    suspend fun addVehiculoCargaMasiva(vins: MutableList<VehiculoA>):Respuesta = withContext(Dispatchers.IO) {
+        var res=Respuesta(TieneError = false, Mensaje = "", Data="")
+        var idVehiculo=0
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var statementDetalle: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            Log.d("DALVehiculo", "💾 Verificar VIN para Carga masiva: ${vins.count()}")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                res.Mensaje="❌ No se pudo obtener conexión"
+                res.TieneError=true
+
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext res
+            }
+            conexion.autoCommit=false
+            var values=""
+            var query = """
+                    select IdVehiculo, Vin from dbo.Vehiculo where Vin in """.trimIndent()
+
+            vins.forEach {
+                if (values.isNotEmpty()) values += ", "
+                values += "?"
+            }
+            values=" ("+values+")"
+            query+=values
+            statement = conexion.prepareStatement(query)
+            var vinsCad=""
+            var contadorParams=1
+            vins.forEach {
+                statement!!.setString(contadorParams, it.VIN)
+                contadorParams++
+                }
+            resultSet= statement.executeQuery()
+            while (resultSet.next())
+            {
+                var vin=resultSet.getString("Vin")?:""
+                val find= vins.filter { it.VIN.equals(vin) }.firstOrNull()
+                if(find!=null)
+                    vins.remove(find)
+            }
+            if(vins.count()==0) {
+                res.TieneError = false
+                res.Mensaje = "La lista de VINs ya existe en el sistema"
+                return@withContext res
+            }
+
+            query = """
+                INSERT INTO Vehiculo (Vin, Motor, IdMarca, IdModelo, Annio, IdTransmision, IdDireccionVehiculo, 
+                            Version	,FechaModificacion, NumeroMotor, Especificaciones)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query,PreparedStatement.RETURN_GENERATED_KEYS)
+            vins.forEach { vin->
+                statement.setString(1, vin?.VIN)
+                statement.setString(2, "")
+                statement.setInt(3, vin.IdMarca)
+                statement.setInt(4, vin?.IdModelo!!)
+                statement.setShort(5, vin?.Anio!!.toShort())
+                statement.setInt(6, 0)
+                statement.setInt(7, 0)
+                statement.setString(8, "")
+                statement.setString(9, "")
+                statement.setString(10, "")
+                statement.setString(11, vin.Especificaciones)
+
+                statement.executeUpdate()
+                var rs = statement.generatedKeys
+                if (rs.next()) {
+                    idVehiculo = rs.getInt(1)
+                }
+            }
+            conexion.commit()
+
+            res.Data=vins.count().toString()
+            Log.d("DALVehiculo", "✅ Vehículo insertado exitosamente")
+        } catch (e: Exception) {
+            res.TieneError=true
+            res.Mensaje="💥 Error agregando el VIN: ${e.message}"
+            Log.e("DALVehiculo", "💥 Error insertando vehículo: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                statement?.close()
+                statementDetalle?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+        return@withContext res
     }
 
     // ✅ INSERTAR NUEVO VEHÍCULO
@@ -399,7 +497,7 @@ class DALVehiculo {
             val query = """                
                 select v.vin, v.idmarca, v.idmodelo, marcaauto.nombre Marca, modelo.nombre Modelo, v.Annio, Motor, 
                         v.idvehiculo, ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, 
-                        tv.Nombre TipoVehiculo, bl
+                        tv.Nombre TipoVehiculo, bl, v.Especificaciones
                 from vehiculo v inner join dbo.MarcaAuto on v.IdMarca=MarcaAuto.IdMarcaAuto
                         inner join dbo.Modelo on v.IdModelo=modelo.IdModelo
                         left join dbo.VehiculoColor vc on v.IdVehiculo=vc.IdVehiculo
@@ -433,15 +531,7 @@ class DALVehiculo {
                     IdEmpresa = "", // No existe en el esquema actual
                     Activo = true, // Asumimos que está activo si existe
                     FechaCreacion = "", // No existe en el esquema actual
-                   // FechaModificacion = resultSet.getString("FechaModificacion") ?: "",
-                    // CAMPOS SOC - Valores por defecto ya que no existen en la BD actual
-                    Odometro = 0,
-                    Bateria = 0,
-                    ModoTransporte = false,
-                    RequiereRecarga = false,
-                    Evidencia1 = "",
-                    Evidencia2 = "",
-                    FechaActualizacion = ""
+                    Especificaciones = resultSet.getString("Especificaciones") ?: ""
                 )
                 Log.d("DALVehiculo", "✅ Vehículo encontrado: ${vehiculo.Marca} ${vehiculo.Modelo} ${vehiculo.Anio}")
             } else {
@@ -524,7 +614,6 @@ class DALVehiculo {
             }
         }
     }
-
 
 
     // ✅ INSERTAR DATOS SOC EN LA NUEVA TABLA

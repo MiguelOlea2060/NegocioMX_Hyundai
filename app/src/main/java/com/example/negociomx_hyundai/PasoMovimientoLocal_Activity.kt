@@ -189,6 +189,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
                 annio=annioAux.toInt()
             val colorExterior = intent.getStringExtra("ColorExterior") ?: ""
             val colorInterior = intent.getStringExtra("ColorInterior") ?: ""
+            val especificaciones = intent.getStringExtra("Especificaciones") ?: ""
 
 
             if (idVehiculo > 0 && vin.isNotEmpty()) {
@@ -200,7 +201,8 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
                     Modelo = modelo,
                     Anio = annio,
                     ColorExterior = colorExterior,
-                    ColorInterior = colorInterior
+                    ColorInterior = colorInterior,
+                    Especificaciones = especificaciones
                 )
 
                 mostrarInfoVehiculo()
@@ -218,7 +220,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
         vehiculoActual?.let { vehiculo ->
             binding.tvVinVehiculoMovimiento.text="VIN: ${vehiculo.VIN}"
             tvBlVehiculo.text = "BL: ${vehiculo.BL}"
-            tvMarcaModeloAnnio.text = "Marca: ${vehiculo.Marca}     Modelo: ${vehiculo.Modelo}    Año: ${vehiculo.Anio}"
+            tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones}   Año: ${vehiculo.Anio}"
             tvColorExterior.text = "Color Ext: ${vehiculo.ColorExterior}"
             tvColorInterior.text = "Color Int: ${vehiculo.ColorInterior}"
 
