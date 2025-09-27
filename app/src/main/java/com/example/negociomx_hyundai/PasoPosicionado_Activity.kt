@@ -150,6 +150,16 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         if(vehiculoActual!=null && vehiculoActual?.Id?.toInt()!!>0) {
             binding.tvVinVehiculo.setText(vehiculoActual?.VIN)
         }
+
+        if(ParametrosSistema.CfgGloSql!=null &&
+            ParametrosSistema?.CfgGloSql!!.ManejaSeleccionBloquePosXTablero==true) {
+            binding.llSeleccionaPosicionTablero.visibility = View.VISIBLE
+            binding.llSeleccionaPosicionSpinner.visibility=View.GONE
+        }
+        else{
+            binding.llSeleccionaPosicionTablero.visibility = View.GONE
+            binding.llSeleccionaPosicionSpinner.visibility=View.VISIBLE
+        }
         mostrarInformacionVehiculo(vehiculoActual!!)
         mostrarFormularioPosicionado()
     }
@@ -356,7 +366,10 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                         if (position > 0) {
                             // Abrir pantalla gráfica de posiciones
-                            abrirPantallaPosicionGrafica(position - 1)
+                            if(ParametrosSistema.CfgGloSql?.ManejaSeleccionBloquePosXTablero==true)
+                                abrirPantallaPosicionGrafica(position - 1)
+                            else
+                                cargarPosiciones(position )
                         } else {
                             binding.spinnerPosicion.adapter = null
                             posicionSeleccionadaManual = null
@@ -372,7 +385,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         }
     }
 
-  /*  private fun cargarPosiciones(posicion: Int) {
+    private fun cargarPosiciones(posicion: Int) {
         lifecycleScope.launch {
             try {
                 var bloque:Bloque=bloques[posicion-1]
@@ -396,7 +409,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 Toast.makeText(this@PasoPosicionado_Activity, "Error cargando posiciones", Toast.LENGTH_SHORT).show()
             }
         }
-    }*/
+    }
 
     private fun limpiarFormulario() {
         binding.spinnerBloque.setSelection(0)
@@ -416,9 +429,11 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private fun abrirPantallaPosicionGrafica(indiceBloqueSeleccionado: Int) {
         try {
             val bloqueSeleccionado = bloques[indiceBloqueSeleccionado]
+            val lista=bloques.toMutableSet()
 
             val intent = Intent(this, PosicionGrafica_Activity::class.java)
             intent.putExtra("bloque", bloqueSeleccionado)
+            intent.putExtra("bloques", lista.first())
 
             seleccionPosicionLauncher.launch(intent)
 

@@ -145,6 +145,25 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/llSeleccionaPosicionTablero"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/btnSeleccionaPosicionPosicionado"
+                    android:textStyle="bold"
+                    android:text="Selecciona Posición"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                </Button>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llSeleccionaPosicionSpinner"
                 android:layout_marginBottom="10dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"

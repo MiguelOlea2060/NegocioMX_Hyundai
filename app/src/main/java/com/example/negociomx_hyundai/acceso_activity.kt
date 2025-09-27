@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.negociomx_hyundai.BE.CfgGlo
 import com.example.negociomx_hyundai.BE.UsuarioNube
 import com.example.negociomx_hyundai.DAL.DALDispotivioAcceso
 import com.example.negociomx_hyundai.DAL.DALUsuario
@@ -135,6 +136,7 @@ class acceso_activity : AppCompatActivity() {
                             prefs.saveUsername(nombreUsuarioEmail)
                             prefs.savePassword(pwd)
 
+                            ParametrosSistema.CfgGloSql= CfgGlo(ManejaSeleccionBloquePosXTablero = true)
                             mainHandler.post {
                                 val intent = Intent(applicationContext, menu_principal_activity::class.java)
                                 startForResult.launch(intent)

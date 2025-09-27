@@ -15,20 +15,24 @@ import com.example.negociomx_hyundai.BE.Bloque
 import com.example.negociomx_hyundai.BE.BloqueColumnaFilaUso
 import com.example.negociomx_hyundai.BE.PosicionBloque
 import com.example.negociomx_hyundai.BLL.BLLBloque
+import com.example.negociomx_hyundai.databinding.ActivityPosicionGraficaBinding
 import kotlinx.coroutines.launch
 
 class PosicionGrafica_Activity : AppCompatActivity() {
 
+    lateinit var binding:ActivityPosicionGraficaBinding
+
     private lateinit var gridLayout: GridLayout
-    private lateinit var tvTitulo: TextView
     private lateinit var tvInfo: TextView
     private var bloque: Bloque? = null
+    private var listaBloques:MutableList<Bloque>?=null
     private var posicionesDisponibles: List<PosicionBloque> = listOf()
     private val bllBloque = BLLBloque()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_posicion_grafica)
+        binding=ActivityPosicionGraficaBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         inicializarComponentes()
         obtenerDatosIntent()
@@ -37,7 +41,7 @@ class PosicionGrafica_Activity : AppCompatActivity() {
 
     private fun inicializarComponentes() {
         gridLayout = findViewById(R.id.gridLayoutPosiciones)
-        tvTitulo = findViewById(R.id.tvTituloBloque)
+        //binding.tvTituloBloque = findViewById(R.id.tvTituloBloque)
         tvInfo = findViewById(R.id.tvInfoPosiciones)
 
         findViewById<ImageView>(R.id.btnRegresar).setOnClickListener {
@@ -47,6 +51,7 @@ class PosicionGrafica_Activity : AppCompatActivity() {
 
     private fun obtenerDatosIntent() {
         bloque = intent.getSerializableExtra("bloque") as? Bloque
+        listaBloques = intent.getSerializableExtra("bloques") as? MutableList<Bloque>
 
         if (bloque == null) {
             Toast.makeText(this, "Error: No se recibió información del bloque", Toast.LENGTH_SHORT).show()
@@ -54,7 +59,7 @@ class PosicionGrafica_Activity : AppCompatActivity() {
             return
         }
 
-        tvTitulo.text = "BLOQUE: ${bloque!!.Nombre}"
+        //binding.tvTituloBloque.text = "BLOQUE: ${bloque!!.Nombre}"
         tvInfo.text = "Columnas: ${bloque!!.NumColumnas} | Filas: ${bloque!!.NumFilas}"
     }
 

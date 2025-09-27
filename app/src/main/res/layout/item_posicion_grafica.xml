@@ -10,8 +10,8 @@
 
     <ImageView
         android:id="@+id/imgPosicion"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:src="@drawable/posicionlibre_32px" />
 
     <TextView
@@ -19,8 +19,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="C1-F1"
-        android:textSize="10sp"
+        android:textSize="14sp"
         android:textStyle="bold"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="2dp" />
 
 </LinearLayout>

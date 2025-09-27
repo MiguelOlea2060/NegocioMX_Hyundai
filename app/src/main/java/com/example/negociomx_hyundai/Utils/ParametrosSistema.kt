@@ -1,5 +1,6 @@
 package com.example.negociomx_hyundai.Utils
 
+import com.example.negociomx_hyundai.BE.CfgGlo
 import com.example.negociomx_hyundai.BE.CfgNVNube
 import com.example.negociomx_hyundai.BE.CfgNube
 import com.example.negociomx_hyundai.BE.EmpresaNube
@@ -20,6 +21,7 @@ class ParametrosSistema {
         var empresaLocal:Empresa?=null
         lateinit var cfg:CfgNube
         var cfgLocal:Config?=null
+        var CfgGloSql:CfgGlo?=null
         var TipoUsoSistema=TipoUsoSistemaEnum.OnLine
         lateinit var cfgNV:CfgNVNube
         var cfgNVLocal:CfgNV?=null
