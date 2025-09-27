@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="80dp"
+    android:layout_height="80dp"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="4dp"
+    android:layout_margin="2dp"
+    android:background="@drawable/edittext_border">
+
+    <ImageView
+        android:id="@+id/imgPosicion"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/posicionlibre_32px" />
+
+    <TextView
+        android:id="@+id/tvPosicion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="C1-F1"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:layout_marginTop="4dp" />
+
+</LinearLayout>

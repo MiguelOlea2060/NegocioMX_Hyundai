@@ -1,5 +1,7 @@
 package com.example.negociomx_hyundai.BE
 
+import java.io.Serializable
+
 data class Bloque(
     var IdBloque:Short=0,
     var Nombre:String="",
@@ -7,5 +9,5 @@ data class Bloque(
     var NumColumnas:Short=0,
     var NumFilas:Short=0,
     var Ocupadas:MutableList<BloqueColumnaFilaUso>?=null
-)
+) : Serializable
 

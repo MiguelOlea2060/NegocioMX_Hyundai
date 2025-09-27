@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        HEADER
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1565C0"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:id="@+id/btnRegresar"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/regresar_icono_64x64" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="SELECCIONAR POSICIÓN"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        INFORMACIÓN DEL BLOQUE
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/tvTituloBloque"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="BLOQUE: [Nombre]"
+                android:textColor="#1565C0"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tvInfoPosiciones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Columnas: 0 | Filas: 0"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🟢 Disponible | 🔴 Ocupada"
+                android:textSize="12sp"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        MATRIZ DE POSICIONES
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <GridLayout
+                android:id="@+id/gridLayoutPosiciones"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="#FFFFFF"
+                android:padding="16dp" />
+
+        </HorizontalScrollView>
+
+    </LinearLayout>
+
+</ScrollView>
