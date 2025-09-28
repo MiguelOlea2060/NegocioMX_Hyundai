@@ -56,7 +56,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="1. ESCANEAR O INGRESAR VIN"
+                android:text="ESCANEAR O INGRESAR VIN"
                 android:textColor="#1565C0"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -99,7 +99,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="2. INFORMACIÓN DEL VEHÍCULO"
+                android:text="INFORMACIÓN DEL VEHÍCULO"
                 android:textColor="#1565C0"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -150,7 +150,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="3. REGISTRO DE ENTRADA"
+                android:text=" REGISTRO DE ENTRADA"
                 android:textColor="#1565C0"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -350,7 +350,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="4. OPCIONES DISPONIBLES"
+                android:text="OPCIONES DISPONIBLES"
                 android:textColor="#1565C0"
                 android:textSize="16sp"
                 android:textStyle="bold"
