@@ -21,5 +21,8 @@ data class VehiculoPasoLog(
     // ✅ CAMPOS SOC (State of Charge)
     var IdPasoLogVehiculo:Int=0,
     var IdStatusActual:Int?=null,
-    var Especificaciones:String=""
+    var Especificaciones:String="",
+    var Columna:Short?=null,
+    var Fila:Short?=null,
+    var NombreBloque:String=""
 )

@@ -122,6 +122,7 @@
                 android:layout_marginBottom="12dp" />
 
             <LinearLayout
+                android:id="@+id/llSeleccionBloquesPosicionado"
                 android:layout_marginBottom="10dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -148,17 +149,26 @@
                 android:id="@+id/llSeleccionaPosicionTablero"
                 android:layout_marginBottom="10dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <Button
                     android:id="@+id/btnSeleccionaPosicionPosicionado"
                     android:textStyle="bold"
                     android:text="Selecciona Posición"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
                 </Button>
+                <TextView
+                    android:layout_marginTop="10dp"
+                    android:id="@+id/lblBloquePosicionSeleccionada"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Bloque, posición a seleccionar"
+                    android:textSize="18sp"
+                    android:layout_marginRight="10dp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 

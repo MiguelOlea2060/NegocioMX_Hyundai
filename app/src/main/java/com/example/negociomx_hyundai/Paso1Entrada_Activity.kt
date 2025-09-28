@@ -36,6 +36,7 @@ import android.widget.AdapterView
 import com.example.negociomx_hyundai.BE.Cliente
 import com.example.negociomx_hyundai.BE.ClienteEmpleado
 import com.example.negociomx_hyundai.DAL.DALCliente
+import com.google.gson.Gson
 
 class Paso1Entrada_Activity : AppCompatActivity() {
 
@@ -61,6 +62,8 @@ class Paso1Entrada_Activity : AppCompatActivity() {
     private lateinit var timerHandler: Handler
     private lateinit var timerRunnable: Runnable
     var fechaActual:String=""
+
+    val gson=Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -147,32 +150,18 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         binding.btnPosicionado.setOnClickListener {
             val codigoRespuesta=101
             val intent = Intent(this, PasoPosicionado_Activity::class.java)
-            val idVehiculo:Int?=vehiculoActual?.Id!!.toInt()
-            intent.putExtra("IdVehiculo",idVehiculo)
-            intent.putExtra("IdPasoLogVehiculo",vehiculoActual?.IdPasoLogVehiculo)
-            intent.putExtra("Vin",vehiculoActual?.VIN)
-            intent.putExtra("Bl",vehiculoActual?.BL)
-            intent.putExtra("Marca",vehiculoActual?.Marca)
-            intent.putExtra("Modelo",vehiculoActual?.Modelo)
-            intent.putExtra("ColorExterior",vehiculoActual?.ColorExterior)
-            intent.putExtra("ColorInterior",vehiculoActual?.ColorInterior)
-            intent.putExtra("Especificaciones",vehiculoActual?.Especificaciones)
+
+            val jsonVeh=gson.toJson(vehiculoActual)
+            intent.putExtra("vehiculo",jsonVeh)
             startActivityForResult(intent,codigoRespuesta)
         }
 
         binding.btnMovimientoLocal.setOnClickListener {
             val codigoRespuesta=101
+            val jsonVeh=gson.toJson(vehiculoActual)
+
             val intent = Intent(this, PasoMovimientoLocal_Activity::class.java)
-            intent.putExtra("IdVehiculo", vehiculoActual?.Id?.toInt())
-            intent.putExtra("IdPasoLogVehiculo", vehiculoActual?.IdPasoLogVehiculo)
-            intent.putExtra("Vin", vehiculoActual?.VIN)
-            intent.putExtra("Bl", vehiculoActual?.BL)
-            intent.putExtra("Marca", vehiculoActual?.Marca)
-            intent.putExtra("Modelo", vehiculoActual?.Modelo)
-            intent.putExtra("Annio", vehiculoActual?.Anio.toString())
-            intent.putExtra("ColorExterior", vehiculoActual?.ColorExterior)
-            intent.putExtra("ColorInterior", vehiculoActual?.ColorInterior)
-            intent.putExtra("Especificaciones",vehiculoActual?.Especificaciones)
+            intent.putExtra("vehiculo", jsonVeh)
             startActivityForResult(intent,codigoRespuesta)
         }
 
@@ -315,8 +304,14 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         binding.layoutFormularioEntrada.visibility = View.GONE
         binding.layoutOpcionesTransicion.visibility = View.VISIBLE
 
+        var detalles:String=""
+        if(vehiculoActual?.IdStatusActual==170)
+        {
+            detalles=" en ${vehiculoActual?.NombreBloque}, Col-> ${vehiculoActual?.Columna} " +
+                    "- Fila-> ${vehiculoActual?.Fila}"
+        }
         val idStatusActual = vehiculoActual?.IdStatusActual ?: 0
-        binding.tvStatusActual.text = "Status actual: ${obtenerNombreStatus(idStatusActual)}"
+        binding.tvStatusActual.text = "Status actual: ${obtenerNombreStatus(idStatusActual)}${detalles}"
 
         // Mostrar botones según reglas de transición
         configurarBotonesTransicion(idStatusActual)

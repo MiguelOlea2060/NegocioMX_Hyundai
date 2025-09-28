@@ -5,6 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -12,10 +14,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.Bloque
-import com.example.negociomx_hyundai.BE.BloqueColumnaFilaUso
 import com.example.negociomx_hyundai.BE.PosicionBloque
 import com.example.negociomx_hyundai.BLL.BLLBloque
 import com.example.negociomx_hyundai.databinding.ActivityPosicionGraficaBinding
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.launch
 
 class PosicionGrafica_Activity : AppCompatActivity() {
@@ -24,7 +27,7 @@ class PosicionGrafica_Activity : AppCompatActivity() {
 
     private lateinit var gridLayout: GridLayout
     private lateinit var tvInfo: TextView
-    private var bloque: Bloque? = null
+    private var bloqueSeleccionado: Bloque? = null
     private var listaBloques:MutableList<Bloque>?=null
     private var posicionesDisponibles: List<PosicionBloque> = listOf()
     private val bllBloque = BLLBloque()
@@ -36,7 +39,7 @@ class PosicionGrafica_Activity : AppCompatActivity() {
 
         inicializarComponentes()
         obtenerDatosIntent()
-        generarMatrizPosiciones()
+        //generarMatrizPosiciones()
     }
 
     private fun inicializarComponentes() {
@@ -50,32 +53,63 @@ class PosicionGrafica_Activity : AppCompatActivity() {
     }
 
     private fun obtenerDatosIntent() {
-        bloque = intent.getSerializableExtra("bloque") as? Bloque
-        listaBloques = intent.getSerializableExtra("bloques") as? MutableList<Bloque>
+        val gson=Gson()
 
-        if (bloque == null) {
-            Toast.makeText(this, "Error: No se recibió información del bloque", Toast.LENGTH_SHORT).show()
+        val jsonLista=intent.getStringExtra("bloques")?:""
+        val listTutorialType = object : TypeToken<MutableList<Bloque>>() {}.type
+        listaBloques=gson.fromJson(jsonLista,listTutorialType)
+
+        if (listaBloques == null || listaBloques?.count()==0) {
+            Toast.makeText(this, "Error: No se recibió información de los bloques", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-        //binding.tvTituloBloque.text = "BLOQUE: ${bloque!!.Nombre}"
-        tvInfo.text = "Columnas: ${bloque!!.NumColumnas} | Filas: ${bloque!!.NumFilas}"
+        cargarBloques()
+    }
+
+    private fun cargarBloques() {
+        val nombresBloques = mutableListOf("Seleccionar bloque...")
+        listaBloques?.forEach {
+            nombresBloques.add(it.Nombre)
+        }
+
+        val adapter = ArrayAdapter(
+            this@PosicionGrafica_Activity,
+            android.R.layout.simple_spinner_item,
+            nombresBloques
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerBloqueGrafica.adapter = adapter
+
+        binding.spinnerBloqueGrafica.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                if (position > 0) {
+                    bloqueSeleccionado=listaBloques!![position-1]
+                    tvInfo.text = "Columnas: ${bloqueSeleccionado!!.NumColumnas} | Filas: ${bloqueSeleccionado!!.NumFilas}"
+
+                    generarMatrizPosiciones()
+                } else {
+                }
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
     }
 
     private fun generarMatrizPosiciones() {
         lifecycleScope.launch {
             try {
                 // Obtener posiciones disponibles
-                posicionesDisponibles = bllBloque.getPosicionesDisponiblesDeBloque(bloque!!) ?: listOf()
+                posicionesDisponibles = bllBloque.getPosicionesDisponiblesDeBloque(bloqueSeleccionado!!) ?: listOf()
 
                 // Configurar grid
-                gridLayout.columnCount = bloque!!.NumColumnas.toInt()
                 gridLayout.removeAllViews()
+                gridLayout.columnCount = bloqueSeleccionado!!.NumColumnas.toInt()
 
                 // Generar matriz
-                for (fila in 1..bloque!!.NumFilas) {
-                    for (columna in 1..bloque!!.NumColumnas) {
+                for (fila in 1..bloqueSeleccionado!!.NumFilas) {
+                    for (columna in 1..bloqueSeleccionado!!.NumColumnas) {
                         val posicionView = crearVistaposicion(fila.toShort(), columna.toShort())
                         gridLayout.addView(posicionView)
                     }
@@ -121,7 +155,6 @@ class PosicionGrafica_Activity : AppCompatActivity() {
     private fun seleccionarPosicion(posicion: PosicionBloque, nombrePosicion: String) {
         val intent = Intent()
         intent.putExtra("posicion_seleccionada", posicion)
-        intent.putExtra("nombre_posicion", nombrePosicion)
         setResult(Activity.RESULT_OK, intent)
         finish()
     }

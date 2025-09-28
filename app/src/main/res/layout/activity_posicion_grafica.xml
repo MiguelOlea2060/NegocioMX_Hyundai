@@ -47,6 +47,7 @@
             android:layout_marginBottom="8dp">
 
             <LinearLayout
+                android:layout_marginBottom="10dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -73,11 +74,12 @@
    -->
                    <TextView
                        android:layout_weight="1"
+                       android:textColor="@color/azul_fuerte"
                        android:id="@+id/tvInfoPosiciones"
                        android:layout_width="wrap_content"
                        android:layout_height="wrap_content"
                        android:text="Columnas: 0 | Filas: 0"
-                       android:textSize="14sp"
+                       android:textSize="16sp"
                        android:gravity="center"/>
                </LinearLayout>
 

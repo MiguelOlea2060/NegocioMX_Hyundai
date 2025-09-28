@@ -164,19 +164,23 @@ class DALPasoLogVehiculo {
             }
 
             val query = """
-                select  v.vin, v.idmarca, v.idmodelo, marcaauto.nombre Marca, modelo.nombre Modelo, v.Annio, Motor, 
-                        v.idvehiculo, ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, 
-                        tv.Nombre TipoVehiculo, bl, pl.IdStatusActual, pl.IdPasoLogVehiculo, v.Especificaciones 
-                from vehiculo v left join dbo.PasoLogVehiculo pl on v.IdVehiculo=pl.IdVehiculo 
-						inner join dbo.MarcaAuto on v.IdMarca=MarcaAuto.IdMarcaAuto
-                        inner join dbo.Modelo on v.IdModelo=modelo.IdModelo
-                        left join dbo.VehiculoColor vc on v.IdVehiculo=vc.IdVehiculo
-                        left join dbo.Color ce on vc.IdColor=ce.IdColor
-                        left join dbo.Color ci on vc.IdColorInterior=ci.IdColor
-                        left join dbo.TipoCombustible tc on v.idtipocombustible=tc.idtipocombustible
-                        left join dbo.tipovehiculo tv on v.idtipovehiculo=tv.idtipovehiculo
-                        left join dbo.bl b on v.idbl=b.idbl
-                where v.vin = ?
+            select top 1 v.vin, v.idmarca, v.idmodelo, marcaauto.nombre Marca, modelo.nombre Modelo, v.Annio, Motor, 
+                    v.idvehiculo, ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, 
+                    tv.Nombre TipoVehiculo, bl, pl.IdStatusActual, pl.IdPasoLogVehiculo, 
+                    v.Especificaciones, pld.Columna, pld.Fila, blo.Nombre NombreBloque 
+            from vehiculo v left join dbo.PasoLogVehiculo pl on v.IdVehiculo=pl.IdVehiculo 
+                    inner join dbo.MarcaAuto on v.IdMarca=MarcaAuto.IdMarcaAuto
+                    inner join dbo.Modelo on v.IdModelo=modelo.IdModelo
+                    left join dbo.VehiculoColor vc on v.IdVehiculo=vc.IdVehiculo
+                    left join dbo.Color ce on vc.IdColor=ce.IdColor
+                    left join dbo.Color ci on vc.IdColorInterior=ci.IdColor
+                    left join dbo.TipoCombustible tc on v.idtipocombustible=tc.idtipocombustible
+                    left join dbo.tipovehiculo tv on v.idtipovehiculo=tv.idtipovehiculo
+                    left join dbo.bl b on v.idbl=b.idbl
+                    left join dbo.PasoLogVehiculoDet pld on pl.IdPasoLogVehiculo=pld.IdPasoLogVehiculo
+                    left join dbo.Bloque blo on pld.IdBloque=blo.idbloque
+            where v.vin = ?
+            order by pld.FechaMovimiento desc
             """.trimIndent()
 
             statement = conexion.prepareStatement(query)
@@ -201,8 +205,14 @@ class DALPasoLogVehiculo {
                     FechaCreacion = "", // No existe en el esquema actual
                     IdPasoLogVehiculo = resultSet.getInt("IdPasoLogVehiculo")?:0,
                     IdStatusActual = resultSet.getInt("IdStatusActual")?:0,
-                    Especificaciones = resultSet.getString("Especificaciones")?:""
+                    Especificaciones = resultSet.getString("Especificaciones")?:"",
+                    NombreBloque = resultSet.getString("NombreBloque")?:""
                 )
+                if(resultSet.getShort("Columna")!=null)
+                    item.Columna=resultSet.getShort("Columna")
+
+                if(resultSet.getShort("Fila")!=null)
+                    item.Fila=resultSet.getShort("Fila")
                 Log.d("DALPasoLogVehiculo", "✅ Status actual encontrado: ${resultSet.getString("NombreStatus")}")
             }
 
@@ -633,6 +643,8 @@ class DALPasoLogVehiculo {
 
             statementDetalle.setInt(contadorparams, paso?.IdPasoLogVehiculo!!)
             contadorparams++
+            statementDetalle.setString(contadorparams, paso?.Placa)
+            contadorparams++
             if (paso?.Bloque != null) {
                 statementDetalle.setString(contadorparams, paso?.Bloque)
                 contadorparams++
@@ -641,9 +653,6 @@ class DALPasoLogVehiculo {
                 statementDetalle.setShort(contadorparams, paso?.Fila!!)
                 contadorparams++
             }
-            statementDetalle.setString(contadorparams, paso?.Placa)
-            contadorparams++
-
             if (paso?.Columna != null) {
                 statementDetalle.setShort(contadorparams, paso?.Columna!!)
                 contadorparams++

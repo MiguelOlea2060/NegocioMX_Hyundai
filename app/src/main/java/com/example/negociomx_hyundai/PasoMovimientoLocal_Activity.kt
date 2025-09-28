@@ -18,6 +18,7 @@ import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
 import com.example.negociomx_hyundai.DAL.DALVehiculo
 import com.example.negociomx_hyundai.BE.TipoMovimiento
 import com.example.negociomx_hyundai.databinding.ActivityPasoMovimientoLocalBinding
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -61,6 +62,8 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
     // Handler para actualizar fecha en tiempo real
     private lateinit var handlerFecha: Handler
     private lateinit var runnableFecha: Runnable
+
+    val gson= Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -178,35 +181,12 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
     private fun obtenerDatosVehiculo() {
         try {
-            val idVehiculo = intent.getIntExtra("IdVehiculo", 0)
-            val vin = intent.getStringExtra("Vin") ?: ""
-            val bl = intent.getStringExtra("Bl") ?: ""
-            val marca = intent.getStringExtra("Marca") ?: ""
-            val modelo = intent.getStringExtra("Modelo") ?: ""
-            val annioAux = intent.getStringExtra("Annio") ?: ""
-            var annio: Int = 0
-            if (annioAux.isNotEmpty())
-                annio=annioAux.toInt()
-            val colorExterior = intent.getStringExtra("ColorExterior") ?: ""
-            val colorInterior = intent.getStringExtra("ColorInterior") ?: ""
-            val especificaciones = intent.getStringExtra("Especificaciones") ?: ""
+            val jsonVeh = intent.getStringExtra("vehiculo") ?: ""
 
-
-            if (idVehiculo > 0 && vin.isNotEmpty()) {
-                vehiculoActual = VehiculoPasoLog(
-                    Id = idVehiculo.toString(),
-                    VIN = vin,
-                    BL = bl,
-                    Marca = marca,
-                    Modelo = modelo,
-                    Anio = annio,
-                    ColorExterior = colorExterior,
-                    ColorInterior = colorInterior,
-                    Especificaciones = especificaciones
-                )
-
+            if (jsonVeh.isNotEmpty()) {
+                vehiculoActual = gson.fromJson(jsonVeh,VehiculoPasoLog::class.java)
                 mostrarInfoVehiculo()
-                Log.d("PasoMovimientoLocal_Activity", "✅ Datos del vehículo obtenidos: VIN=$vin")
+                Log.d("PasoMovimientoLocal_Activity", "✅ Datos del vehículo obtenidos: VIN=${vehiculoActual?.VIN}")
             } else {
                 mostrarError("No se recibieron datos válidos del vehículo")
             }

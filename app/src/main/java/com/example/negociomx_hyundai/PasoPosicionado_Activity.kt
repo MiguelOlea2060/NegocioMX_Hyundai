@@ -31,6 +31,7 @@ import com.example.negociomx_hyundai.DAL.DALEmpleadoSQL
 import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
 import com.example.negociomx_hyundai.Utils.ParametrosSistema
 import com.example.negociomx_hyundai.databinding.ActivityPasoPosicionadoBinding
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -60,18 +61,18 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private lateinit var bloques : List<Bloque>
     private var posiciones = listOf<PosicionBloque>()
 
+    val gson=Gson()
 
     // Variable para manejar resultado de selección de posición
     private val seleccionPosicionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val posicionSeleccionada = result.data?.getSerializableExtra("posicion_seleccionada") as? PosicionBloque
-            val nombrePosicion = result.data?.getStringExtra("nombre_posicion")
-
-            if (posicionSeleccionada != null && nombrePosicion != null) {
+            val posicionSeleccionada = result.data?.getSerializableExtra("posicion_seleccionada")
+                    as? PosicionBloque
+            if (posicionSeleccionada != null) {
                 // Actualizar spinner con la posición seleccionada
-                actualizarSpinnerConPosicionSeleccionada(posicionSeleccionada, nombrePosicion)
+                actualizarSpinnerConPosicionSeleccionada(posicionSeleccionada)
             }
         }
     }
@@ -92,26 +93,10 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         bllBlo=BLLBloque()
         if(intent?.extras!=null)
         {
-            val idPasoLogVehiculo= intent.extras?.getInt("IdPasoLogVehiculo",0)?:0
-            IdVehiculo= intent.extras?.getInt("IdVehiculo",0)?:0
-            val marca= intent.extras?.getString("Marca","")?:""
-            val modelo= intent.extras?.getString("Modelo","")?:""
-            val bl= intent.extras?.getString("Bl","")?:""
-            val vin= intent.extras?.getString("Vin","")?:""
-            val colorExterior= intent.extras?.getString("ColorExterior","")?:""
-            val colorInterior= intent.extras?.getString("ColorInterior","")?:""
-            val especificaciones= intent.extras?.getString("Especificaciones","")?:""
-            vehiculoActual=VehiculoPasoLog(
-                Id =IdVehiculo.toString(),
-                Marca = marca,
-                Modelo = modelo,
-                BL =bl,
-                VIN = vin,
-                ColorExterior = colorExterior,
-                ColorInterior = colorInterior,
-                IdPasoLogVehiculo = idPasoLogVehiculo,
-                Especificaciones = especificaciones
-            )
+            val jsonVeh=intent.extras?.getString("vehiculo","")
+            vehiculoActual=gson.fromJson(jsonVeh,VehiculoPasoLog::class.java)
+
+            IdVehiculo= vehiculoActual?.Id!!.toInt()
         }
 
         inicializarComponentes()
@@ -120,6 +105,10 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     }
 
     private fun inicializarComponentes() {
+        if(ParametrosSistema.CfgGloSql!=null &&
+            ParametrosSistema.CfgGloSql?.ManejaSeleccionBloquePosXTablero==true)
+            leeBloquesSistema()
+
         loadingContainer = findViewById(R.id.loadingContainer)
         tvLoadingText = findViewById(R.id.tvLoadingText)
         tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
@@ -131,8 +120,11 @@ class PasoPosicionado_Activity : AppCompatActivity() {
             guardarStatusPosicionado()
         }
 
+        binding.btnSeleccionaPosicionPosicionado.setOnClickListener{
+            abrirPantallaPosicionGrafica()
+        }
         binding.btnRegresarPosicionado.setOnClickListener {
-            finish()
+                finish()
         }
     }
 
@@ -144,8 +136,6 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         inicializarHoraDinamica()
         // Cargar personal
         cargarPersonal()
-        // <CHANGE> Cargar datos para spinners
-        cargarBloques()
 
         if(vehiculoActual!=null && vehiculoActual?.Id?.toInt()!!>0) {
             binding.tvVinVehiculo.setText(vehiculoActual?.VIN)
@@ -155,10 +145,14 @@ class PasoPosicionado_Activity : AppCompatActivity() {
             ParametrosSistema?.CfgGloSql!!.ManejaSeleccionBloquePosXTablero==true) {
             binding.llSeleccionaPosicionTablero.visibility = View.VISIBLE
             binding.llSeleccionaPosicionSpinner.visibility=View.GONE
+            binding.llSeleccionBloquesPosicionado.visibility=View.GONE
         }
         else{
             binding.llSeleccionaPosicionTablero.visibility = View.GONE
             binding.llSeleccionaPosicionSpinner.visibility=View.VISIBLE
+            binding.llSeleccionBloquesPosicionado.visibility=View.VISIBLE
+            // <CHANGE> Cargar datos para spinners
+            cargarBloques()
         }
         mostrarInformacionVehiculo(vehiculoActual!!)
         mostrarFormularioPosicionado()
@@ -199,10 +193,22 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 Log.d("PasoPosicionado", "💾 Guardando Status->Posicionado del vehículo")
+                var idBloque:Short = 0
+                var nombreBloque:String=""
 
-                val posicionBloque = binding.spinnerBloque.selectedItemPosition
-                val bloque=bloques[posicionBloque-1]
-                val idBloque:Short = bloque.IdBloque
+                if(ParametrosSistema.CfgGloSql!=null &&
+                    ParametrosSistema.CfgGloSql?.ManejaSeleccionBloquePosXTablero==false) {
+                    val posicionBloque = binding.spinnerBloque.selectedItemPosition
+                    val bloque = bloques[posicionBloque - 1]
+                    idBloque = bloque.IdBloque
+                    nombreBloque=bloque.Nombre
+                }
+                else
+                {
+                    idBloque=posicionSeleccionadaManual?.IdBloque!!
+                    val bloque=bloques.filter { it.IdBloque==posicionSeleccionadaManual?.IdBloque }.first()
+                    nombreBloque=bloque.Nombre
+                }
 
                 val posicionEmpleado=binding.spinnerPersonal.selectedItemPosition
                 val empleado= empleados[posicionEmpleado-1]
@@ -241,7 +247,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                     Observacion = null,
                     FechaMovimiento = fechaActual,
                     NumeroEconomico = "",
-                    Bloque = bloque.Nombre,
+                    Bloque = nombreBloque,
                     Placa = "",
                     PersonaQueHaraMovimiento = nombrePersonalMovimiento,
                     IdVehiculo = IdVehiculo
@@ -269,7 +275,8 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     }
 
     private fun validarFormularioPosicionado(): Boolean {
-        if (binding.spinnerBloque.selectedItemPosition == 0) {
+        if (ParametrosSistema.CfgGloSql?.ManejaSeleccionBloquePosXTablero==false &&
+            binding.spinnerBloque.selectedItemPosition == 0) {
             Toast.makeText(this, "Seleccione el bloque", Toast.LENGTH_SHORT).show()
             return false
         }
@@ -343,6 +350,18 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         binding.btnGuardarPosicionado.alpha = 1.0f
     }
 
+    private fun leeBloquesSistema()
+    {
+        lifecycleScope.launch {
+            try {
+                    bloques = dalPasoLog.consultarBloques()
+                } catch (e: Exception) {
+                Log.e("PasoPosicionado", "Error cargando bloques: ${e.message}")
+                Toast.makeText(this@PasoPosicionado_Activity, "Error cargando bloques", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     // MÉTODOS PARA CARGAR DATOS DE SPINNERS
     private fun cargarBloques() {
         lifecycleScope.launch {
@@ -367,7 +386,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                         if (position > 0) {
                             // Abrir pantalla gráfica de posiciones
                             if(ParametrosSistema.CfgGloSql?.ManejaSeleccionBloquePosXTablero==true)
-                                abrirPantallaPosicionGrafica(position - 1)
+                                abrirPantallaPosicionGrafica()
                             else
                                 cargarPosiciones(position )
                         } else {
@@ -424,16 +443,13 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         statusActual = null
     }
 
-
-
-    private fun abrirPantallaPosicionGrafica(indiceBloqueSeleccionado: Int) {
+    private fun abrirPantallaPosicionGrafica() {
         try {
-            val bloqueSeleccionado = bloques[indiceBloqueSeleccionado]
-            val lista=bloques.toMutableSet()
+            val gson=Gson()
+            val jsonBloques=gson.toJson(bloques)
 
             val intent = Intent(this, PosicionGrafica_Activity::class.java)
-            intent.putExtra("bloque", bloqueSeleccionado)
-            intent.putExtra("bloques", lista.first())
+            intent.putExtra("bloques", jsonBloques)
 
             seleccionPosicionLauncher.launch(intent)
 
@@ -443,25 +459,20 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         }
     }
 
-    private fun actualizarSpinnerConPosicionSeleccionada(posicion: PosicionBloque, nombrePosicion: String) {
+    private fun actualizarSpinnerConPosicionSeleccionada(posicion: PosicionBloque) {
         // Guardar la posición seleccionada
-        posicionSeleccionadaManual = posicion
+        val bloque=bloques.filter { it.IdBloque==posicion.IdBloque }.firstOrNull()
+        if(bloque!=null) {
+            posicionSeleccionadaManual = posicion
+            var nombrePosicion: String = "Bloque: ${bloque.Nombre}, " +
+                    "Col.: ${posicion.Columna} -> Fila: ${posicion.Fila}"
 
-        // Crear adapter con la posición seleccionada
-        val nombresPosiciones = mutableListOf("Seleccionar posición...", nombrePosicion)
+            binding.lblBloquePosicionSeleccionada.setText(nombrePosicion)
 
-        val adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_item,
-            nombresPosiciones
-        )
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerPosicion.adapter = adapter
-
-        // Seleccionar la posición
-        binding.spinnerPosicion.setSelection(1)
-
-        Toast.makeText(this, "Posición seleccionada: $nombrePosicion", Toast.LENGTH_SHORT).show()
+            // Crear adapter con la posición seleccionada
+            Toast.makeText(this, "Posición seleccionada: $nombrePosicion", Toast.LENGTH_SHORT)
+                .show()
+        }
     }
 
 
