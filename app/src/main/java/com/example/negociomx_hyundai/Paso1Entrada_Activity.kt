@@ -283,7 +283,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         // <CHANGE> Mostrar información del vehículo (copiado de Paso1SOC)
         binding.apply {
             tvBlVehiculo.text = "BL: ${vehiculo.BL}"
-            tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones} , Año -> ${vehiculo.Anio}"
+            tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones}  Año -> ${vehiculo.Anio}"
             tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
             tvColorInterior.text = "Color Int.: ${vehiculo.ColorInterior}"
 

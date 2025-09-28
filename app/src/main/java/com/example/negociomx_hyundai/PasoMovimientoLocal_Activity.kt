@@ -17,6 +17,7 @@ import com.example.negociomx_hyundai.DAL.DALEmpleadoSQL
 import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
 import com.example.negociomx_hyundai.DAL.DALVehiculo
 import com.example.negociomx_hyundai.BE.TipoMovimiento
+import com.example.negociomx_hyundai.Utils.ParametrosSistema
 import com.example.negociomx_hyundai.databinding.ActivityPasoMovimientoLocalBinding
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
@@ -52,7 +53,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
     private var vehiculoActual: VehiculoPasoLog? = null
     private var empleados = listOf<Empleado>()
     private var tiposMovimiento = listOf<TipoMovimiento>()
-    private var usuarioActual = "Sistema" // En implementación real, obtener del usuario logueado
+   // private var usuarioActual = "Sistema" // En implementación real, obtener del usuario logueado
 
     // DALs
     private val dalVehiculo = DALVehiculo()
@@ -114,7 +115,8 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
         tvError = findViewById(R.id.tvError)
 
         // Configurar empleado que registra
-        tvEmpleadoRegistra.text = "Empleado que registra: $usuarioActual"
+        binding.tvEmpleadoRegistra.text = "Empleado receptor: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
+
     }
 
     private fun configurarEventos() {

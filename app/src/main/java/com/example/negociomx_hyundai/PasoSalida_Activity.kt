@@ -89,6 +89,7 @@ class PasoSalida_Activity : AppCompatActivity() {
             val vin= intent.extras?.getString("Vin","")?:""
             val colorExterior= intent.extras?.getString("ColorExterior","")?:""
             val colorInterior= intent.extras?.getString("ColorInterior","")?:""
+            val especificaciones = intent.getStringExtra("Especificaciones") ?: ""
             vehiculoActual=VehiculoPasoLog(
                 Id =IdVehiculo.toString(),
                 Marca = marca,
@@ -98,7 +99,9 @@ class PasoSalida_Activity : AppCompatActivity() {
                 ColorExterior = colorExterior,
                 ColorInterior = colorInterior,
                 IdPasoLogVehiculo = idPasoLogVehiculo,
+                Especificaciones = especificaciones,
                 Anio = annio.toInt()
+
             )
         }
 
@@ -163,7 +166,7 @@ class PasoSalida_Activity : AppCompatActivity() {
         binding.apply {
             tvVinVehiculoSalida.text = "VIN: ${vehiculo.VIN}"
             tvBlVehiculoSalida.text = "MBL: ${vehiculo.BL}"
-            tvMarcaModeloAnnioSalida.text = "${vehiculo.Especificaciones}, Año: ${vehiculo.Anio}"
+            tvMarcaModeloAnnioSalida.text = "${vehiculo.Especificaciones} Año: ${vehiculo.Anio}"
             tvColorExteriorSalida.text = "Color Ext.: ${vehiculo.ColorExterior}"
             tvColorInteriorVehiculoSalida.text = "Color Int.: ${vehiculo.ColorInterior}"
 
