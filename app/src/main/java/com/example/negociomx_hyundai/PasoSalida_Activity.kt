@@ -695,15 +695,21 @@ class PasoSalida_Activity : AppCompatActivity() {
                 val placa= transportistaSeleccionado?.Placas!![posicionPlaca-1]
                 val idVehiculoPlacas=placa.IdVehiculoPlacas
                 var placas=placa.Placas
+                var numeco=binding.etNumeroEconomico.text.toString()
 
                 val idBloque:Short? =  null
                 val fila:Short? =  null
                 val columna:Short? =  null
+               // var idTransporte=binding.spinnerEmpresaMadrinaSalida.selectedItemPosition.toString()
 
                 var idUsuario=ParametrosSistema.usuarioLogueado.Id?.toInt()
+                var idTipoEntradaSalida = 1
+                if (binding.rbEnMadrinaSalida.isChecked)idTipoEntradaSalida=2
 
                 val paso=PasoLogVehiculoDet(
+
                     IdPasoLogVehiculo = vehiculoActual?.IdPasoLogVehiculo,
+                   // idTransporte = idTransporte,
                     IdEmpleadoTransporte =idEmpleadoTransporteSalida,
                     IdEmpleadoPosiciono = null,
                     Fila = fila,
@@ -715,15 +721,15 @@ class PasoSalida_Activity : AppCompatActivity() {
                     IdUsuarioMovimiento = idUsuario,
                     IdPasoLogVehiculoDet = 0,
                     IdParteDanno = null,
-                    IdTipoEntradaSalida = null,
+                    IdTipoEntradaSalida = idTipoEntradaSalida,
                     EnviadoAInterface = null,
                     FechaEnviado = null,
                     Observacion = null,
                     FechaMovimiento = fechaActual,
-                    NumeroEconomico = "",
-                    Bloque = "",
+                    NumeroEconomico = numeco,
+                    Bloque = null,
                     Placa = placas,
-                    PersonaQueHaraMovimiento = "",
+                    PersonaQueHaraMovimiento = null,
                     IdVehiculo = IdVehiculo,
                     IdVehiculoPlacas = idVehiculoPlacas,
                 )

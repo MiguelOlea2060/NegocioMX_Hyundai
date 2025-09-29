@@ -635,6 +635,14 @@ class DALPasoLogVehiculo {
                 campos += ", IdEmpleadoTransporte"
                 valores += ", ?"
             }
+            if (paso?.IdTipoEntradaSalida != null) {
+                campos += ", IdTipoEntradaSalida"
+                valores += ", ?"
+            }
+            if (paso?.IdTransporte != null) {
+                campos += ", IdTransporte"
+                valores += ", ?"
+            }
             campos += ") "
             valores += ") "
             var queryDetalle = "INSERT INTO PasoLogVehiculoDet "
@@ -697,6 +705,16 @@ class DALPasoLogVehiculo {
             if (paso?.IdEmpleadoTransporte!=null)
             {
                 statementDetalle.setInt(contadorparams, paso?.IdEmpleadoTransporte!!)
+                contadorparams++
+            }
+            if (paso?.IdTipoEntradaSalida!=null)
+            {
+                statementDetalle.setInt(contadorparams, paso?.IdTipoEntradaSalida!!)
+                contadorparams++
+            }
+            if (paso?.IdTransporte!=null)
+            {
+                statementDetalle.setInt(contadorparams, paso?.IdTransporte!!)
                 contadorparams++
             }
 

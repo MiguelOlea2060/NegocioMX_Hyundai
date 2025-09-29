@@ -158,6 +158,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
         binding.btnMovimientoLocal.setOnClickListener {
             val codigoRespuesta=101
             val jsonVeh=gson.toJson(vehiculoActual)
+
             val intent = Intent(this, PasoMovimientoLocal_Activity::class.java)
             intent.putExtra("vehiculo", jsonVeh)
             startActivityForResult(intent,codigoRespuesta)

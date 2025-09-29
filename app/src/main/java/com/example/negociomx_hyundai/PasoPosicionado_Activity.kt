@@ -92,17 +92,11 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         }
 
         bllBlo = BLLBloque()
-           if(intent?.extras!=null)
-        {
-        //    val jsonVeh=intent.extras?.getString("vehiculo","")
-        //    vehiculoActual=gson.fromJson(jsonVeh,VehiculoPasoLog::class.java)
-         //   IdVehiculo= vehiculoActual?.Id!!.toInt()
-        }
+
 
         inicializarComponentes()
         configurarEventos()
         cargarDatosIniciales()
-       // inicializarFormulario()
         inicializarHoraDinamica()
     }
 
@@ -115,10 +109,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         loadingContainer = findViewById(R.id.loadingContainer)
         tvLoadingText = findViewById(R.id.tvLoadingText)
         tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
-
         binding.tvEmpleadoReceptor.text = "Empleado receptor: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
-
-
 
     }
 
@@ -127,7 +118,6 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         binding.btnGuardarPosicionado.setOnClickListener {
             guardarStatusPosicionado()
         }
-
         binding.btnSeleccionaPosicionPosicionado.setOnClickListener {
             abrirPantallaPosicionGrafica()
         }
