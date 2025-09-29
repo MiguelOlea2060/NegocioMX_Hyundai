@@ -13,12 +13,20 @@ import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.VIEW_MODEL_STORE_OWNER_KEY
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.Cliente
 import com.example.negociomx_hyundai.BE.Empleado
@@ -32,12 +40,15 @@ import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
 import com.example.negociomx_hyundai.DAL.DALVehiculo
 import com.example.negociomx_hyundai.Utils.ParametrosSistema
 import com.example.negociomx_hyundai.databinding.ActivityPasoSalidaBinding
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+
 class PasoSalida_Activity : AppCompatActivity() {
+    val gson= Gson()
 
     private lateinit var binding:ActivityPasoSalidaBinding
     private var empleados = listOf<Empleado>()
@@ -54,6 +65,49 @@ class PasoSalida_Activity : AppCompatActivity() {
     private lateinit var adapterTransportistasMadrina: ArrayAdapter<String>
     private lateinit var adapterConductores: ArrayAdapter<String>
     private lateinit var adapterPlacas: ArrayAdapter<String>
+
+
+
+
+    private lateinit var layoutInfoVehiculo: LinearLayout
+    private lateinit var layoutFormulario: LinearLayout
+
+    private lateinit var loadingContainer: LinearLayout
+    private lateinit var layoutError: LinearLayout
+
+
+    private lateinit var layoutRodando: LinearLayout
+    private lateinit var layoutEnMadrina: LinearLayout
+
+
+    private lateinit var tvVinVehiculo: TextView
+    private lateinit var tvBlVehiculo: TextView
+    private lateinit var tvMarcaModeloAnnio: TextView
+    private lateinit var tvColorExterior: TextView
+    private lateinit var tvColorInteriorVehiculo: TextView
+
+    private lateinit var rgTipo: RadioGroup
+    private lateinit var rbRodando: RadioButton
+    private lateinit var rbEnMadrina: RadioButton
+    private lateinit var spinnerEmpresaRodando: Spinner
+    private lateinit var spinnerEmpresaMadrina: Spinner
+    private lateinit var spinnerConductor: Spinner
+    private lateinit var lblPlacaPaso1: TextView
+    private lateinit var spinnerPlacaTransporte: Spinner
+    private lateinit var lblNumEconomicoPaso1: TextView
+    private lateinit var tNumeroEconomico: TextView
+    private lateinit var tvEmpleadoReceptor: TextView
+    private lateinit var tvFechaMovimiento: TextView
+
+    private lateinit var btnGuardar: Button
+
+
+    // Loading y error
+    private lateinit var progressBar: ProgressBar
+    private lateinit var tvLoadingText: TextView
+    private lateinit var tvLoadingSubtext: TextView
+
+    private lateinit var  tvMensajeError: TextView
 
     var dalVeh:DALVehiculo?=null
     // Variables para hora dinámica
@@ -105,111 +159,68 @@ class PasoSalida_Activity : AppCompatActivity() {
             )
         }
 
+        inicializarComponentes()
         configurarEventos()
-        inicializarFormulario()
-    }
-
-    private fun inicializarFormulario() {
-        // Inicializar empleado receptor
-        binding.tvEmpleadoReceptorSalida.text = "Empleado Responsable: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
-
-        // Inicializar hora dinámica
+        cargarDatosIniciales()
         inicializarHoraDinamica()
-        // Cargar transportistas
-        cargarTransportistas()
-
-        // Cargar personal
-        cargaConductores()
-
-        if(vehiculoActual!=null && vehiculoActual?.Id?.toInt()!!>0) {
-            binding.tvVinVehiculoSalida.setText(vehiculoActual?.VIN)
-        }
-        mostrarInformacionVehiculo(vehiculoActual!!)
-        mostrarFormularioStatusSalida()
+        /*
+        inicializarComponentes()
+        configurarEventos()
+        inicializarFormulario()*/
     }
 
-    // MÉTODOS PARA CARGAR SPINNERS
-    private fun cargarTransportistas() {
-        lifecycleScope.launch {
-            try {
-                transportistas = dalCliente.consultarTransportistasConPlacasNumEco(true)
 
-                val nombresTransportistas = mutableListOf("Seleccionar empresa...")
-                nombresTransportistas.addAll(transportistas.map { it.Nombre ?: "Sin nombre" })
 
-                // Configurar adapter para Rodando
-                adapterTransportistasRodando = ArrayAdapter(
-                    this@PasoSalida_Activity,
-                    android.R.layout.simple_spinner_item,
-                    nombresTransportistas
-                )
-                adapterTransportistasRodando.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.spinnerEmpresaRodandoSalida.adapter = adapterTransportistasRodando
 
-                // Configurar adapter para Madrina
-                adapterTransportistasMadrina = ArrayAdapter(
-                    this@PasoSalida_Activity,
-                    android.R.layout.simple_spinner_item,
-                    nombresTransportistas
-                )
-                adapterTransportistasMadrina.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.spinnerEmpresaMadrinaSalida.adapter = adapterTransportistasMadrina
+    private fun inicializarComponentes() {
+        // Layouts
+        layoutInfoVehiculo = findViewById(R.id.layoutInfoVehiculoSalida)
+        layoutFormulario = findViewById(R.id.layoutFormularioSalida)
 
-            } catch (e: Exception) {
-                Log.e("Paso1Entrada", "Error cargando transportistas: ${e.message}")
-                Toast.makeText(this@PasoSalida_Activity, "Error cargando empresas", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+        loadingContainer = findViewById(R.id.loadingContainerSalida)
+        layoutError= findViewById(R.id.layoutErrorSalida)
 
-    private fun mostrarInformacionVehiculo(vehiculo: VehiculoPasoLog) {
-        binding.apply {
-            tvVinVehiculoSalida.text = "VIN: ${vehiculo.VIN}"
-            tvBlVehiculoSalida.text = "MBL: ${vehiculo.BL}"
-            tvMarcaModeloAnnioSalida.text = "${vehiculo.Especificaciones} Año: ${vehiculo.Anio}"
-            tvColorExteriorSalida.text = "Color Ext.: ${vehiculo.ColorExterior}"
-            tvColorInteriorVehiculoSalida.text = "Color Int.: ${vehiculo.ColorInterior}"
 
-            layoutInfoVehiculoSalida.visibility = View.VISIBLE
-        }
-    }
+        layoutRodando = findViewById(R.id.layoutRodandoSalida)
+        layoutEnMadrina = findViewById(R.id.layoutEnMadrinaSalida)
 
-    private fun mostrarFormularioStatusSalida() {
-        binding.layoutFormularioSalida.visibility = View.VISIBLE
-        binding.layoutErrorSalida.visibility = View.GONE
-        Toast.makeText(this, "✅ Vehículo válido para status->Salida", Toast.LENGTH_SHORT).show()
-    }
 
-    // MÉTODOS PARA CARGAR PERSONAL
-    private fun cargaConductores() {
-        lifecycleScope.launch {
-            try {
-                empleados = dalEmp.consultarEmpleados(105)
+        // Información del vehículo
+        tvVinVehiculo = findViewById(R.id.tvVinVehiculoSalida)
+        tvBlVehiculo = findViewById(R.id.tvBlVehiculoSalida)
+        tvMarcaModeloAnnio = findViewById(R.id.tvMarcaModeloAnnioSalida)
+        tvColorExterior = findViewById(R.id.tvColorExteriorSalida)
+        tvColorInteriorVehiculo = findViewById(R.id.tvColorInteriorVehiculoSalida)
 
-                val nombresPersonal = mutableListOf("Seleccionar personal...")
-                nombresPersonal.addAll(empleados.map { it.NombreCompleto ?: "Sin nombre" })
 
-                val adapter = ArrayAdapter(
-                    this@PasoSalida_Activity,
-                    android.R.layout.simple_spinner_item,
-                    nombresPersonal
-                )
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.spinnerConductorSalida.adapter = adapter
+        // Formulario
+        rgTipo = findViewById(R.id.rgTipoSalida)
+        rbRodando = findViewById(R.id.rbRodandoSalida)
+        rbEnMadrina = findViewById(R.id.rbEnMadrinaSalida)
+        spinnerEmpresaRodando = findViewById(R.id.spinnerEmpresaRodandoSalida)
+        spinnerEmpresaMadrina = findViewById(R.id.spinnerEmpresaMadrinaSalida)
+        spinnerConductor = findViewById(R.id.spinnerConductorSalida)
+        lblPlacaPaso1 = findViewById(R.id.lblPlacaPaso1Entrada)
+        spinnerPlacaTransporte = findViewById(R.id.spinnerPlacaTransporteSalida)
+        lblNumEconomicoPaso1= findViewById(R.id.lblNumEconomicoPaso1Entrada)
+        tNumeroEconomico = findViewById(R.id.etNumeroEconomico)
+        tvEmpleadoReceptor = findViewById(R.id.tvEmpleadoReceptorSalida)
+        tvFechaMovimiento = findViewById(R.id.tvFechaMovimientoSalida)
 
-            } catch (e: Exception) {
-                Log.e("PasoSalida", "Error cargando empleado: ${e.message}")
-                Toast.makeText(this@PasoSalida_Activity, "Error cargando empleado", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
+        // Botones de acción
+        btnGuardar = findViewById(R.id.btnGuardarSalida)
 
-    fun Activity.hideKeyboard() {
-        hideKeyboard(currentFocus ?: View(this))
-    }
-    fun Context.hideKeyboard(view: View) {
-        val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+
+        // Loading y error
+        progressBar = findViewById(R.id.progressBarSalida)
+        tvLoadingText = findViewById(R.id.tvLoadingTextSalida)
+        tvLoadingSubtext = findViewById(R.id.tvLoadingSubtextSalida)
+
+        tvMensajeError = findViewById(R.id.tvMensajeErrorSalida)
+
+
+        // Configurar empleado que registra
+        binding.tvEmpleadoReceptorSalida.text = "Empleado Responsable: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
     }
 
     private fun configurarEventos() {
@@ -236,7 +247,183 @@ class PasoSalida_Activity : AppCompatActivity() {
         }
 
         configurarEventosSpinners()
+0    }
+
+    private fun cargarDatosIniciales() {
+        //obtenerDatosVehiculo()
+        mostrarCarga("Cargando datos iniciales...", "Consultando empleados y tipos de movimiento")
+
+        lifecycleScope.launch {
+            try {
+                // Obtener datos del vehículo por Intent
+                obtenerDatosVehiculo()
+
+
+
+                // Cargar transportistas
+                transportistas = dalCliente.consultarTransportistasConPlacasNumEco(true)
+                cargarTransportistas()
+
+                // Cargar personal
+                empleados = dalEmp.consultarEmpleados(105)
+                cargaConductores()
+/*
+                if(vehiculoActual!=null && vehiculoActual?.Id?.toInt()!!>0) {
+                    binding.tvVinVehiculoSalida.setText(vehiculoActual?.VIN)
+                }*/
+
+                ocultarCarga()
+                mostrarFormularios()
+                Log.d("PasoSalida_Activity", "✅ Datos iniciales cargados correctamente")
+
+            } catch (e: Exception) {
+                ocultarCarga()
+                mostrarError("Error cargando datos iniciales: ${e.message}")
+                Log.e("PasoSalida_Activity", "Error cargando datos: ${e.message}")
+            }
+        }
     }
+
+    private fun obtenerDatosVehiculo() {
+        try {
+            val jsonVeh = intent.getStringExtra("vehiculo") ?: ""
+
+            if (jsonVeh.isNotEmpty()) {
+                vehiculoActual = gson.fromJson(jsonVeh,VehiculoPasoLog::class.java)
+                mostrarInfoVehiculo()
+                Log.d("PasoSalida_Activity", "✅ Datos del vehículo obtenidos: VIN=${vehiculoActual?.VIN}")
+            } else {
+                mostrarError("No se recibieron datos válidos del vehículo")
+            }
+        } catch (e: Exception) {
+            mostrarError("Error obteniendo datos del vehículo: ${e.message}")
+            Log.e("PasoSalida_Activity", "Error obteniendo datos: ${e.message}")
+        }
+    }
+
+    private fun mostrarInfoVehiculo() {
+        vehiculoActual?.let { vehiculo ->
+            binding.tvVinVehiculoSalida.text="VIN: ${vehiculo.VIN}"
+            tvBlVehiculo.text = "BL: ${vehiculo.BL}"
+            tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones}   Año: ${vehiculo.Anio}"
+            tvColorExterior.text = "Color Ext: ${vehiculo.ColorExterior}"
+            tvColorInteriorVehiculo.text = "Color Int: ${vehiculo.ColorInterior}"
+            layoutInfoVehiculo.visibility = View.VISIBLE
+        }
+    }
+
+    private fun inicializarFormulario() {
+
+        // Inicializar hora dinámica
+        inicializarHoraDinamica()
+        // Cargar transportistas
+        cargarTransportistas()
+
+        // Cargar personal
+        cargaConductores()
+
+        if(vehiculoActual!=null && vehiculoActual?.Id?.toInt()!!>0) {
+            binding.tvVinVehiculoSalida.setText(vehiculoActual?.VIN)
+        }
+        mostrarInformacionVehiculo(vehiculoActual!!)
+        mostrarFormularioStatusSalida()
+    }
+
+    // MÉTODOS PARA CARGAR SPINNERS
+    private fun cargarTransportistas() {
+       // lifecycleScope.launch {
+            try {
+
+
+                val nombresTransportistas = mutableListOf("Seleccionar empresa...")
+                nombresTransportistas.addAll(transportistas.map { it.Nombre ?: "Sin nombre" })
+
+                // Configurar adapter para Rodando
+                adapterTransportistasRodando = ArrayAdapter(
+                    this@PasoSalida_Activity,
+                    android.R.layout.simple_spinner_item,
+                    nombresTransportistas
+                )
+                adapterTransportistasRodando.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.spinnerEmpresaRodandoSalida.adapter = adapterTransportistasRodando
+
+                // Configurar adapter para Madrina
+                adapterTransportistasMadrina = ArrayAdapter(
+                    this@PasoSalida_Activity,
+                    android.R.layout.simple_spinner_item,
+                    nombresTransportistas
+                )
+                adapterTransportistasMadrina.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.spinnerEmpresaMadrinaSalida.adapter = adapterTransportistasMadrina
+
+            } catch (e: Exception) {
+                Log.e("Paso1Entrada", "Error cargando transportistas: ${e.message}")
+                Toast.makeText(this@PasoSalida_Activity, "Error cargando empresas", Toast.LENGTH_SHORT).show()
+            }
+       // }
+    }
+
+    private fun mostrarInformacionVehiculo(vehiculo: VehiculoPasoLog) {
+        binding.apply {
+            layoutInfoVehiculoSalida.visibility = View.VISIBLE
+            tvVinVehiculoSalida.text = "VIN: ${vehiculo.VIN}"
+            tvBlVehiculoSalida.text = "MBL: ${vehiculo.BL}"
+            tvMarcaModeloAnnioSalida.text = "${vehiculo.Especificaciones} Año: ${vehiculo.Anio}"
+            tvColorExteriorSalida.text = "Color Ext.: ${vehiculo.ColorExterior}"
+            tvColorInteriorVehiculoSalida.text = "Color Int.: ${vehiculo.ColorInterior}"
+
+        }
+    }
+
+    private fun mostrarFormularios() {
+
+
+        // <CHANGE> Mostrar información del vehículo cuando se muestran los formularios
+
+        binding.layoutFormularioSalida.visibility = View.VISIBLE
+        binding.layoutErrorSalida.visibility = View.GONE
+        Toast.makeText(this, "✅ Vehículo válido para status->Salida", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun mostrarFormularioStatusSalida() {
+        binding.layoutFormularioSalida.visibility = View.VISIBLE
+        binding.layoutErrorSalida.visibility = View.GONE
+        Toast.makeText(this, "✅ Vehículo válido para status->Salida", Toast.LENGTH_SHORT).show()
+    }
+
+    // MÉTODOS PARA CARGAR PERSONAL
+    private fun cargaConductores() {
+        //lifecycleScope.launch {
+            try {
+
+
+                val nombresPersonal = mutableListOf("Seleccionar personal...")
+                nombresPersonal.addAll(empleados.map { it.NombreCompleto ?: "Sin nombre" })
+
+                val adapter = ArrayAdapter(
+                    this@PasoSalida_Activity,
+                    android.R.layout.simple_spinner_item,
+                    nombresPersonal
+                )
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                binding.spinnerConductorSalida.adapter = adapter
+
+            } catch (e: Exception) {
+                Log.e("PasoSalida", "Error cargando empleado: ${e.message}")
+                Toast.makeText(this@PasoSalida_Activity, "Error cargando empleado", Toast.LENGTH_SHORT).show()
+            }
+     //   }
+    }
+
+    fun Activity.hideKeyboard() {
+        hideKeyboard(currentFocus ?: View(this))
+    }
+    fun Context.hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+
 
     private fun configurarEventosSpinners() {
         // Evento para spinner de empresa en Madrina
@@ -587,6 +774,31 @@ class PasoSalida_Activity : AppCompatActivity() {
             return false
         }
         return true
+    }
+
+    private fun mostrarCarga(mensaje: String, submensaje: String = "") {
+        binding.loadingContainerSalida.visibility = View.VISIBLE
+        binding.tvLoadingTextSalida.text= mensaje
+        binding.tvLoadingSubtextSalida.text = submensaje
+        binding.tvLoadingSubtextSalida.visibility = if(submensaje.isNotEmpty()) View.VISIBLE else View.GONE
+        binding.btnGuardarSalida.isEnabled = false
+        binding.btnGuardarSalida.alpha = 0.5f
+
+     //   btnGuardar.isEnabled = false
+     //   btnGuardar.alpha = 0.5f
+    }
+
+    private fun ocultarCarga() {
+        binding.loadingContainerSalida.visibility = View.GONE
+        binding.btnGuardarSalida.isEnabled = true
+        binding.btnGuardarSalida.alpha = 1.0f
+      //  btnGuardar.isEnabled = true
+      //  btnGuardar.alpha = 1.0f
+    }
+
+    private fun mostrarError(mensaje: String) {
+        tvMensajeError.text = mensaje
+        layoutError.visibility = View.VISIBLE
     }
 
     private fun mostrarCargaGuardado() {

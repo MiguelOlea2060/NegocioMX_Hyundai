@@ -205,7 +205,6 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
             tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones}   Año: ${vehiculo.Anio}"
             tvColorExterior.text = "Color Ext: ${vehiculo.ColorExterior}"
             tvColorInterior.text = "Color Int: ${vehiculo.ColorInterior}"
-
             layoutInfoVehiculo.visibility = View.VISIBLE
         }
     }

@@ -16,13 +16,12 @@
 
         <!-- HEADER -->
         <LinearLayout
-            android:gravity="center_vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#1565C0"
             android:orientation="horizontal"
             android:padding="8dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="12dp">
 
             <ImageView
                 android:id="@+id/btnRegresarSalida"
@@ -32,7 +31,10 @@
 
             </ImageView>
             <TextView
-                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_marginLeft="15dp"
+                android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="SALIDA DE VEHÍCULO"
                 android:textColor="#FFFFFF"
@@ -49,14 +51,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:visibility="gone"
             android:padding="8dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="12dp"
             >
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="1. INFORMACIÓN DEL VEHÍCULO"
+                android:text=" INFORMACIÓN DEL VEHÍCULO "
                 android:textColor="#1565C0"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -118,7 +121,7 @@
 
         </LinearLayout>
 
-        <!-- FORMULARIO DE POSICIONADO -->
+        <!-- FORMULARIO DE Salida -->
         <LinearLayout
             android:background="@drawable/edittext_background"
             android:id="@+id/layoutFormularioSalida"
@@ -132,7 +135,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="2. DATOS DE LA SALIDA"
+                android:text=" DATOS DE LA SALIDA "
                 android:textColor="#1565C0"
                 android:textSize="16sp"
                 android:textStyle="bold"
@@ -331,7 +334,6 @@
             android:id="@+id/loadingContainerSalida"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
             android:orientation="vertical"
             android:visibility="gone"
             android:gravity="center"
@@ -351,7 +353,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Consultando vehículo..."
+                android:text="Procesando..."
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#1565C0" />
@@ -361,8 +363,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Verificando información en base de datos"
-                android:textSize="12sp"
+                android:text="Verificando información "
+                android:textSize="14sp"
                 android:textColor="#37474F" />
 
         </LinearLayout>
@@ -393,10 +395,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="El vehículo no existe o no tiene un status válido para posicionado."
+                android:textColor="#C62828"
                 android:textSize="14sp"
-                android:textColor="#37474F"
                 android:gravity="center"
-                android:layout_marginBottom="16dp" />
+                 />
 
         </LinearLayout>
 
