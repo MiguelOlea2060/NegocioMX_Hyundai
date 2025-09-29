@@ -41,7 +41,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private lateinit var binding: ActivityPasoPosicionadoBinding
     private val dalPasoLog = DALPasoLogVehiculo()
     private val dalCliente = DALCliente()
-    private val dalEmp=DALEmpleadoSQL()
+    private val dalEmp = DALEmpleadoSQL()
     private var vehiculoActual: VehiculoPasoLog? = null
     private var statusActual: PasoLogVehiculoDet? = null
     private var empleados = listOf<Empleado>()
@@ -51,17 +51,18 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private lateinit var tvLoadingText: TextView
     private lateinit var tvLoadingSubtext: TextView
 
-    var IdVehiculo:Int?=null
-    var bllBlo:BLLBloque?=null
+   // var IdVehiculo: Int? = null
+    var bllBlo: BLLBloque? = null
+
     // Variables para hora dinámica
     private lateinit var timerHandler: Handler
     private lateinit var timerRunnable: Runnable
 
-    var fechaActual:String =""
-    private lateinit var bloques : List<Bloque>
+    var fechaActual: String = ""
+    private lateinit var bloques: List<Bloque>
     private var posiciones = listOf<PosicionBloque>()
 
-    val gson=Gson()
+    val gson = Gson()
 
     // Variable para manejar resultado de selección de posición
     private val seleccionPosicionLauncher = registerForActivityResult(
@@ -90,28 +91,35 @@ class PasoPosicionado_Activity : AppCompatActivity() {
             insets
         }
 
-        bllBlo=BLLBloque()
-        if(intent?.extras!=null)
+        bllBlo = BLLBloque()
+           if(intent?.extras!=null)
         {
-            val jsonVeh=intent.extras?.getString("vehiculo","")
-            vehiculoActual=gson.fromJson(jsonVeh,VehiculoPasoLog::class.java)
-
-            IdVehiculo= vehiculoActual?.Id!!.toInt()
+        //    val jsonVeh=intent.extras?.getString("vehiculo","")
+        //    vehiculoActual=gson.fromJson(jsonVeh,VehiculoPasoLog::class.java)
+         //   IdVehiculo= vehiculoActual?.Id!!.toInt()
         }
 
         inicializarComponentes()
         configurarEventos()
-        inicializarFormulario()
+        cargarDatosIniciales()
+       // inicializarFormulario()
+        inicializarHoraDinamica()
     }
 
     private fun inicializarComponentes() {
-        if(ParametrosSistema.CfgGloSql!=null &&
-            ParametrosSistema.CfgGloSql?.ManejaSeleccionBloquePosXTablero==true)
+        if (ParametrosSistema.CfgGloSql != null &&
+            ParametrosSistema.CfgGloSql?.ManejaSeleccionBloquePosXTablero == true
+        )
             leeBloquesSistema()
 
         loadingContainer = findViewById(R.id.loadingContainer)
         tvLoadingText = findViewById(R.id.tvLoadingText)
         tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
+
+        binding.tvEmpleadoReceptor.text = "Empleado receptor: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
+
+
+
     }
 
     private fun configurarEventos() {
@@ -120,40 +128,107 @@ class PasoPosicionado_Activity : AppCompatActivity() {
             guardarStatusPosicionado()
         }
 
-        binding.btnSeleccionaPosicionPosicionado.setOnClickListener{
+        binding.btnSeleccionaPosicionPosicionado.setOnClickListener {
             abrirPantallaPosicionGrafica()
         }
         binding.btnRegresarPosicionado.setOnClickListener {
-                finish()
+            finish()
         }
     }
 
+
+
+    private fun cargarDatosIniciales() {
+        //obtenerDatosVehiculo()
+        mostrarCarga("Cargando datos iniciales...", "Consultando empleados y tipos de movimiento")
+
+        lifecycleScope.launch {
+            try {
+                // Obtener datos del vehículo por Intent
+                obtenerDatosVehiculo()
+
+
+                empleados = dalEmp.consultarEmpleados(105)
+                // Cargar personal
+                cargarPersonal()
+
+
+                if(ParametrosSistema.CfgGloSql!=null &&
+                    ParametrosSistema?.CfgGloSql!!.ManejaSeleccionBloquePosXTablero==true) {
+                    binding.llSeleccionaPosicionTablero.visibility = View.VISIBLE
+                    binding.llSeleccionaPosicionSpinner.visibility=View.GONE
+                    binding.llSeleccionBloquesPosicionado.visibility=View.GONE
+                }
+                else{
+                    binding.llSeleccionaPosicionTablero.visibility = View.GONE
+                    binding.llSeleccionaPosicionSpinner.visibility=View.VISIBLE
+                    binding.llSeleccionBloquesPosicionado.visibility=View.VISIBLE
+                    // <CHANGE> Cargar datos para spinners
+                    cargarBloques()
+                }
+
+
+                ocultarCarga()
+                mostrarFormularios()
+                Log.d("PasoSalida_Activity", "✅ Datos iniciales cargados correctamente")
+
+            } catch (e: Exception) {
+                ocultarCarga()
+                mostrarError("Error cargando datos iniciales: ${e.message}")
+                Log.e("PasoSalida_Activity", "Error cargando datos: ${e.message}")
+            }
+        }
+    }
+
+
+
+    private fun obtenerDatosVehiculo() {
+        try {
+            val jsonVeh = intent.getStringExtra("vehiculo") ?: ""
+
+            if (jsonVeh.isNotEmpty()) {
+                vehiculoActual = gson.fromJson(jsonVeh,VehiculoPasoLog::class.java)
+                mostrarInfoVehiculo()
+                Log.d("PasoPosicionado_Activity", "✅ Datos del vehículo obtenidos: VIN=${vehiculoActual?.VIN}")
+            } else {
+                mostrarError("No se recibieron datos válidos del vehículo")
+            }
+        } catch (e: Exception) {
+            mostrarError("Error obteniendo datos del vehículo: ${e.message}")
+            Log.e("PasoPosicionado_Activity", "Error obteniendo datos: ${e.message}")
+        }
+    }
+
+    private fun mostrarInfoVehiculo() {
+        vehiculoActual?.let { vehiculo ->
+            // <CHANGE> Optimizado usando apply para reducir accesos al binding
+            binding.apply {
+                tvVinVehiculo.text = "VIN: ${vehiculo.VIN}"
+                tvBlVehiculo.text = "BL: ${vehiculo.BL}"
+                tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones}   Año: ${vehiculo.Anio}"
+                tvColorExterior.text = "Color Ext: ${vehiculo.ColorExterior}"
+                tvColorInteriorVehiculo.text = "Color Int: ${vehiculo.ColorInterior}"
+                layoutInfoVehiculo.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun mostrarFormularios() {
+        // <CHANGE> Mostrar información del vehículo cuando se muestran los formularios
+        binding.layoutFormularioPosicionado.visibility = View.VISIBLE
+        binding.layoutError.visibility = View.GONE
+        Toast.makeText(this, "✅ Vehículo válido para status->Posicionado", Toast.LENGTH_SHORT).show()
+    }
+
+
     private fun inicializarFormulario() {
-        // Inicializar empleado receptor
-        binding.tvEmpleadoReceptor.text = "Empleado receptor: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
 
-        // Inicializar hora dinámica
-        inicializarHoraDinamica()
-        // Cargar personal
-        cargarPersonal()
 
-        if(vehiculoActual!=null && vehiculoActual?.Id?.toInt()!!>0) {
+     /*   if(vehiculoActual!=null && vehiculoActual?.Id?.toInt()!!>0) {
             binding.tvVinVehiculo.setText(vehiculoActual?.VIN)
-        }
+        }*/
 
-        if(ParametrosSistema.CfgGloSql!=null &&
-            ParametrosSistema?.CfgGloSql!!.ManejaSeleccionBloquePosXTablero==true) {
-            binding.llSeleccionaPosicionTablero.visibility = View.VISIBLE
-            binding.llSeleccionaPosicionSpinner.visibility=View.GONE
-            binding.llSeleccionBloquesPosicionado.visibility=View.GONE
-        }
-        else{
-            binding.llSeleccionaPosicionTablero.visibility = View.GONE
-            binding.llSeleccionaPosicionSpinner.visibility=View.VISIBLE
-            binding.llSeleccionBloquesPosicionado.visibility=View.VISIBLE
-            // <CHANGE> Cargar datos para spinners
-            cargarBloques()
-        }
+
         mostrarInformacionVehiculo(vehiculoActual!!)
         mostrarFormularioPosicionado()
     }
@@ -173,7 +248,6 @@ class PasoPosicionado_Activity : AppCompatActivity() {
             tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones}, Año: ${vehiculo.Anio}"
             tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
             tvColorInteriorVehiculo.text = "Color Int.: ${vehiculo.ColorInterior}"
-
             layoutInfoVehiculo.visibility = View.VISIBLE
         }
     }
@@ -250,7 +324,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                     Bloque = nombreBloque,
                     Placa = "",
                     PersonaQueHaraMovimiento = nombrePersonalMovimiento,
-                    IdVehiculo = IdVehiculo
+                    IdVehiculo = vehiculoActual?.Id?.toInt()
                 )
                 val exito = dalPasoLog.insertaStatusNuevoPasoLogVehiculo(paso)
                 ocultarCargaGuardado()
@@ -313,9 +387,9 @@ class PasoPosicionado_Activity : AppCompatActivity() {
 
     // MÉTODOS PARA CARGAR PERSONAL
     private fun cargarPersonal() {
-        lifecycleScope.launch {
+       // lifecycleScope.launch {
             try {
-                empleados = dalEmp.consultarEmpleados(105)
+
 
                 val nombresPersonal = mutableListOf("Seleccionar personal...")
                 nombresPersonal.addAll(empleados.map { it.NombreCompleto ?: "Sin nombre" })
@@ -332,7 +406,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 Log.e("PasoPosicionado", "Error cargando personal: ${e.message}")
                 Toast.makeText(this@PasoPosicionado_Activity, "Error cargando personal", Toast.LENGTH_SHORT).show()
             }
-        }
+      //  }
     }
 
     private fun mostrarCargaGuardado() {
@@ -350,8 +424,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         binding.btnGuardarPosicionado.alpha = 1.0f
     }
 
-    private fun leeBloquesSistema()
-    {
+    private fun leeBloquesSistema() {
         lifecycleScope.launch {
             try {
                     bloques = dalPasoLog.consultarBloques()
@@ -430,6 +503,36 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         }
     }
 
+
+
+    private fun mostrarCarga(mensaje: String, submensaje: String = "") {
+        // <CHANGE> Optimizado usando apply para reducir accesos al binding
+        binding.apply {
+            loadingContainer.visibility = View.VISIBLE
+            tvLoadingText.text = mensaje
+            tvLoadingSubtext.text = submensaje
+            tvLoadingSubtext.visibility = if(submensaje.isNotEmpty()) View.VISIBLE else View.GONE
+            btnGuardarPosicionado.isEnabled = false
+            btnGuardarPosicionado.alpha = 0.5f
+        }
+    }
+
+    private fun ocultarCarga() {
+        // <CHANGE> Optimizado usando apply para reducir accesos al binding
+        binding.apply {
+            loadingContainer.visibility = View.GONE
+            btnGuardarPosicionado.isEnabled = true
+            btnGuardarPosicionado.alpha = 1.0f
+        }
+    }
+
+    private fun mostrarError(mensaje: String) {
+        // <CHANGE> Optimizado usando apply para reducir accesos al binding
+        binding.apply {
+            tvMensajeError.text = mensaje
+            layoutError.visibility = View.VISIBLE
+        }
+    }
     private fun limpiarFormulario() {
         binding.spinnerBloque.setSelection(0)
         binding.spinnerPosicion.setSelection(0)
