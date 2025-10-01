@@ -508,7 +508,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     }
 
     private fun ocultarCarga() {
-        // <CHANGE> Optimizado usando apply para reducir accesos al binding
+        // Optimizado usando apply para reducir accesos al binding
         binding.apply {
             loadingContainer.visibility = View.GONE
             btnGuardarPosicionado.isEnabled = true

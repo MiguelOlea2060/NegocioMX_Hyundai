@@ -110,9 +110,15 @@ class PasoSalida_Activity : AppCompatActivity() {
     private lateinit var  tvMensajeError: TextView
 
     var dalVeh:DALVehiculo?=null
+
+    // Reusar formateadores para reducir asignaciones por segundo
+    private val sdfForBackend = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    private val sdfForUi = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
+
     // Variables para hora dinámica
-    private lateinit var timerHandler: Handler
-    private lateinit var timerRunnable: Runnable
+    private var timerHandler: Handler? = null
+    private var timerRunnable: Runnable? = null
+
     var fechaActual:String=""
     var IdVehiculo:Int?=null
 
@@ -363,6 +369,8 @@ class PasoSalida_Activity : AppCompatActivity() {
        // }
     }
 
+
+    //Optimizado por miguel
     private fun mostrarInformacionVehiculo(vehiculo: VehiculoPasoLog) {
         binding.apply {
             layoutInfoVehiculoSalida.visibility = View.VISIBLE
@@ -371,15 +379,11 @@ class PasoSalida_Activity : AppCompatActivity() {
             tvMarcaModeloAnnioSalida.text = "${vehiculo.Especificaciones} Año: ${vehiculo.Anio}"
             tvColorExteriorSalida.text = "Color Ext.: ${vehiculo.ColorExterior}"
             tvColorInteriorVehiculoSalida.text = "Color Int.: ${vehiculo.ColorInterior}"
-
         }
     }
 
+
     private fun mostrarFormularios() {
-
-
-        // <CHANGE> Mostrar información del vehículo cuando se muestran los formularios
-
         binding.layoutFormularioSalida.visibility = View.VISIBLE
         binding.layoutErrorSalida.visibility = View.GONE
         Toast.makeText(this, "✅ Vehículo válido para status->Salida", Toast.LENGTH_SHORT).show()
@@ -418,11 +422,12 @@ class PasoSalida_Activity : AppCompatActivity() {
     fun Activity.hideKeyboard() {
         hideKeyboard(currentFocus ?: View(this))
     }
+
+
     fun Context.hideKeyboard(view: View) {
         val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
-
 
 
     private fun configurarEventosSpinners() {
@@ -604,6 +609,7 @@ class PasoSalida_Activity : AppCompatActivity() {
         }
     }
 
+
     private fun limpiarSpinnerConductores() {
         val conductoresVacio = listOf("Seleccionar conductor...")
         adapterConductores = ArrayAdapter(
@@ -615,6 +621,7 @@ class PasoSalida_Activity : AppCompatActivity() {
         binding.spinnerConductorSalida.adapter = adapterConductores
     }
 
+
     private fun limpiarSpinnerPlacas() {
         val placaVacia = listOf("Seleccionar...")
         adapterPlacas = ArrayAdapter(
@@ -625,6 +632,7 @@ class PasoSalida_Activity : AppCompatActivity() {
         adapterPlacas.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerPlacaTransporteSalida.adapter = adapterPlacas
     }
+
 
     private fun cargarConductores(idCliente: Int) {
         try {
@@ -645,6 +653,7 @@ class PasoSalida_Activity : AppCompatActivity() {
             Toast.makeText(this@PasoSalida_Activity, "Error cargando conductores", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     private fun cargarPlacasYNumeros(idCliente: Int,posicionSeleccionada:Int?) {
         try {
@@ -672,6 +681,7 @@ class PasoSalida_Activity : AppCompatActivity() {
             Toast.makeText(this@PasoSalida_Activity, "Error cargando conductores", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     private fun guardarStatusSalida() {
         if (!validarFormularioStatusSalida()) {
@@ -756,11 +766,7 @@ class PasoSalida_Activity : AppCompatActivity() {
         }
     }
 
-    private fun ocultarCargaGuardado() {
-        binding.loadingContainerSalida.visibility = View.GONE
-        binding.btnGuardarSalida.isEnabled = true
-        binding.btnGuardarSalida.alpha = 1.0f
-    }
+
 
     private fun validarFormularioStatusSalida(): Boolean {
         if (binding.spinnerEmpresaMadrinaSalida.selectedItemPosition == 0) {
@@ -782,70 +788,107 @@ class PasoSalida_Activity : AppCompatActivity() {
         return true
     }
 
+
+    //Optimizado por migue
     private fun mostrarCarga(mensaje: String, submensaje: String = "") {
-        binding.loadingContainerSalida.visibility = View.VISIBLE
-        binding.tvLoadingTextSalida.text= mensaje
-        binding.tvLoadingSubtextSalida.text = submensaje
-        binding.tvLoadingSubtextSalida.visibility = if(submensaje.isNotEmpty()) View.VISIBLE else View.GONE
-        binding.btnGuardarSalida.isEnabled = false
-        binding.btnGuardarSalida.alpha = 0.5f
-
-     //   btnGuardar.isEnabled = false
-     //   btnGuardar.alpha = 0.5f
+        binding.apply {
+            loadingContainerSalida.visibility = View.VISIBLE
+            tvLoadingTextSalida.text= mensaje
+            tvLoadingSubtextSalida.text = submensaje
+            tvLoadingSubtextSalida.visibility = if(submensaje.isNotEmpty()) View.VISIBLE else View.GONE
+            btnGuardarSalida.isEnabled = false
+            btnGuardarSalida.alpha = 0.5f
+        }
     }
 
+ //OPtimizado por miguel
     private fun ocultarCarga() {
-        binding.loadingContainerSalida.visibility = View.GONE
-        binding.btnGuardarSalida.isEnabled = true
-        binding.btnGuardarSalida.alpha = 1.0f
-      //  btnGuardar.isEnabled = true
-      //  btnGuardar.alpha = 1.0f
+        binding.apply {
+            loadingContainerSalida.visibility = View.GONE
+            btnGuardarSalida.isEnabled = true
+            btnGuardarSalida.alpha = 1.0f
+        }
     }
 
-    private fun mostrarError(mensaje: String) {
-        tvMensajeError.text = mensaje
-        layoutError.visibility = View.VISIBLE
-    }
 
+    //Optimizado por migue
     private fun mostrarCargaGuardado() {
-        binding.loadingContainerSalida.visibility = View.VISIBLE
-        binding.btnGuardarSalida.isEnabled = false
-        binding.btnGuardarSalida.alpha = 0.5f
-
-        binding.tvLoadingTextSalida.text = "Guardando status->Salida..."
-       binding.tvLoadingSubtextSalida.text = "Actualizando status del vehículo"
+        binding.apply {
+            loadingContainerSalida.visibility = View.VISIBLE
+            btnGuardarSalida.isEnabled = false
+            btnGuardarSalida.alpha = 0.5f
+            tvLoadingTextSalida.text = "Guardando status->Salida..."
+            tvLoadingSubtextSalida.text = "Actualizando status del vehículo"
+        }
     }
 
+
+    //Optimizado por migue
+    private fun ocultarCargaGuardado() {
+        binding.apply {
+            loadingContainerSalida.visibility = View.GONE
+            btnGuardarSalida.isEnabled = true
+            btnGuardarSalida.alpha = 1.0f
+        }
+    }
+
+
+    //opitmizado por migue
+    private fun mostrarError(mensaje: String) {
+        binding.apply {
+            tvMensajeErrorSalida.text=mensaje
+            layoutErrorSalida.visibility = View.VISIBLE
+        }
+    }
+
+
+    //Optimizado por migue
     private fun limpiarFormulario() {
-        binding.spinnerConductorSalida.setSelection(0)
-
-        binding.layoutInfoVehiculoSalida.visibility = View.GONE
-        binding.layoutFormularioSalida.visibility = View.GONE
-        binding.layoutErrorSalida.visibility = View.GONE
-
+        binding.apply {
+            spinnerConductorSalida.setSelection(0)
+            layoutInfoVehiculoSalida.visibility = View.GONE
+            layoutFormularioSalida.visibility = View.GONE
+            layoutErrorSalida.visibility = View.GONE
+        }
         vehiculoActual = null
         statusActual = null
     }
 
-    // MÉTODOS PARA HORA DINÁMICA
+
+    //Optimizado por migue
     private fun inicializarHoraDinamica() {
+        if (timerHandler != null && timerRunnable != null) return
         timerHandler = Handler(Looper.getMainLooper())
-        timerRunnable = object : Runnable {
-            override fun run() {
-                fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-                var fechaActualAux = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
+        timerRunnable = Runnable {
+            try {
+                val now = Date()
+                fechaActual = sdfForBackend.format(now)
+                val fechaActualAux = sdfForUi.format(now)
                 binding.tvFechaMovimientoSalida.text = "Fecha de movimiento: $fechaActualAux"
-                timerHandler.postDelayed(this, 1000)
+            } catch (ex: Exception) {
+                Log.e("PasoSalida_Activity", "Error en reloj dinámico: ${ex.message}")
+            } finally {
+                timerHandler?.postDelayed(timerRunnable!!, 1000L)
             }
         }
-        timerHandler.post(timerRunnable)
+        timerHandler?.post(timerRunnable!!)
     }
 
+
+    //Optimizado por migue
     private fun detenerHoraDinamica() {
-        if (::timerHandler.isInitialized) {
-            timerHandler.removeCallbacks(timerRunnable)
+        try {
+            timerRunnable?.let {
+                timerHandler?.removeCallbacks(it)
+            }
+        } catch (ex: Exception) {
+            Log.e("PasoSalida_Activity", "Error deteniendo reloj dinámico: ${ex.message}")
+        } finally {
+            timerRunnable = null
+            timerHandler = null
         }
     }
+
 
     override fun onDestroy() {
         super.onDestroy()

@@ -304,16 +304,12 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
     }
 
     private fun limpiarFormulario() {
-
         vehiculoActual = null
         spinnerPersonalMovimiento.setSelection(0)
         spinnerTipoMovimiento.setSelection(0)
         etObservacion.setText("")
-
      //   ocultarFormularios() // No ocultar formularios, solo limpiar campos
         ocultarError()
-
-
     }
 
     // MÉTODOS DE UI
@@ -322,18 +318,13 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
         tvLoadingSubtext.text = submensaje
         tvLoadingSubtext.visibility = if (submensaje.isNotEmpty()) View.VISIBLE else View.GONE
         loadingContainer.visibility = View.VISIBLE
-
         btnGuardarMovimiento.isEnabled = false
-
         btnGuardarMovimiento.alpha = 0.5f
     }
 
     private fun ocultarCarga() {
         loadingContainer.visibility = View.GONE
-
-
         btnGuardarMovimiento.isEnabled = true
-
         btnGuardarMovimiento.alpha = 1.0f
     }
 
