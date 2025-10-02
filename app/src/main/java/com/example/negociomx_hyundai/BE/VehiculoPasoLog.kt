@@ -25,4 +25,5 @@ data class VehiculoPasoLog(
     var Columna:Short?=null,
     var Fila:Short?=null,
     var NombreBloque:String=""
+
 )

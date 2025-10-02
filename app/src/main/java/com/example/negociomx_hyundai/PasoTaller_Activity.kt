@@ -16,6 +16,7 @@ import com.example.negociomx_hyundai.DAL.DALCliente
 import com.example.negociomx_hyundai.DAL.DALClienteSQL
 import com.example.negociomx_hyundai.DAL.DALEmpleadoSQL
 import com.example.negociomx_hyundai.DAL.DALTaller
+import com.example.negociomx_hyundai.Utils.ParametrosSistema
 import com.example.negociomx_hyundai.databinding.ActivityPasoTallerBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -357,27 +358,38 @@ class PasoTaller_Activity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val idVehiculo = vehiculoActual?.Id?.toIntOrNull() ?: 0
-                val idUsuario = 1 // Obtener del usuario actual
-                val idPersonalMovimiento = empleados[binding.spinnerPersonalMovimientoTaller.selectedItemPosition].IdEmpleado
-                val tipoReparacion = if (binding.radioEnSitioTaller.isChecked) "EN_SITIO" else "FORANEA"
-                val idParteDanno = parteSeleccionada?.IdParteDanno ?: 0
-                val descripcion = binding.etDescripcionTaller.text.toString()
-                val fechaInicio = binding.tvFechaInicioTaller.text.toString()
 
-                val resultado = dalTaller.crearRegistroTaller(
-                    idVehiculo = idVehiculo,
-                    idUsuario = idUsuario,
-                    idPersonalMovimiento = idPersonalMovimiento,
-                    tipoReparacion = tipoReparacion,
-                    idParteDanno = idParteDanno,
-                    descripcion = descripcion,
-                    fechaInicio = fechaInicio
+                var idVehiculo = vehiculoActual?.Id?: 0
+                var idUsuario=ParametrosSistema.usuarioLogueado.Id?.toInt()
+                var empleado = empleados[binding.spinnerPersonalMovimientoTaller.selectedItemPosition]
+                var PersonaMoviento= empleado.NombreCompleto
+                var tipoReparacion = 1
+                if(binding.radioForaneaTaller.isSelected)  tipoReparacion = 2
+                var PersonaReparacion = binding.spinnerPersonaReparacionTaller.selectedItemPosition
+                var fechaInicio = binding.tvFechaInicioTaller.text.toString()
+                var idParteDanno = parteSeleccionada?.IdParteDanno ?: 0
+                var descripcion = binding.etDescripcionTaller.text.toString()
+
+
+                val paso=PasoLogVehiculoDet(
+                    IdPasoLogVehiculo = vehiculoActual?.IdPasoLogVehiculo,
+                    PersonaQueHaraMovimiento = PersonaMoviento,
+                    IdTipoEntradaSalida = tipoReparacion,
+                    IdParteDanno = idParteDanno.toInt(),
+                    Observacion = descripcion,
+                    IdStatus = vehiculoActual?.IdStatusActual,
+                    IdUsuarioMovimiento = idUsuario,
+                    IdEmpleadoPosiciono = PersonaReparacion,
+                    FechaMovimiento = fechaInicio
+
+
                 )
+                val exito = dalTaller.crearRegistroTaller(paso)
+
 
                 ocultarCarga()
 
-                if (resultado) {
+                if (exito) {
                     Toast.makeText(this@PasoTaller_Activity, "✅ Registro de taller guardado exitosamente", Toast.LENGTH_LONG).show()
                     finish()
                 } else {
@@ -394,11 +406,21 @@ class PasoTaller_Activity : AppCompatActivity() {
 
 
     private fun validarFormulario(): Boolean {
-        // Validar personal
+        // Validar personal general
         if (binding.spinnerPersonalMovimientoTaller.selectedItemPosition < 0) {
             mostrarError("Seleccione el personal que hará el movimiento")
             return false
         }
+
+
+    /*   //sitio  spinnerEmpresaInternaTaller
+        spinnerPersonaReparacionTaller
+        tvFechaInicioTaller*/
+
+        //general  containerPartesTaller
+        //general etDescripcionTaller
+
+        //general btnGuardarTaller
 
         // Validar tipo de reparación específico
         if (binding.radioForaneaTaller.isChecked && binding.spinnerEmpresaExternaTaller.selectedItemPosition < 0) {

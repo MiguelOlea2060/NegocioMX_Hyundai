@@ -30,5 +30,6 @@ data class PasoLogVehiculoDet(
     var NombreEmpleadoPosiciono:String="",
     var NombreEmpleadoTransporte:String="",
     var NombreTransporte:String="",
-    var NombreStatus:String=""
+    var NombreStatus:String="",
+
 )

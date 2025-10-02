@@ -2,6 +2,7 @@ package com.example.negociomx_hyundai.DAL
 
 import android.util.Log
 import com.example.negociomx_hyundai.BE.ParteDanno
+import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
 import com.example.negociomx_hyundai.Utils.ConexionSQLServer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -65,23 +66,15 @@ class DALTaller {
 
     // GUARDAR REGISTRO DE TALLER
     suspend fun crearRegistroTaller(
-        idVehiculo: Int,
-        idUsuario: Int,
-        idPersonalMovimiento: Int,
-        tipoReparacion: String, // "EN_SITIO" o "FORANEA"
-        idEmpresaExterna: Int? = null,
-        idEmpresaInterna: Int? = null,
-        idPersonaReparacion: Int? = null,
-        idParteDanno: Short,
-        descripcion: String,
-        fechaInicio: String
+
+       det: PasoLogVehiculoDet
     ): Boolean = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statementPrincipal: PreparedStatement? = null
         var statementDetalle: PreparedStatement? = null
 
         try {
-            Log.d("DALTaller", "💾 Creando registro de taller para vehículo ID: $idVehiculo")
+            Log.d("DALTaller", "💾 Creando registro de taller para vehículo ID: ${det.IdVehiculo}")
 
             conexion = ConexionSQLServer.obtenerConexion()
             if (conexion == null) {
@@ -99,13 +92,13 @@ class DALTaller {
             """.trimIndent()
 
             statementPrincipal = conexion.prepareStatement(queryPrincipal)
-            statementPrincipal.setInt(1, idVehiculo)
+            statementPrincipal.setInt(1, det.IdVehiculo!!)
             statementPrincipal.executeUpdate()
 
             // 2. Obtener IdPasoLogVehiculo
             val queryObtenerID = "SELECT IdPasoLogVehiculo FROM PasoLogVehiculo WHERE IdVehiculo = ?"
             val statementObtenerID = conexion.prepareStatement(queryObtenerID)
-            statementObtenerID.setInt(1, idVehiculo)
+            statementObtenerID.setInt(1, det.IdVehiculo!!)
             val resultSet = statementObtenerID.executeQuery()
 
             var idPasoLogVehiculo = 0
@@ -116,18 +109,21 @@ class DALTaller {
             // 3. Insertar detalle de taller
             val queryDetalle = """
                 INSERT INTO PasoLogVehiculoDet (
-                    IdPasoLogVehiculo, PersonaQueHaraMovimiento, IdParteDanno,
-                    Observacion, IdStatus, FechaMovimiento, IdUsuarioMovimiento
-                ) VALUES (?, ?, ?, ?, 171, ?, ?)
+                    IdPasoLogVehiculo, PersonaQueHaraMovimiento, IdParteDanno, IdtipoEntradaSalida,
+                    Observacion, IdStatus, FechaMovimiento, IdUsuarioMovimiento, IdEmpleadoPosiciono
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent()
 
             statementDetalle = conexion.prepareStatement(queryDetalle)
             statementDetalle.setInt(1, idPasoLogVehiculo)
-            statementDetalle.setString(2, "ID:$idPersonalMovimiento - Tipo:$tipoReparacion")
-            statementDetalle.setShort(3, idParteDanno)
-            statementDetalle.setString(4, descripcion)
-            statementDetalle.setString(5, fechaInicio)
-            statementDetalle.setInt(6, idUsuario)
+            statementDetalle.setString(2, det.PersonaQueHaraMovimiento )
+            statementDetalle.setShort(3, det.IdParteDanno!!.toShort())
+            statementDetalle.setInt(4, det.IdTipoEntradaSalida!!)
+            statementDetalle.setString(5, det.Observacion)
+            statementDetalle.setInt(6, det.IdStatus!!)
+            statementDetalle.setString(7, det.FechaMovimiento)
+            statementDetalle.setInt(8, det.IdUsuarioMovimiento!!)
+            statementDetalle.setInt(9, det.IdEmpleadoPosiciono!!)
 
             statementDetalle.executeUpdate()
 
