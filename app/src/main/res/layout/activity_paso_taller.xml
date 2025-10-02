@@ -8,7 +8,7 @@
     tools:context=".PasoTaller_Activity">
 
     <LinearLayout
-        android:id="@+id/main"
+        android:id="@+id/mainTaller"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -24,8 +24,8 @@
             android:layout_marginBottom="12dp">
 
                 <ImageView
-                    android:src="@drawable/regresar_icono_64x64"
                     android:id="@+id/btnRegresarPasoTaller"
+                    android:src="@drawable/regresar_icono_64x64"
                     android:layout_width="48dp"
                     android:layout_height="48dp">
                 </ImageView>
@@ -47,8 +47,8 @@
 
         <!-- INFORMACIÓN DEL VEHÍCULO -->
         <LinearLayout
+            android:id="@+id/layoutInfoVehiculoTaller"
             android:background="@drawable/edittext_background"
-            android:id="@+id/layoutInfoVehiculo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -68,8 +68,8 @@
                 android:layout_marginBottom="12dp" />
 
             <TextView
+                android:id="@+id/tvVinVehiculoTaller"
                 android:background="@drawable/edittext_background"
-                android:id="@+id/tvInfoVehiculo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Vin: "
@@ -79,7 +79,7 @@
                 />
 
             <TextView
-                android:id="@+id/tvBlVehiculo"
+                android:id="@+id/tvBlVehiculoTaller"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="BL: "
@@ -90,7 +90,7 @@
                 />
 
             <TextView
-                android:id="@+id/tvMarcaModeloAnnio"
+                android:id="@+id/tvMarcaModeloAnnioTaller"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Marca:    Modelo:     Año: "
@@ -105,7 +105,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tvColorExterior"
+                    android:id="@+id/tvColorExteriorTaller"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -115,7 +115,7 @@
                     />
 
                 <TextView
-                    android:id="@+id/tvColorInterior"
+                    android:id="@+id/tvColorInteriorTaller"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -159,7 +159,7 @@
                 android:layout_marginBottom="8dp" />
 
             <Spinner
-                android:id="@+id/spinnerPersonalMovimiento"
+                android:id="@+id/spinnerPersonalMovimientoTaller"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/edittext_border"
@@ -175,14 +175,14 @@
                 android:layout_marginBottom="8dp" />
 
             <RadioGroup
-                android:id="@+id/radioGroupTipoReparacion"
+                android:id="@+id/radioGroupTipoReparacionTaller"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="16dp">
 
                 <RadioButton
-                    android:id="@+id/radioEnSitio"
+                    android:id="@+id/radioEnSitioTaller"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -191,7 +191,7 @@
                     android:checked="true" />
 
                 <RadioButton
-                    android:id="@+id/radioForanea"
+                    android:id="@+id/radioForaneaTaller"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -202,7 +202,7 @@
 
             <!-- Empresa externa (solo para Foránea) -->
             <LinearLayout
-                android:id="@+id/layoutEmpresaExterna"
+                android:id="@+id/layoutEmpresaExternaTaller"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -217,7 +217,7 @@
                     android:layout_marginBottom="8dp" />
 
                 <Spinner
-                    android:id="@+id/spinnerEmpresaExterna"
+                    android:id="@+id/spinnerEmpresaExternaTaller"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@drawable/edittext_border"
@@ -227,7 +227,7 @@
 
             <!-- Empresa interna (solo para En sitio) -->
             <LinearLayout
-                android:id="@+id/layoutEmpresaInterna"
+                android:id="@+id/layoutEmpresaInternaTaller"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -241,7 +241,7 @@
                     android:layout_marginBottom="8dp" />
 
                 <Spinner
-                    android:id="@+id/spinnerEmpresaInterna"
+                    android:id="@+id/spinnerEmpresaInternaTaller"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@drawable/edittext_border"
@@ -256,7 +256,7 @@
                     android:layout_marginBottom="8dp" />
 
                 <Spinner
-                    android:id="@+id/spinnerPersonaReparacion"
+                    android:id="@+id/spinnerPersonaReparacionTaller"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:background="@drawable/edittext_border"
@@ -280,7 +280,7 @@
                 android:layout_marginBottom="16dp">
 
                 <TextView
-                    android:id="@+id/tvFechaInicio"
+                    android:id="@+id/tvFechaInicioTaller"
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
@@ -293,7 +293,7 @@
                     android:layout_marginEnd="8dp" />
 
                 <Button
-                    android:id="@+id/btnSeleccionarFecha"
+                    android:id="@+id/btnSeleccionarFechaTaller"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:text="📅"
@@ -307,7 +307,7 @@
 
         <!-- SELECCIÓN DE PARTES DAÑADAS -->
         <LinearLayout
-            android:id="@+id/layoutPartesDanadas"
+            android:id="@+id/layoutPartesDanadasTaller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#FFFFFF"
@@ -334,7 +334,7 @@
                 android:layout_marginBottom="16dp">
 
                 <Button
-                    android:id="@+id/btnPaginaAnterior"
+                    android:id="@+id/btnPaginaAnteriorTaller"
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:text="◀"
@@ -344,7 +344,7 @@
                     android:enabled="false" />
 
                 <TextView
-                    android:id="@+id/tvPaginaActual"
+                    android:id="@+id/tvPaginaActualTaller"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Página 1 de 3"
@@ -353,7 +353,7 @@
                     android:layout_marginHorizontal="16dp" />
 
                 <Button
-                    android:id="@+id/btnPaginaSiguiente"
+                    android:id="@+id/btnPaginaSiguienteTaller"
                     android:layout_width="wrap_content"
                     android:layout_height="36dp"
                     android:text="▶"
@@ -365,7 +365,7 @@
 
             <!-- Container para las partes (se llenará dinámicamente) -->
             <LinearLayout
-                android:id="@+id/containerPartes"
+                android:id="@+id/containerPartesTaller"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
@@ -374,7 +374,7 @@
 
         <!-- DESCRIPCIÓN DETALLADA -->
         <LinearLayout
-            android:id="@+id/layoutDescripcion"
+            android:id="@+id/layoutDescripcionTaller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#FFFFFF"
@@ -393,7 +393,7 @@
                 android:layout_marginBottom="12dp" />
 
             <EditText
-                android:id="@+id/etDescripcion"
+                android:id="@+id/etDescripcionTaller"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
                 android:background="@drawable/edittext_border"
@@ -409,7 +409,7 @@
 
         <!-- BOTONES DE ACCIÓN -->
         <LinearLayout
-            android:id="@+id/layoutBotones"
+            android:id="@+id/layoutBotonesTaller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -417,7 +417,7 @@
             android:visibility="gone">
 
             <Button
-                android:id="@+id/btnLimpiar"
+                android:id="@+id/btnLimpiarTaller"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
@@ -427,7 +427,7 @@
                 android:layout_marginEnd="8dp" />
 
             <Button
-                android:id="@+id/btnGuardar"
+                android:id="@+id/btnGuardarTaller"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
@@ -440,7 +440,7 @@
 
         <!-- OVERLAY DE CARGA -->
         <LinearLayout
-            android:id="@+id/loadingContainer"
+            android:id="@+id/loadingContainerTaller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -451,14 +451,14 @@
             android:layout_marginTop="16dp">
 
             <ProgressBar
-                android:id="@+id/progressBar"
+                android:id="@+id/progressBarTaller"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 style="?android:attr/progressBarStyleLarge"
                 android:indeterminateTint="#1565C0" />
 
             <TextView
-                android:id="@+id/tvLoadingText"
+                android:id="@+id/tvLoadingTextTaller"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -471,7 +471,7 @@
 
         <!-- MENSAJE DE ERROR -->
         <LinearLayout
-            android:id="@+id/layoutError"
+            android:id="@+id/layoutErrorTaller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#FFEBEE"
@@ -481,7 +481,7 @@
             android:visibility="gone">
 
             <TextView
-                android:id="@+id/tvError"
+                android:id="@+id/tvErrorTaller"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Error: No se pudo procesar la solicitud"

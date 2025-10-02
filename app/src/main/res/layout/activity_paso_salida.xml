@@ -46,8 +46,8 @@
 
         <!-- INFORMACIÓN DEL VEHÍCULO -->
         <LinearLayout
-            android:background="@drawable/edittext_background"
             android:id="@+id/layoutInfoVehiculoSalida"
+            android:background="@drawable/edittext_background"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -123,8 +123,8 @@
 
         <!-- FORMULARIO DE Salida -->
         <LinearLayout
-            android:background="@drawable/edittext_background"
             android:id="@+id/layoutFormularioSalida"
+            android:background="@drawable/edittext_background"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -251,19 +251,19 @@
                     android:layout_height="wrap_content">
 
                     <TextView
+                        android:id="@+id/lblPlacaPaso1Entrada"
                         android:layout_marginRight="10dp"
                         android:textStyle="bold"
                         android:textSize="16sp"
                         android:text="Placa:"
-                        android:id="@+id/lblPlacaPaso1Entrada"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
 
                     </TextView>
 
                     <Spinner
-                        android:layout_weight="1"
                         android:id="@+id/spinnerPlacaTransporteSalida"
+                        android:layout_weight="1"
                         android:layout_width="wrap_content"
                         android:layout_height="48dp"
                         android:background="@drawable/edittext_border"/>
