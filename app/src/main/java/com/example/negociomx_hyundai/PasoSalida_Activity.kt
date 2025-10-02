@@ -768,7 +768,7 @@ class PasoSalida_Activity : AppCompatActivity() {
 
 
 
-    private fun validarFormularioStatusSalida(): Boolean {
+   /* private fun validarFormularioStatusSalida(): Boolean {
         if (binding.spinnerEmpresaMadrinaSalida.selectedItemPosition == 0) {
             Toast.makeText(this, "Seleccione el el transporte que se llevara el Vehiculo", Toast.LENGTH_SHORT).show()
             return false
@@ -786,7 +786,44 @@ class PasoSalida_Activity : AppCompatActivity() {
             return false
         }
         return true
+    }*/
+
+
+    private fun validarFormularioStatusSalida(): Boolean {
+        // Usamos 'with(binding)' para reducir repetición al acceder a vistas
+        with(binding) {
+            // Validar transporte seleccionado (posición 0 = "Seleccionar...")
+            if (spinnerEmpresaMadrinaSalida.selectedItemPosition <= 0) {
+                showShortToast("Seleccione el el transporte que se llevara el Vehiculo")
+                spinnerEmpresaMadrinaSalida.requestFocus()
+                return false
+            }
+
+            // Validar conductor seleccionado
+            if (spinnerConductorSalida.selectedItemPosition <= 0) {
+                showShortToast("Seleccione el conductor que manejará el Transporte")
+                spinnerConductorSalida.requestFocus()
+                return false
+            }
+
+            // Validar placas seleccionadas
+            if (spinnerPlacaTransporteSalida.selectedItemPosition <= 0) {
+                showShortToast("Seleccione las placas del Transporte")
+                spinnerPlacaTransporteSalida.requestFocus()
+                return false
+            }
+
+            // Validar número económico (trim + isBlank)
+            if (etNumeroEconomico.text.toString().isBlank()) {
+                showShortToast("Suministre el numero economico del Transporte")
+                etNumeroEconomico.requestFocus()
+                return false
+            }
+        }
+
+        return true
     }
+
 
 
     //Optimizado por migue
@@ -888,6 +925,12 @@ class PasoSalida_Activity : AppCompatActivity() {
             timerHandler = null
         }
     }
+
+    // Helper para mostrar Toast cortos, evita repetir el mismo constructor
+    private fun showShortToast(mensaje: String) {
+        Toast.makeText(this@PasoSalida_Activity, mensaje, Toast.LENGTH_SHORT).show()
+    }
+
 
 
     override fun onDestroy() {
