@@ -146,7 +146,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
                 configurarSpinnerTiposMovimiento()
 
                 // Cargar empleados
-                empleados = dalEmpleado.consultarEmpleados(105)
+                empleados = dalEmpleado.consultarEmpleados(105,null)
                 configurarSpinnerPersonal()
 
 

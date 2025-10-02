@@ -138,7 +138,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                 obtenerDatosVehiculo()
 
 
-                empleados = dalEmp.consultarEmpleados(105)
+                empleados = dalEmp.consultarEmpleados(105,null)
                 // Cargar personal
                 cargarPersonal()
 

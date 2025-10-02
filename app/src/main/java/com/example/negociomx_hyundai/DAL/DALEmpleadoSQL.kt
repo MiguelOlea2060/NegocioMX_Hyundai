@@ -1,7 +1,6 @@
 package com.example.negociomx_hyundai.DAL
 
 import android.util.Log
-import com.example.negociomx_hyundai.BE.ClienteEmpleado
 import com.example.negociomx_hyundai.BE.Empleado
 import com.example.negociomx_hyundai.Utils.ConexionSQLServer
 import kotlinx.coroutines.Dispatchers
@@ -12,7 +11,8 @@ import java.sql.ResultSet
 
 class DALEmpleadoSQL {
     // CONSULTAR EMPLEADOS INTERNOS DE LA EMPRESA POR TIPO DE EMPLEADO
-    suspend fun consultarEmpleados(idTipoEmpleado:Int?): List<Empleado> = withContext(
+    suspend fun consultarEmpleados(idTipoEmpleadoConductor:Int?, idTipoEmpleadoTaller :Int?):
+            List<Empleado> = withContext(
         Dispatchers.IO) {
         val empleados = mutableListOf<Empleado>()
         var conexion: Connection? = null
@@ -20,7 +20,7 @@ class DALEmpleadoSQL {
         var resultSet: ResultSet? = null
 
         try {
-            Log.d("DALEMPLEADO", "🔍 Consultando los empleados por tipoempleado: $idTipoEmpleado")
+            Log.d("DALEMPLEADO", "🔍 Consultando los empleados por tipoempleado: $idTipoEmpleadoConductor")
 
             conexion = ConexionSQLServer.obtenerConexion()
             if (conexion == null) {
@@ -31,12 +31,20 @@ class DALEmpleadoSQL {
             var query = "select IdEmpleado, nombres, apellidopaterno, apellidomaterno, IdTipoEmpleado\n" +
                     "from dbo.Empleado where substring(tabla, 2,1)='1' \n" +
                     "and IdStatus=1"
-            if(idTipoEmpleado!=null)
-                query += " and IdTipoEmpleado = ?"
+            if(idTipoEmpleadoConductor!=null)
+                query += " and (IdTipoEmpleado =? "
+            if(idTipoEmpleadoTaller!=null)
+                query += " or idtipoempleado= ?)"
+            else
+                query += " )"
+
 
             statement = conexion.prepareStatement(query)
-            if (idTipoEmpleado!=null)
-                statement.setInt(1, idTipoEmpleado)
+            if (idTipoEmpleadoConductor!=null)
+                statement.setInt(1, idTipoEmpleadoConductor)
+            if (idTipoEmpleadoTaller!=null)
+                statement.setInt(2, idTipoEmpleadoTaller)
+
             resultSet = statement.executeQuery()
 
             while (resultSet.next()) {

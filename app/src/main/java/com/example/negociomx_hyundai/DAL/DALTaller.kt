@@ -66,7 +66,6 @@ class DALTaller {
 
     // GUARDAR REGISTRO DE TALLER
     suspend fun crearRegistroTaller(
-
        det: PasoLogVehiculoDet
     ): Boolean = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
@@ -95,27 +94,16 @@ class DALTaller {
             statementPrincipal.setInt(1, det.IdVehiculo!!)
             statementPrincipal.executeUpdate()
 
-            // 2. Obtener IdPasoLogVehiculo
-            val queryObtenerID = "SELECT IdPasoLogVehiculo FROM PasoLogVehiculo WHERE IdVehiculo = ?"
-            val statementObtenerID = conexion.prepareStatement(queryObtenerID)
-            statementObtenerID.setInt(1, det.IdVehiculo!!)
-            val resultSet = statementObtenerID.executeQuery()
-
-            var idPasoLogVehiculo = 0
-            if (resultSet.next()) {
-                idPasoLogVehiculo = resultSet.getInt("IdPasoLogVehiculo")
-            }
-
             // 3. Insertar detalle de taller
             val queryDetalle = """
                 INSERT INTO PasoLogVehiculoDet (
                     IdPasoLogVehiculo, PersonaQueHaraMovimiento, IdParteDanno, IdtipoEntradaSalida,
-                    Observacion, IdStatus, FechaMovimiento, IdUsuarioMovimiento, IdEmpleadoPosiciono
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    Observacion, IdStatus, FechaMovimiento, IdUsuarioMovimiento, IdEmpleadoPosiciono, Placa
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent()
 
             statementDetalle = conexion.prepareStatement(queryDetalle)
-            statementDetalle.setInt(1, idPasoLogVehiculo)
+            statementDetalle.setInt(1, det.IdPasoLogVehiculo!!)
             statementDetalle.setString(2, det.PersonaQueHaraMovimiento )
             statementDetalle.setShort(3, det.IdParteDanno!!.toShort())
             statementDetalle.setInt(4, det.IdTipoEntradaSalida!!)
@@ -124,6 +112,7 @@ class DALTaller {
             statementDetalle.setString(7, det.FechaMovimiento)
             statementDetalle.setInt(8, det.IdUsuarioMovimiento!!)
             statementDetalle.setInt(9, det.IdEmpleadoPosiciono!!)
+            statementDetalle.setString(10, det.Placa!!)
 
             statementDetalle.executeUpdate()
 

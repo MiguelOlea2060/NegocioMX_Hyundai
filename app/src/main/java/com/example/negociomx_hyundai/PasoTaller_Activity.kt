@@ -12,12 +12,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.*
-import com.example.negociomx_hyundai.DAL.DALCliente
+import com.example.negociomx_hyundai.BLL.BLLEmpleado
 import com.example.negociomx_hyundai.DAL.DALClienteSQL
 import com.example.negociomx_hyundai.DAL.DALEmpleadoSQL
 import com.example.negociomx_hyundai.DAL.DALTaller
 import com.example.negociomx_hyundai.Utils.ParametrosSistema
 import com.example.negociomx_hyundai.databinding.ActivityPasoTallerBinding
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,9 +32,13 @@ class PasoTaller_Activity : AppCompatActivity() {
     // Variables de datos
     private var vehiculoActual: VehiculoPasoLog? = null
     private var empleados = listOf<Empleado>()
+    private var empleadosConductores = listOf<Empleado>()
+    private var empleadosTaller = listOf<Empleado>()
+
     private var empresasTaller = listOf<Cliente>()
     private var partesDanadas = listOf<ParteDanno>()
     private var parteSeleccionada: ParteDanno? = null
+    var fechaActual:String=""
 
     // Variables de paginación
     private var paginaActual = 0
@@ -44,7 +49,9 @@ class PasoTaller_Activity : AppCompatActivity() {
     private val dalTaller = DALTaller()
     private var dalEmpresaTaller=DALClienteSQL()
     private val dalEmpleado = DALEmpleadoSQL()
+    var bllEmp= BLLEmpleado()
 
+    val gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,36 +127,14 @@ class PasoTaller_Activity : AppCompatActivity() {
 
     private fun obtenerDatosVehiculo() {
         try {
-            val idVehiculo = intent.getIntExtra("IdVehiculo", 0)
-            val vin = intent.getStringExtra("Vin") ?: ""
-            val bl = intent.getStringExtra("Bl") ?: ""
-            val marca = intent.getStringExtra("Marca") ?: ""
-            val modelo = intent.getStringExtra("Modelo") ?: ""
-            val annioAux = intent.getStringExtra("Annio") ?: ""
-            var annio: Int = 0
-            if (annioAux.isNotEmpty())
-                annio=annioAux.toInt()
-            val colorExterior = intent.getStringExtra("ColorExterior") ?: ""
-            val colorInterior = intent.getStringExtra("ColorInterior") ?: ""
-            val especificaciones = intent.getStringExtra("Especificaciones") ?: ""
+            val jsonVeh = intent.getStringExtra("vehiculo") ?: ""
 
-
-            if (idVehiculo > 0 && vin.isNotEmpty()) {
-                vehiculoActual = VehiculoPasoLog(
-                    Id = idVehiculo.toString(),
-                    VIN = vin,
-                    BL = bl,
-                    Marca = marca,
-                    Modelo = modelo,
-                    Anio = annio,
-                    ColorExterior = colorExterior,
-                    ColorInterior = colorInterior,
-                    Especificaciones = especificaciones
-                )
-
+            if (jsonVeh.isNotEmpty()) {
+                vehiculoActual = gson.fromJson(jsonVeh,VehiculoPasoLog::class.java)
                 mostrarInfoVehiculo()
 
-                Log.d("PasoTaller_Activity", "✅ Datos del vehículo obtenidos: VIN=$vin")
+                Log.d("PasoTaller_Activity", "✅ Datos del vehículo obtenidos: " +
+                        "VIN=${vehiculoActual!!.VIN}")
             } else {
                 mostrarError("No se recibieron datos válidos del vehículo")
             }
@@ -178,8 +163,12 @@ class PasoTaller_Activity : AppCompatActivity() {
                 obtenerDatosVehiculo()
 
                 // Cargar empleados
-                empleados = dalEmpleado.consultarEmpleados(105)
-                configurarSpinnerConductor()
+                empleados = dalEmpleado.consultarEmpleados(105,106)
+
+                empleadosConductores=bllEmp.getEmpleadosPorTipo(105,empleados)
+                empleadosTaller=bllEmp.getEmpleadosPorTipo(106,empleados)
+
+                configurarSpinnerConductorYTaller()
 
                 // Cargar empresas de taller
                 empresasTaller = dalEmpresaTaller.consultarEmpresasTaller()
@@ -202,11 +191,17 @@ class PasoTaller_Activity : AppCompatActivity() {
         }
     }
 
-    private fun configurarSpinnerConductor() {
-        val nombresEmpleados = empleados.map { "${it.NombreCompleto} (ID: ${it.IdEmpleado})" }
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, nombresEmpleados)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerPersonalMovimientoTaller.adapter = adapter
+    private fun configurarSpinnerConductorYTaller() {
+        val nombresEmpleadosConductores = empleadosConductores.map { "${it.NombreCompleto} (ID: ${it.IdEmpleado})" }
+        val adapterCon = ArrayAdapter(this, android.R.layout.simple_spinner_item, nombresEmpleadosConductores)
+        adapterCon.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerPersonalMovimientoTaller.adapter = adapterCon
+
+        val nombresEmpleadosTaller = empleadosTaller.map { "${it.NombreCompleto} (ID: ${it.IdEmpleado})" }
+        val adapterTall = ArrayAdapter(this, android.R.layout.simple_spinner_item,
+            nombresEmpleadosTaller)
+        adapterTall.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerPersonaReparacionTaller.adapter = adapterTall
     }
 
     private fun configurarSpinnersEmpresas() {
@@ -223,11 +218,6 @@ class PasoTaller_Activity : AppCompatActivity() {
         val adapterInternas = ArrayAdapter(this, android.R.layout.simple_spinner_item, nombresInternas)
         adapterInternas.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerEmpresaInternaTaller.adapter = adapterInternas
-
-        // Spinner personas de reparación (inicialmente vacío)
-        val adapterPersonas = ArrayAdapter(this, android.R.layout.simple_spinner_item, listOf<String>())
-        adapterPersonas.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.spinnerPersonaReparacionTaller.adapter = adapterPersonas
     }
 
     private fun configurarPartesDanadas() {
@@ -359,30 +349,27 @@ class PasoTaller_Activity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
 
-                var idVehiculo = vehiculoActual?.Id?: 0
                 var idUsuario=ParametrosSistema.usuarioLogueado.Id?.toInt()
                 var empleado = empleados[binding.spinnerPersonalMovimientoTaller.selectedItemPosition]
                 var PersonaMoviento= empleado.NombreCompleto
                 var tipoReparacion = 1
                 if(binding.radioForaneaTaller.isSelected)  tipoReparacion = 2
                 var PersonaReparacion = binding.spinnerPersonaReparacionTaller.selectedItemPosition
-                var fechaInicio = binding.tvFechaInicioTaller.text.toString()
                 var idParteDanno = parteSeleccionada?.IdParteDanno ?: 0
                 var descripcion = binding.etDescripcionTaller.text.toString()
 
-
                 val paso=PasoLogVehiculoDet(
+                    IdVehiculo = vehiculoActual?.Id!!.toInt(),
                     IdPasoLogVehiculo = vehiculoActual?.IdPasoLogVehiculo,
                     PersonaQueHaraMovimiento = PersonaMoviento,
                     IdTipoEntradaSalida = tipoReparacion,
                     IdParteDanno = idParteDanno.toInt(),
                     Observacion = descripcion,
-                    IdStatus = vehiculoActual?.IdStatusActual,
+                    IdStatus = 171,
                     IdUsuarioMovimiento = idUsuario,
                     IdEmpleadoPosiciono = PersonaReparacion,
-                    FechaMovimiento = fechaInicio
-
-
+                    FechaMovimiento = fechaActual,
+                    Placa = ""
                 )
                 val exito = dalTaller.crearRegistroTaller(paso)
 
@@ -411,16 +398,6 @@ class PasoTaller_Activity : AppCompatActivity() {
             mostrarError("Seleccione el personal que hará el movimiento")
             return false
         }
-
-
-    /*   //sitio  spinnerEmpresaInternaTaller
-        spinnerPersonaReparacionTaller
-        tvFechaInicioTaller*/
-
-        //general  containerPartesTaller
-        //general etDescripcionTaller
-
-        //general btnGuardarTaller
 
         // Validar tipo de reparación específico
         if (binding.radioForaneaTaller.isChecked && binding.spinnerEmpresaExternaTaller.selectedItemPosition < 0) {
@@ -513,6 +490,7 @@ class PasoTaller_Activity : AppCompatActivity() {
 
     private fun inicializarFechaActual() {
         val formatoFechaHora = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+        fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
         binding.tvFechaInicioTaller.text = formatoFechaHora.format(Date())
     }
 
