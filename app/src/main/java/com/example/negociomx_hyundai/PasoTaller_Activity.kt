@@ -165,7 +165,6 @@ class PasoTaller_Activity : AppCompatActivity() {
             binding.tvMarcaModeloAnnioTaller.text = "${vehiculo.Especificaciones}  Año: ${vehiculo.Anio}"
             binding.tvColorExteriorTaller.text = "Color Ext: ${vehiculo.ColorExterior}"
             binding.tvColorInteriorTaller.text = "Color Int: ${vehiculo.ColorInterior}"
-
             binding.layoutInfoVehiculoTaller.visibility = View.VISIBLE
         }
     }
@@ -301,12 +300,15 @@ class PasoTaller_Activity : AppCompatActivity() {
         return id
     }
 
-    private fun actualizarBotonesPaginacion() {
-        binding.btnPaginaAnteriorTaller.isEnabled = paginaActual > 0
-        binding.btnPaginaSiguienteTaller.isEnabled = paginaActual < totalPaginas - 1
 
-        binding.btnPaginaAnteriorTaller.alpha = if (paginaActual > 0) 1.0f else 0.5f
-        binding.btnPaginaSiguienteTaller.alpha = if (paginaActual < totalPaginas - 1) 1.0f else 0.5f
+    //Optimizado por miguel
+    private fun actualizarBotonesPaginacion() {
+        binding.apply {
+            btnPaginaAnteriorTaller.isEnabled = paginaActual > 0
+            btnPaginaSiguienteTaller.isEnabled = paginaActual < totalPaginas - 1
+            btnPaginaAnteriorTaller.alpha = if (paginaActual > 0) 1.0f else 0.5f
+            btnPaginaSiguienteTaller.alpha = if (paginaActual < totalPaginas - 1) 1.0f else 0.5f
+        }
     }
 
 
@@ -337,11 +339,14 @@ class PasoTaller_Activity : AppCompatActivity() {
     }
 
 
+    //Optimizado por miguel
     private fun mostrarFormularios() {
-        binding.layoutFormularioTaller.visibility = View.VISIBLE
-        binding.layoutPartesDanadasTaller.visibility = View.VISIBLE
-        binding.layoutDescripcionTaller.visibility = View.VISIBLE
-        binding.layoutBotonesTaller.visibility = View.VISIBLE
+        binding.apply {
+            layoutFormularioTaller.visibility = View.VISIBLE
+            layoutPartesDanadasTaller.visibility = View.VISIBLE
+            layoutDescripcionTaller.visibility = View.VISIBLE
+            layoutBotonesTaller.visibility = View.VISIBLE
+        }
     }
 
 
@@ -428,51 +433,68 @@ class PasoTaller_Activity : AppCompatActivity() {
     }
 
 
+    //Optimizado por miguel
     private fun limpiarFormulario() {
-        binding.spinnerPersonalMovimientoTaller.setSelection(0)
-        binding.radioEnSitioTaller.isChecked = true
-        binding.spinnerEmpresaExternaTaller.setSelection(0)
-        binding.spinnerEmpresaInternaTaller.setSelection(0)
-        binding.spinnerPersonaReparacionTaller.setSelection(0)
-        binding.etDescripcionTaller.setText("")
+        binding.apply {
+            spinnerPersonalMovimientoTaller.setSelection(0)
+            radioEnSitioTaller.isChecked = true
+            spinnerEmpresaExternaTaller.setSelection(0)
+            spinnerEmpresaInternaTaller.setSelection(0)
+            spinnerPersonaReparacionTaller.setSelection(0)
+            etDescripcionTaller.setText("")
+        }
+
         inicializarFechaActual()
 
-        // Limpiar selección de partes
+
         partesDanadas.forEach { it.Seleccionada = false }
         parteSeleccionada = null
         paginaActual = 0
+
         mostrarPartesActuales()
         actualizarBotonesPaginacion()
-
         ocultarError()
     }
 
 
-    // MÉTODOS DE UI
+    //Optimizado por miguel
     private fun mostrarCarga(mensaje: String) {
-        binding.tvLoadingTextTaller.text = mensaje
-        binding.loadingContainerTaller.visibility = View.VISIBLE
-        binding.btnGuardarTaller.isEnabled = false
-        binding.btnGuardarTaller.alpha = 0.5f
+        binding.apply {
+            tvLoadingTextTaller.text = mensaje
+            loadingContainerTaller.visibility = View.VISIBLE
+            btnGuardarTaller.isEnabled = false
+            btnGuardarTaller.alpha = 0.5f
+        }
     }
 
 
+    //Optimizado por miguel
     private fun ocultarCarga() {
-        binding.loadingContainerTaller.visibility = View.GONE
-        binding.btnGuardarTaller.isEnabled = true
-        binding.btnGuardarTaller.alpha = 1.0f
+        binding.apply {
+            loadingContainerTaller.visibility = View.GONE
+            btnGuardarTaller.isEnabled = true
+            btnGuardarTaller.alpha = 1.0f
+        }
+
     }
 
 
+    //Optimizado por miguel
     private fun mostrarError(mensaje: String) {
-        binding.tvErrorTaller.text = mensaje
-        binding.layoutErrorTaller.visibility = View.VISIBLE
+        binding.apply {
+            tvErrorTaller.text = mensaje
+            layoutErrorTaller.visibility = View.VISIBLE
+        }
+
     }
+
 
     private fun inicializarFechaActual() {
         val formatoFechaHora = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
         binding.tvFechaInicioTaller.text = formatoFechaHora.format(Date())
     }
+
+
 
     private fun ocultarError() {
         binding.layoutErrorTaller.visibility = View.GONE
