@@ -24,11 +24,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class PasoTaller_Activity : AppCompatActivity() {
-
-
-
     private lateinit var binding:ActivityPasoTallerBinding
-
     // Variables de datos
     private var vehiculoActual: VehiculoPasoLog? = null
     private var empleados = listOf<Empleado>()
@@ -40,31 +36,24 @@ class PasoTaller_Activity : AppCompatActivity() {
     private var parteSeleccionada: ParteDanno? = null
     var fechaActual:String=""
 
-    // Variables de paginación
     private var paginaActual = 0
     private val partesPorPagina = 2
     private var totalPaginas = 0
-
-    // DALs
     private val dalTaller = DALTaller()
     private var dalEmpresaTaller=DALClienteSQL()
     private val dalEmpleado = DALEmpleadoSQL()
     var bllEmp= BLLEmpleado()
-
     val gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding=ActivityPasoTallerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainTaller)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
         inicializarComponentes()
         configurarEventos()
         cargarDatosIniciales()
@@ -128,11 +117,9 @@ class PasoTaller_Activity : AppCompatActivity() {
     private fun obtenerDatosVehiculo() {
         try {
             val jsonVeh = intent.getStringExtra("vehiculo") ?: ""
-
             if (jsonVeh.isNotEmpty()) {
                 vehiculoActual = gson.fromJson(jsonVeh,VehiculoPasoLog::class.java)
                 mostrarInfoVehiculo()
-
                 Log.d("PasoTaller_Activity", "✅ Datos del vehículo obtenidos: " +
                         "VIN=${vehiculoActual!!.VIN}")
             } else {
@@ -292,7 +279,7 @@ class PasoTaller_Activity : AppCompatActivity() {
     }
 
 
-    //Optimizado por miguel
+    //Optimizado l
     private fun actualizarBotonesPaginacion() {
         binding.apply {
             btnPaginaAnteriorTaller.isEnabled = paginaActual > 0
@@ -330,7 +317,7 @@ class PasoTaller_Activity : AppCompatActivity() {
     }
 
 
-    //Optimizado por miguel
+    //Optimizado
     private fun mostrarFormularios() {
         binding.apply {
             layoutFormularioTaller.visibility = View.VISIBLE
@@ -343,13 +330,9 @@ class PasoTaller_Activity : AppCompatActivity() {
 
     private fun guardarRegistroTaller() {
         if (!validarFormulario()) return
-
         mostrarCarga("Guardando registro de taller...")
-
-        /// Aqui se ejecuta el Hilo  para el guardado del status -> en Taller
         lifecycleScope.launch {
             try {
-
                 var idUsuario=ParametrosSistema.usuarioLogueado.Id?.toInt()
                 var empleado = empleados[binding.spinnerPersonalMovimientoTaller.selectedItemPosition]
                 var PersonaMoviento= empleado.NombreCompleto
@@ -373,17 +356,13 @@ class PasoTaller_Activity : AppCompatActivity() {
                     Placa = ""
                 )
                 val exito = dalTaller.crearRegistroTaller(paso)
-
-
                 ocultarCarga()
-
                 if (exito) {
                     Toast.makeText(this@PasoTaller_Activity, "✅ Registro de taller guardado exitosamente", Toast.LENGTH_LONG).show()
                     finish()
                 } else {
                     mostrarError("Error al guardar el registro de taller")
                 }
-
             } catch (e: Exception) {
                 ocultarCarga()
                 mostrarError("Error de conexión: ${e.message}")
@@ -422,18 +401,16 @@ class PasoTaller_Activity : AppCompatActivity() {
             mostrarError("Seleccione la parte a reparar")
             return false
         }
-
         // Validar fecha
         if (binding.tvFechaInicioTaller.text.toString().isEmpty()) {
             mostrarError("Seleccione la fecha de inicio")
             return false
         }
-
         return true
     }
 
 
-    //Optimizado por miguel
+    //Optimizado
     private fun limpiarFormulario() {
         binding.apply {
             spinnerPersonalMovimientoTaller.setSelection(0)
@@ -457,7 +434,7 @@ class PasoTaller_Activity : AppCompatActivity() {
     }
 
 
-    //Optimizado por miguel
+    //Optimizado
     private fun mostrarCarga(mensaje: String) {
         binding.apply {
             tvLoadingTextTaller.text = mensaje
@@ -468,7 +445,7 @@ class PasoTaller_Activity : AppCompatActivity() {
     }
 
 
-    //Optimizado por miguel
+    //Optimizado
     private fun ocultarCarga() {
         binding.apply {
             loadingContainerTaller.visibility = View.GONE
@@ -479,7 +456,7 @@ class PasoTaller_Activity : AppCompatActivity() {
     }
 
 
-    //Optimizado por miguel
+    //Optimizado
     private fun mostrarError(mensaje: String) {
         binding.apply {
             tvErrorTaller.text = mensaje
@@ -494,7 +471,6 @@ class PasoTaller_Activity : AppCompatActivity() {
         fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
         binding.tvFechaInicioTaller.text = formatoFechaHora.format(Date())
     }
-
 
 
     private fun ocultarError() {

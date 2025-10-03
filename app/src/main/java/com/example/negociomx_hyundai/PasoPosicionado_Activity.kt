@@ -310,7 +310,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                     FechaEnviado = null,
                     Observacion = null,
                     FechaMovimiento = fechaActual,
-                    NumeroEconomico = "",
+                    NumeroEconomico = null,
                     Bloque = nombreBloque,
                     Placa = "",
                     PersonaQueHaraMovimiento = nombrePersonalMovimiento,

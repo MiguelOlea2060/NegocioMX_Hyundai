@@ -72,13 +72,13 @@ class PasoSalida_Activity : AppCompatActivity() {
 
         dalVeh=DALVehiculo()
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainSalida)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        if(intent?.extras!=null)
+       /* if(intent?.extras!=null)
         {
             val jsonVeh = intent.getStringExtra("vehiculo") ?: ""
             if (jsonVeh.isNotEmpty()) {
@@ -86,25 +86,88 @@ class PasoSalida_Activity : AppCompatActivity() {
             } else {
                 mostrarError("No se recibieron datos válidos del vehículo")
             }
-        }
-
+        }*/
+        inicializarComponentes()
         configurarEventos()
-        inicializarFormulario()
+        cargarDatosIniciales()
+        inicializarHoraDinamica()
     }
 
-    //Optimizado por miguel
-    private fun mostrarError(mensaje: String) {
-        binding.apply {
-            tvMensajeErrorSalida.text = mensaje
-            layoutErrorSalida.visibility = View.VISIBLE
-        }
+    private fun inicializarComponentes() {
+        binding.tvEmpleadoReceptorSalida.text = "Empleado Responsable: " + "${ParametrosSistema.usuarioLogueado.NombreCompleto}"
+    }
+    private fun cargarDatosIniciales() {
+        mostrarCarga("Cargando datos iniciales...")
 
+        lifecycleScope.launch {
+            try {
+                obtenerDatosVehiculo()
+
+                // Cargar transportistas
+                transportistas = dalCliente.consultarTransportistasConPlacasNumEco(true)
+                cargarTransportistas()
+
+                // Cargar personal
+                empleados = dalEmp.consultarEmpleados(105,106)
+                cargaConductores()
+
+                ocultarCarga()
+                mostrarFormularios()
+
+                Log.d("PasoTaller_Activity", "✅ Datos iniciales cargados correctamente")
+
+            } catch (e: Exception) {
+                ocultarCarga()
+                mostrarError("Error cargando datos: ${e.message}")
+                Log.e("PasoTaller_Activity", "Error cargando datos: ${e.message}")
+
+            }
+        }
+    }
+
+
+    private fun obtenerDatosVehiculo() {
+        try {
+            val jsonVeh = intent.getStringExtra("vehiculo") ?: ""
+            if (jsonVeh.isNotEmpty()) {
+                vehiculoActual = gson.fromJson(jsonVeh,VehiculoPasoLog::class.java)
+                mostrarInfoVehiculo()
+                Log.d("PasoTaller_Activity", "✅ Datos del vehículo obtenidos: " +
+                        "VIN=${vehiculoActual!!.VIN}")
+            } else {
+                mostrarError("No se recibieron datos válidos del vehículo")
+            }
+        } catch (e: Exception) {
+            mostrarError("Error obteniendo datos del vehículo: ${e.message}")
+            Log.e("PasoTaller_Activity", "Error obteniendo datos: ${e.message}")
+        }
+    }
+
+    private fun mostrarInfoVehiculo() {
+        vehiculoActual?.let { vehiculo ->
+            binding.tvVinVehiculoSalida.text = "VIN: ${vehiculo.VIN}"
+            binding.tvBlVehiculoSalida.text = "BL: ${vehiculo.BL}"
+            binding.tvMarcaModeloAnnioSalida.text = "${vehiculo.Especificaciones}  Año: ${vehiculo.Anio}"
+            binding.tvColorExteriorSalida.text = "Color Ext: ${vehiculo.ColorExterior}"
+            binding.tvColorInteriorVehiculoSalida.text = "Color Int: ${vehiculo.ColorInterior}"
+            binding.layoutInfoVehiculoSalida.visibility = View.VISIBLE
+        }
+    }
+
+    private fun mostrarFormularios() {
+        binding.apply {
+            binding.apply {
+                layoutFormularioSalida.visibility = View.VISIBLE
+                layoutErrorSalida.visibility = View.GONE
+            }
+
+            Toast.makeText(this@PasoSalida_Activity, "✅ Vehículo válido para status->Salida", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun inicializarFormulario() {
         // Inicializar empleado receptor
-        binding.tvEmpleadoReceptorSalida.text = "Empleado Responsable: " +
-                "${ParametrosSistema.usuarioLogueado.NombreCompleto}"
+        binding.tvEmpleadoReceptorSalida.text = "Empleado Responsable: " + "${ParametrosSistema.usuarioLogueado.NombreCompleto}"
 
         // Inicializar hora dinámica
         inicializarHoraDinamica()
@@ -123,9 +186,8 @@ class PasoSalida_Activity : AppCompatActivity() {
 
     // MÉTODOS PARA CARGAR SPINNERS
     private fun cargarTransportistas() {
-        lifecycleScope.launch {
+      //  lifecycleScope.launch {
             try {
-                transportistas = dalCliente.consultarTransportistasConPlacasNumEco(true)
 
                 val nombresTransportistas = mutableListOf("Seleccionar empresa...")
                 nombresTransportistas.addAll(transportistas.map { it.Nombre ?: "Sin nombre" })
@@ -152,7 +214,7 @@ class PasoSalida_Activity : AppCompatActivity() {
                 Log.e("Paso1Entrada", "Error cargando transportistas: ${e.message}")
                 Toast.makeText(this@PasoSalida_Activity, "Error cargando empresas", Toast.LENGTH_SHORT).show()
             }
-        }
+       // }
     }
 
     private fun mostrarInformacionVehiculo(vehiculo: VehiculoPasoLog) {
@@ -162,22 +224,23 @@ class PasoSalida_Activity : AppCompatActivity() {
             tvMarcaModeloAnnioSalida.text = "${vehiculo.Especificaciones}, Año: ${vehiculo.Anio}"
             tvColorExteriorSalida.text = "Color Ext.: ${vehiculo.ColorExterior}"
             tvColorInteriorVehiculoSalida.text = "Color Int.: ${vehiculo.ColorInterior}"
-
             layoutInfoVehiculoSalida.visibility = View.VISIBLE
         }
     }
 
     private fun mostrarFormularioStatusSalida() {
-        binding.layoutFormularioSalida.visibility = View.VISIBLE
-        binding.layoutErrorSalida.visibility = View.GONE
+        binding.apply {
+            layoutFormularioSalida.visibility = View.VISIBLE
+            layoutErrorSalida.visibility = View.GONE
+        }
+
         Toast.makeText(this, "✅ Vehículo válido para status->Salida", Toast.LENGTH_SHORT).show()
     }
 
     // MÉTODOS PARA CARGAR PERSONAL
     private fun cargaConductores() {
-        lifecycleScope.launch {
+        //lifecycleScope.launch {
             try {
-                empleados = dalEmp.consultarEmpleados(105,106)
 
                 val nombresPersonal = mutableListOf("Seleccionar personal...")
                 nombresPersonal.addAll(empleados.map { it.NombreCompleto ?: "Sin nombre" })
@@ -194,7 +257,7 @@ class PasoSalida_Activity : AppCompatActivity() {
                 Log.e("PasoSalida", "Error cargando empleado: ${e.message}")
                 Toast.makeText(this@PasoSalida_Activity, "Error cargando empleado", Toast.LENGTH_SHORT).show()
             }
-        }
+       // }
     }
 
     fun Activity.hideKeyboard() {
@@ -317,7 +380,7 @@ class PasoSalida_Activity : AppCompatActivity() {
                                             binding.spinnerPlacaTransporteSalida.setSelection(posicion + 1)
                                         else
                                             binding.spinnerPlacaTransporteSalida.setSelection(0)
-                                        binding.etNumeroEconomico.setText(numeroEconomico)
+                                        binding.etNumeroEconomicoSalida.setText(numeroEconomico)
                                     }
 
                                     dialog.dismiss()
@@ -362,7 +425,7 @@ class PasoSalida_Activity : AppCompatActivity() {
                                                 posicionNueva=contador
                                             contador++
                                         }
-                                        binding.etNumeroEconomico.setText(numeroEconomico)
+                                        binding.etNumeroEconomicoSalida.setText(numeroEconomico)
 
                                         cargarPlacasYNumeros(transportista.IdCliente!!,null)
 
@@ -395,14 +458,14 @@ class PasoSalida_Activity : AppCompatActivity() {
                         if(position>0) {
                             val placa = placasTransportista!![position-1]
                             if (placa != null && placa.NumeroEconomico.isNotEmpty()) {
-                                binding.etNumeroEconomico.setText(placa.NumeroEconomico)
-                                binding.etNumeroEconomico.requestFocus()
+                                binding.etNumeroEconomicoSalida.setText(placa.NumeroEconomico)
+                                binding.etNumeroEconomicoSalida.requestFocus()
                             } else {
-                                binding.etNumeroEconomico.setText("")
+                                binding.etNumeroEconomicoSalida.setText("")
                             }
                         }
                         else
-                            binding.etNumeroEconomico.setText("")
+                            binding.etNumeroEconomicoSalida.setText("")
                     }
                 }
             }
@@ -501,11 +564,12 @@ class PasoSalida_Activity : AppCompatActivity() {
                 val placa= transportistaSeleccionado?.Placas!![posicionPlaca-1]
                 val idVehiculoPlacas=placa.IdVehiculoPlacas
                 var placas=placa.Placas
-
+                var tipoEntradaSalida = 1
+                if(binding.rbEnMadrinaSalida.isSelected) tipoEntradaSalida=2
                 val idBloque:Short? =  null
                 val fila:Short? =  null
                 val columna:Short? =  null
-
+                var numeroEconomico = binding.etNumeroEconomicoSalida.text.toString().trim()
                 var idUsuario=ParametrosSistema.usuarioLogueado.Id?.toInt()
 
                 val paso=PasoLogVehiculoDet(
@@ -521,15 +585,15 @@ class PasoSalida_Activity : AppCompatActivity() {
                     IdUsuarioMovimiento = idUsuario,
                     IdPasoLogVehiculoDet = 0,
                     IdParteDanno = null,
-                    IdTipoEntradaSalida = null,
+                    IdTipoEntradaSalida =tipoEntradaSalida,
                     EnviadoAInterface = null,
                     FechaEnviado = null,
                     Observacion = null,
                     FechaMovimiento = fechaActual,
-                    NumeroEconomico = "",
-                    Bloque = "",
+                    NumeroEconomico = numeroEconomico,
+                    Bloque = null,
                     Placa = placas,
-                    PersonaQueHaraMovimiento = "",
+                    PersonaQueHaraMovimiento = null,
                     IdVehiculo = vehiculoActual!!.Id.toInt(),
                     IdVehiculoPlacas = idVehiculoPlacas,
                 )
@@ -575,7 +639,7 @@ class PasoSalida_Activity : AppCompatActivity() {
             Toast.makeText(this, "Seleccione las placas del Transporte", Toast.LENGTH_SHORT).show()
             return false
         }
-        else if (binding.etNumeroEconomico.text.isEmpty()) {
+        else if (binding.etNumeroEconomicoSalida.text.isEmpty()) {
             Toast.makeText(this, "Suministre el numero economico del Transporte", Toast.LENGTH_SHORT).show()
             return false
         }
@@ -583,20 +647,48 @@ class PasoSalida_Activity : AppCompatActivity() {
     }
 
     private fun mostrarCargaGuardado() {
-        binding.loadingContainerSalida.visibility = View.VISIBLE
-        binding.btnGuardarSalida.isEnabled = false
-        binding.btnGuardarSalida.alpha = 0.5f
-        binding.tvLoadingTextSalida.text = "Guardando status->Salida..."
-        binding.tvLoadingSubtextSalida.text = "Actualizando status del vehículo"
+        binding.apply {
+            loadingContainerSalida.visibility = View.VISIBLE
+            btnGuardarSalida.isEnabled = false
+            btnGuardarSalida.alpha = 0.5f
+            tvLoadingTextSalida.text = "Guardando status->Salida..."
+            tvLoadingSubtextSalida.text = "Actualizando status del vehículo"
+        }
+
+    }
+    //Optimizado por miguel
+    private fun mostrarError(mensaje: String) {
+        binding.apply {
+            tvMensajeErrorSalida.text = mensaje
+            layoutErrorSalida.visibility = View.VISIBLE
+        }
+
+    }
+    private fun mostrarCarga(mensaje: String) {
+        binding.apply {
+            tvLoadingTextSalida.text = mensaje
+            loadingContainerSalida.visibility = View.VISIBLE
+            btnGuardarSalida.isEnabled = false
+            btnGuardarSalida.alpha = 0.5f
+        }
+    }
+
+
+    //Optimizado
+    private fun ocultarCarga() {
+        binding.apply {
+            loadingContainerSalida.visibility = View.GONE
+            btnGuardarSalida.isEnabled = true
+            btnGuardarSalida.alpha = 1.0f
+        }
+
     }
 
     private fun limpiarFormulario() {
         binding.spinnerConductorSalida.setSelection(0)
-
         binding.layoutInfoVehiculoSalida.visibility = View.GONE
         binding.layoutFormularioSalida.visibility = View.GONE
         binding.layoutErrorSalida.visibility = View.GONE
-
         vehiculoActual = null
         statusActual = null
     }
