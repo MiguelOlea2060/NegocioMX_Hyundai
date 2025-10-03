@@ -346,6 +346,7 @@ class PasoTaller_Activity : AppCompatActivity() {
 
         mostrarCarga("Guardando registro de taller...")
 
+        /// Aqui se ejecuta el Hilo  para el guardado del status -> en Taller
         lifecycleScope.launch {
             try {
 

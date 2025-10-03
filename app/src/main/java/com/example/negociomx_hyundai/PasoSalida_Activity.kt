@@ -33,6 +33,7 @@ import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
 import com.example.negociomx_hyundai.DAL.DALVehiculo
 import com.example.negociomx_hyundai.Utils.ParametrosSistema
 import com.example.negociomx_hyundai.databinding.ActivityPasoSalidaBinding
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -61,7 +62,8 @@ class PasoSalida_Activity : AppCompatActivity() {
     private lateinit var timerHandler: Handler
     private lateinit var timerRunnable: Runnable
     var fechaActual:String=""
-    var IdVehiculo:Int?=null
+
+    val gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,38 +80,31 @@ class PasoSalida_Activity : AppCompatActivity() {
 
         if(intent?.extras!=null)
         {
-            val idPasoLogVehiculo= intent.extras?.getInt("IdPasoLogVehiculo",0)?:0
-            val annioCad=intent.extras?.getString("Annio","")
-            var annio:Short=0
-            if(annioCad.toString().isNotEmpty())
-                annio=annioCad.toString().toShort()
-            IdVehiculo= intent.extras?.getInt("IdVehiculo",0)?:0
-            val marca= intent.extras?.getString("Marca","")?:""
-            val modelo= intent.extras?.getString("Modelo","")?:""
-            val bl= intent.extras?.getString("Bl","")?:""
-            val vin= intent.extras?.getString("Vin","")?:""
-            val colorExterior= intent.extras?.getString("ColorExterior","")?:""
-            val colorInterior= intent.extras?.getString("ColorInterior","")?:""
-            vehiculoActual=VehiculoPasoLog(
-                Id =IdVehiculo.toString(),
-                Marca = marca,
-                Modelo = modelo,
-                BL =bl,
-                VIN = vin,
-                ColorExterior = colorExterior,
-                ColorInterior = colorInterior,
-                IdPasoLogVehiculo = idPasoLogVehiculo,
-                Anio = annio.toInt()
-            )
+            val jsonVeh = intent.getStringExtra("vehiculo") ?: ""
+            if (jsonVeh.isNotEmpty()) {
+            vehiculoActual = gson.fromJson(jsonVeh,VehiculoPasoLog::class.java)
+            } else {
+                mostrarError("No se recibieron datos válidos del vehículo")
+            }
         }
 
         configurarEventos()
         inicializarFormulario()
     }
 
+    //Optimizado por miguel
+    private fun mostrarError(mensaje: String) {
+        binding.apply {
+            tvMensajeErrorSalida.text = mensaje
+            layoutErrorSalida.visibility = View.VISIBLE
+        }
+
+    }
+
     private fun inicializarFormulario() {
         // Inicializar empleado receptor
-        binding.tvEmpleadoReceptorSalida.text = "Empleado Responsable: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
+        binding.tvEmpleadoReceptorSalida.text = "Empleado Responsable: " +
+                "${ParametrosSistema.usuarioLogueado.NombreCompleto}"
 
         // Inicializar hora dinámica
         inicializarHoraDinamica()
@@ -535,7 +530,7 @@ class PasoSalida_Activity : AppCompatActivity() {
                     Bloque = "",
                     Placa = placas,
                     PersonaQueHaraMovimiento = "",
-                    IdVehiculo = IdVehiculo,
+                    IdVehiculo = vehiculoActual!!.Id.toInt(),
                     IdVehiculoPlacas = idVehiculoPlacas,
                 )
                 val exito = dalPasoLog.insertaStatusNuevoPasoLogVehiculo(paso)
