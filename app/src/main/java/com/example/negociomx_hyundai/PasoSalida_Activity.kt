@@ -586,9 +586,8 @@ class PasoSalida_Activity : AppCompatActivity() {
         binding.loadingContainerSalida.visibility = View.VISIBLE
         binding.btnGuardarSalida.isEnabled = false
         binding.btnGuardarSalida.alpha = 0.5f
-
         binding.tvLoadingTextSalida.text = "Guardando status->Salida..."
-       binding.tvLoadingSubtextSalida.text = "Actualizando status del vehículo"
+        binding.tvLoadingSubtextSalida.text = "Actualizando status del vehículo"
     }
 
     private fun limpiarFormulario() {
