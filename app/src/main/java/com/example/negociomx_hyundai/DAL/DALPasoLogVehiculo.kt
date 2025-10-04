@@ -5,11 +5,13 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.Bloque
 import com.example.negociomx_hyundai.BE.BloqueColumnaFilaUso
+import com.example.negociomx_hyundai.BE.MovimientoCompleto
 import com.example.negociomx_hyundai.BE.MovimientoTracking
 import com.example.negociomx_hyundai.BE.Paso1SOCItem
 import com.example.negociomx_hyundai.BE.PasoLogVehiculo
 import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
 import com.example.negociomx_hyundai.BE.PosicionBloque
+import com.example.negociomx_hyundai.BE.ResumenCompletoConQuery
 import com.example.negociomx_hyundai.BE.TipoMovimiento
 import com.example.negociomx_hyundai.BE.VehiculoPasoLog
 import com.example.negociomx_hyundai.Utils.ConexionSQLServer
@@ -1080,7 +1082,7 @@ class DALPasoLogVehiculo {
     }
 
 
-    // CONSULTAR RESUMEN COMPLETO DEL VEHÍCULO
+   /* // CONSULTAR RESUMEN COMPLETO DEL VEHÍCULO
     suspend fun consultarResumenCompleto(vin: String): Map<String, Any?> = withContext(Dispatchers.IO) {
         val resultado = mutableMapOf<String, Any?>()
         var conexion: Connection? = null
@@ -1250,6 +1252,116 @@ class DALPasoLogVehiculo {
         return@withContext movimientos
     }
 
+*/
+
+    // NUEVO Metodo Consultar resumen completo con query unificado
+    suspend fun consultarResumenCompletoConQuery(vin: String): ResumenCompletoConQuery? = withContext(Dispatchers.IO) {
+        var resultado: ResumenCompletoConQuery? = null
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            Log.d("DALPasoLogVehiculo", "🔍 Consultando resumen completo con query unificado para VIN: $vin")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALPasoLogVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext null
+            }
+
+            // <CHANGE> Query SQL completo del usuario
+            val query = """
+            SELECT v.VIN, v.IdVehiculo, v.IdMarca, ma.Nombre Marca, v.IdModelo, mo.Nombre Modelo, BL,
+                vc.IdColor idcolorexterior, cole.Nombre colorexterior, vc.IdColorInterior, coli.Nombre colorinterior,
+                plv.IdStatusActual,
+                pd.IdTransporte, trans.Nombre NombreTransporte, pd.IdStatus IdStatusMovimiento, s.Nombre as NombreStatusActual, 
+                sd.Nombre NombreStatusMovimiento,
+                pd.FechaMovimiento,
+                pd.IdBloque, blo.nombre NombreBloque, pd.Columna, pd.Fila,
+                pd.IdParteDanno, par.Nombre NombreParteDanno, pd.IdTipoMovimiento, tm.Nombre NombreTipoMovimiento
+            FROM Vehiculo v
+                inner join dbo.VehiculoColor vc on v.IdVehiculo=vc.IdVehiculo
+                inner join dbo.Color cole on vc.IdColor=cole.IdColor
+                inner join dbo.Color coli on vc.IdColorInterior=coli.IdColor
+                inner join dbo.MarcaAuto ma on v.IdMarca=ma.IdMarcaAuto
+                inner join dbo.Modelo mo on v.IdModelo=mo.IdModelo
+                left join dbo.bl on v.idbl=bl.idbl
+                INNER JOIN PasoLogVehiculo plv ON v.IdVehiculo = plv.IdVehiculo
+                inner join dbo.PasoLogVehiculoDet pd on plv.IdPasoLogVehiculo=pd.IdPasoLogVehiculo
+                LEFT JOIN Status s ON plv.IdStatusActual = s.IdStatus
+                left join dbo.Status sd on pd.IdStatus=sd.IdStatus
+                left join dbo.Bloque blo on pd.IdBloque=blo.IdBloque
+                left join dbo.ParteDanno par on pd.IdParteDanno=par.IdParteDanno
+                left join dbo.TipoMovimiento tm on pd.IdTipoMovimiento=tm.IdTipoMovimiento
+                left join dbo.Cliente trans on pd.IdTransporte=trans.IdCliente
+            WHERE v.Vin = ?
+            order by pd.FechaMovimiento
+        """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setString(1, vin)
+            resultSet = statement.executeQuery()
+
+            var primeraFila = true
+            while (resultSet.next()) {
+                // <CHANGE> En la primera fila, crear el objeto resultado con datos del vehículo
+                if (primeraFila) {
+                    resultado = ResumenCompletoConQuery(
+                        VIN = resultSet.getString("VIN") ?: "",
+                        IdVehiculo = resultSet.getInt("IdVehiculo"),
+                        IdMarca = resultSet.getInt("IdMarca"),
+                        Marca = resultSet.getString("Marca") ?: "",
+                        IdModelo = resultSet.getInt("IdModelo"),
+                        Modelo = resultSet.getString("Modelo") ?: "",
+                        BL = resultSet.getString("BL") ?: "",
+                        IdColorExterior = resultSet.getInt("idcolorexterior"),
+                        ColorExterior = resultSet.getString("colorexterior") ?: "",
+                        IdColorInterior = resultSet.getInt("IdColorInterior"),
+                        ColorInterior = resultSet.getString("colorinterior") ?: "",
+                        IdStatusActual = resultSet.getInt("IdStatusActual"),
+                        NombreStatusActual = resultSet.getString("NombreStatusActual") ?: ""
+                    )
+                    primeraFila = false
+                }
+
+                // <CHANGE> Agregar cada movimiento a la lista
+                val movimiento = MovimientoCompleto(
+                    IdTransporte = resultSet.getObject("IdTransporte") as? Int,
+                    NombreTransporte = resultSet.getString("NombreTransporte") ?: "",
+                    IdStatusMovimiento = resultSet.getInt("IdStatusMovimiento"),
+                    NombreStatusMovimiento = resultSet.getString("NombreStatusMovimiento") ?: "",
+                    FechaMovimiento = resultSet.getString("FechaMovimiento") ?: "",
+                    IdBloque = resultSet.getObject("IdBloque") as? Int,
+                    NombreBloque = resultSet.getString("NombreBloque") ?: "",
+                    Columna = resultSet.getObject("Columna") as? Short,
+                    Fila = resultSet.getObject("Fila") as? Short,
+                    IdParteDanno = resultSet.getObject("IdParteDanno") as? Int,
+                    NombreParteDanno = resultSet.getString("NombreParteDanno") ?: "",
+                    IdTipoMovimiento = resultSet.getObject("IdTipoMovimiento") as? Int,
+                    NombreTipoMovimiento = resultSet.getString("NombreTipoMovimiento") ?: ""
+                )
+
+                resultado?.Movimientos?.add(movimiento)
+            }
+
+            Log.d("DALPasoLogVehiculo", "✅ Resumen completo obtenido: ${resultado?.Movimientos?.size ?: 0} movimientos")
+
+        } catch (e: Exception) {
+            Log.e("DALPasoLogVehiculo", "💥 Error consultando resumen completo: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALPasoLogVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+
+        return@withContext resultado
+    }
 
 
 

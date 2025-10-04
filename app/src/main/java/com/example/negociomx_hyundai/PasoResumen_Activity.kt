@@ -11,7 +11,9 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.negociomx_hyundai.BE.MovimientoCompleto
 import com.example.negociomx_hyundai.BE.MovimientoTracking
+import com.example.negociomx_hyundai.BE.ResumenCompletoConQuery
 import com.example.negociomx_hyundai.BE.Vehiculo
 import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
 import com.example.negociomx_hyundai.DAL.DALVehiculo
@@ -39,7 +41,7 @@ class PasoResumen_Activity : AppCompatActivity() {
         binding = ActivityPasoResumenBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.mainResumen) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -57,10 +59,6 @@ class PasoResumen_Activity : AppCompatActivity() {
     }
 
     private fun configurarUI() {
-        // Botón escanear QR
-        binding.btnEscanearQRResumen.setOnClickListener {
-            iniciarEscaneoQR()
-        }
 
         // Botón consultar
         binding.btnConsultarResumen.setOnClickListener {
@@ -72,10 +70,7 @@ class PasoResumen_Activity : AppCompatActivity() {
             consultarVehiculo(vin)
         }
 
-        // Botón regresar
-        binding.btnRegresarResumen.setOnClickListener {
-            finish()
-        }
+
     }
 
     private fun configurarRecyclerView() {
@@ -112,33 +107,19 @@ class PasoResumen_Activity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                // Consultar vehículo
-                val vehiculo = dalVehiculo.consultarVehiculoPorVIN(vin)
+                // <CHANGE> Usar el nuevo metodo con query completo
+                val resumen = dalPasoLog.consultarResumenCompletoConQuery(vin)
 
-                if (vehiculo == null || vehiculo.Id.toInt() <= 0) {
-                    ocultarCarga()
-                    mostrarError("Vehículo no registrado")
-                    return@launch
-                }
-
-                vehiculoActual = vehiculo
-
-                // Consultar resumen completo
-                val resumen = dalPasoLog.consultarResumenCompleto(vin)
-
-                if (resumen.isEmpty()) {
+                if (resumen == null || resumen.Movimientos.isEmpty()) {
                     ocultarCarga()
                     mostrarError("No hay registros para este vehículo")
                     return@launch
                 }
 
-                // Consultar tracking
-                val tracking = dalPasoLog.consultarTrackingMovimientos(vin)
-
-                // Mostrar datos
-                mostrarDatosVehiculo(vehiculo, resumen)
-                mostrarStatusResumen(resumen)
-                mostrarTracking(tracking)
+                // <CHANGE> Mostrar datos usando el nuevo objeto ResumenCompletoConQuery
+                mostrarDatosVehiculoNuevo(resumen)
+                mostrarStatusResumenNuevo(resumen)
+                mostrarTrackingNuevo(resumen.Movimientos)
 
                 ocultarCarga()
 
@@ -150,54 +131,89 @@ class PasoResumen_Activity : AppCompatActivity() {
         }
     }
 
-    private fun mostrarDatosVehiculo(vehiculo: Vehiculo, resumen: Map<String, Any?>) {
+    private fun mostrarDatosVehiculoNuevo(resumen: ResumenCompletoConQuery) {
         binding.apply {
-            tvVinResumen.text = "VIN: ${vehiculo.VIN}"
-            tvBlResumen.text = "BL: ${vehiculo.BL}"
-            tvMarcaModeloResumen.text = "${vehiculo.Marca} ${vehiculo.Modelo} - ${vehiculo.Anio}"
-            tvColorExteriorResumen.text = "Color Ext: ${vehiculo.ColorExterior}"
-            tvColorInteriorResumen.text = "Color Int: ${vehiculo.ColorInterior}"
+            // <CHANGE> Datos del vehículo desde ResumenCompletoConQuery
+            tvBlResumen.text = "MBL: ${resumen.BL}"
+            tvMarcaModeloResumen.text = "${resumen.Marca} ${resumen.Modelo}"
+            tvColorExteriorResumen.text = "Color Ext.: ${resumen.ColorExterior}"
+            tvColorInteriorResumen.text = "Color Int.: ${resumen.ColorInterior}"
 
-
-            // Calcular y mostrar días de estadía
-            val diasEstadia = resumen["DiasEstadia"] as? Int ?: 0
-            tvDiasEstadiaResumen.text = "Estadía: ${formatearDiasEstadia(diasEstadia)}"
+            // <CHANGE> Calcular días de estadía desde el primer movimiento
+            val diasEstadia = calcularDiasEstadia(resumen.Movimientos)
+            tvDiasEstadiaResumen.text = formatearDiasEstadia(diasEstadia)
 
             layoutInfoVehiculoResumen.visibility = View.VISIBLE
         }
     }
 
-    private fun mostrarStatusResumen(resumen: Map<String, Any?>) {
+    private fun mostrarStatusResumenNuevo(resumen: ResumenCompletoConQuery) {
         binding.apply {
-            tvStatusActualResumen.text = resumen["StatusActual"] as? String ?: "—"
+            // <CHANGE> Obtener el último movimiento (status actual)
+            val ultimoMovimiento = resumen.Movimientos.lastOrNull()
 
-            // Fecha entrada
-            val fechaEntrada = resumen["FechaEntrada"] as? String
-            tvFechaEntradaResumen.text = if (fechaEntrada != null) {
-                formatearFecha(fechaEntrada)
+            if (ultimoMovimiento != null) {
+                // Status actual con posición
+                val statusTexto = if (ultimoMovimiento.NombreBloque.isNotEmpty()) {
+                    "${ultimoMovimiento.NombreStatusMovimiento}, Col.: ${ultimoMovimiento.Columna ?: "—"}, Fila: ${ultimoMovimiento.Fila ?: "—"}"
+                } else {
+                    ultimoMovimiento.NombreStatusMovimiento
+                }
+                tvStatusActualResumen.text = statusTexto
+
+                // Fecha del último movimiento
+                tvFechaMovimientoResumen.text = formatearFecha(ultimoMovimiento.FechaMovimiento)
+            }
+
+            // <CHANGE> Fecha de entrada (primer movimiento)
+            val primerMovimiento = resumen.Movimientos.firstOrNull()
+            tvFechaEntradaResumen.text = if (primerMovimiento != null) {
+                formatearFecha(primerMovimiento.FechaMovimiento)
             } else "—"
 
-            // Fecha salida
-            val fechaSalida = resumen["FechaSalida"] as? String
-            tvFechaSalidaResumen.text = if (fechaSalida != null) {
-                formatearFecha(fechaSalida)
+            // <CHANGE> Fecha de salida (buscar movimiento con status "Salida" o similar)
+            val movimientoSalida = resumen.Movimientos.find {
+                it.NombreStatusMovimiento.contains("Salida", ignoreCase = true)
+            }
+            tvFechaSalidaResumen.text = if (movimientoSalida != null) {
+                formatearFecha(movimientoSalida.FechaMovimiento)
             } else "—"
 
-            // Total movimientos
-            val totalMovimientos = resumen["TotalMovimientos"] as? Int ?: 0
-            tvTotalMovimientosResumen.text = totalMovimientos.toString()
+            // Total de movimientos
+            tvTotalMovimientosResumen.text = resumen.Movimientos.size.toString()
 
             layoutStatusResumen.visibility = View.VISIBLE
         }
     }
-
-    private fun mostrarTracking(movimientos: List<MovimientoTracking>) {
+    private fun mostrarTrackingNuevo(movimientos: List<MovimientoCompleto>) {
         if (movimientos.isEmpty()) {
             binding.layoutTrackingResumen.visibility = View.GONE
             return
         }
 
-        trackingAdapter.actualizarMovimientos(movimientos)
+        // <CHANGE> Convertir MovimientoCompleto a MovimientoTracking con nombres correctos
+        val movimientosTracking = movimientos.map { mov ->
+            MovimientoTracking(
+                fecha = mov.FechaMovimiento,
+                status = mov.NombreStatusMovimiento,
+                detalle = buildString {
+                    if (mov.NombreBloque.isNotEmpty()) {
+                        append("${mov.NombreBloque} Col. ${mov.Columna}, Fila ${mov.Fila}")
+                    }
+                    if (mov.NombreParteDanno.isNotEmpty()) {
+                        if (isNotEmpty()) append(" - ")
+                        append("Parte: ${mov.NombreParteDanno}")
+                    }
+                    if (mov.NombreTransporte.isNotEmpty()) {
+                        if (isNotEmpty()) append(" - ")
+                        append("Transporte: ${mov.NombreTransporte}")
+                    }
+                },
+                usuario = "" // No viene en el query, dejar vacío
+            )
+        }
+
+        trackingAdapter.actualizarMovimientos(movimientosTracking)
         binding.layoutTrackingResumen.visibility = View.VISIBLE
     }
 
@@ -233,6 +249,35 @@ class PasoResumen_Activity : AppCompatActivity() {
             formatoSalida.format(date!!)
         } catch (e: Exception) {
             fecha
+        }
+    }
+    private fun calcularDiasEstadia(movimientos: List<MovimientoCompleto>): Int {
+        if (movimientos.isEmpty()) return 0
+
+        return try {
+            val formatoFecha = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val primerMovimiento = movimientos.firstOrNull() ?: return 0
+            val fechaEntrada = formatoFecha.parse(primerMovimiento.FechaMovimiento) ?: return 0
+
+            // <CHANGE> Buscar fecha de salida o usar fecha actual
+            val movimientoSalida = movimientos.find {
+                it.NombreStatusMovimiento.contains("Salida", ignoreCase = true)
+            }
+
+            // <CHANGE> Calcular diferencia correctamente
+            val fechaSalidaMillis = if (movimientoSalida != null) {
+                val fechaSalidaDate = formatoFecha.parse(movimientoSalida.FechaMovimiento)
+                fechaSalidaDate?.time ?: System.currentTimeMillis()
+            } else {
+                System.currentTimeMillis()
+            }
+
+            val diferencia = fechaSalidaMillis - fechaEntrada.time
+
+            TimeUnit.MILLISECONDS.toDays(diferencia).toInt()
+        } catch (e: Exception) {
+            Log.e("PasoResumen", "Error calculando días: ${e.message}")
+            0
         }
     }
 

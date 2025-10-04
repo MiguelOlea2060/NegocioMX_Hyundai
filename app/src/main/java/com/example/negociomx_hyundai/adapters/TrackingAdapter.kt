@@ -29,11 +29,11 @@ class TrackingAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val movimiento = movimientos[position]
 
-        holder.tvFecha.text = movimiento.FechaMovimiento
-        holder.tvHora.text = movimiento.HoraMovimiento
-        holder.tvStatus.text = movimiento.NombreStatus
-        holder.tvDetalle.text = if (movimiento.Detalle.isNotEmpty()) movimiento.Detalle else "Sin detalles"
-        holder.tvUsuario.text = "Usuario: ${movimiento.Usuario}"
+        holder.tvFecha.text = movimiento.fecha
+     //   holder.tvHora.text = movimiento.HoraMovimiento
+        holder.tvStatus.text = movimiento.status
+        holder.tvDetalle.text = if (movimiento.detalle.isNotEmpty()) movimiento.detalle else "Sin detalles"
+        holder.tvUsuario.text = "Usuario: ${movimiento.usuario}"
     }
 
     override fun getItemCount() = movimientos.size

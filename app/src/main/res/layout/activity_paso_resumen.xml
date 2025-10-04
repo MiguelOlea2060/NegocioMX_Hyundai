@@ -1,408 +1,365 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
     tools:context=".PasoResumen_Activity">
 
-    <!-- ScrollView principal -->
-    <ScrollView
+    <LinearLayout
+        android:id="@+id/mainResumen"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <!-- HEADER -->
+        <TextView
+            android:padding="8dp"
+            android:background="@color/naranja_ligero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Estadía"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#2E7D32"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:background="@drawable/card_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
 
-            <!-- Título -->
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="RESUMEN DEL VEHÍCULO"
-                android:textSize="24sp"
+                android:text="🚗 Escanea el Codigo QR"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#1976D2"
-                android:gravity="center"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="12dp" />
 
-            <!-- Sección: Escaneo/Ingreso de VIN -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/border_layout"
-                android:layout_marginBottom="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="ESCANEAR O INGRESAR VIN"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#1976D2"
-                    android:layout_marginBottom="12dp" />
+                android:orientation="horizontal">
 
                 <EditText
                     android:id="@+id/etVinResumen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
                     android:hint="Ingrese VIN del vehículo"
-                    android:inputType="textCapCharacters"
-                    android:maxLength="17"
+                    android:background="@drawable/edittext_background"
                     android:padding="12dp"
-                    android:background="@drawable/border_edittext"
-                    android:layout_marginBottom="12dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <Button
-                        android:id="@+id/btnEscanearQRResumen"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="ESCANEAR QR"
-                        android:textColor="#FFFFFF"
-                        android:backgroundTint="#1976D2"
-                        android:layout_marginEnd="8dp" />
-
-                    <Button
-                        android:id="@+id/btnConsultarResumen"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="CONSULTAR"
-                        android:textColor="#FFFFFF"
-                        android:backgroundTint="#2E7D32"
-                        android:layout_marginStart="8dp" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- Mensaje de Error -->
-            <LinearLayout
-                android:id="@+id/layoutErrorResumen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:background="#FFEBEE"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/tvMensajeErrorResumen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Error"
-                    android:textSize="14sp"
-                    android:textColor="#C62828"
-                    android:gravity="center" />
-
-            </LinearLayout>
-
-            <!-- Sección: Datos del Vehículo -->
-            <LinearLayout
-                android:id="@+id/layoutInfoVehiculoResumen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/border_layout"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="DATOS DEL VEHÍCULO"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#1976D2"
-                    android:layout_marginBottom="12dp" />
+                    android:maxLength="19"
+                    android:layout_marginEnd="8dp" />
 
-                <TextView
-                    android:id="@+id/tvVinResumen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="VIN: "
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="#424242"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/tvBlResumen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="BL: "
-                    android:textSize="14sp"
-                    android:textColor="#666666"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/tvMarcaModeloResumen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Marca Modelo - Año"
-                    android:textSize="14sp"
-                    android:textColor="#666666"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/tvColorExteriorResumen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Color Ext: "
-                    android:textSize="14sp"
-                    android:textColor="#666666"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/tvColorInteriorResumen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Color Int: "
-                    android:textSize="14sp"
-                    android:textColor="#666666"
-                    android:layout_marginBottom="4dp" />
-
-                <TextView
-                    android:id="@+id/tvNumeroMotorResumen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Motor: "
-                    android:textSize="14sp"
-                    android:textColor="#666666"
-                    android:layout_marginBottom="8dp" />
-
-                <!-- Días de Estadía -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#E0E0E0"
-                    android:layout_marginVertical="8dp" />
-
-                <TextView
-                    android:id="@+id/tvDiasEstadiaResumen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Estadía: "
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#D32F2F" />
+                <Button
+                    android:id="@+id/btnConsultarResumen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="🔍"
+                    android:backgroundTint="#2196F3"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp" />
 
             </LinearLayout>
-
-            <!-- Sección: Status Actual y Resumen -->
-            <LinearLayout
-                android:id="@+id/layoutStatusResumen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/border_layout"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="STATUS ACTUAL"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#1976D2"
-                    android:layout_marginBottom="12dp" />
-
-                <TextView
-                    android:id="@+id/tvStatusActualResumen"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="POSICIONADO"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#2E7D32"
-                    android:layout_marginBottom="16dp" />
-
-                <!-- Entrada -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Entrada:"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="#424242" />
-
-                    <TextView
-                        android:id="@+id/tvFechaEntradaResumen"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="01/01/2024 14:30"
-                        android:textSize="14sp"
-                        android:textColor="#666666" />
-
-                </LinearLayout>
-
-                <!-- Salida -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Salida:"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="#424242" />
-
-                    <TextView
-                        android:id="@+id/tvFechaSalidaResumen"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="—"
-                        android:textSize="14sp"
-                        android:textColor="#666666" />
-
-                </LinearLayout>
-
-                <!-- Movimientos -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Movimientos:"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="#424242" />
-
-                    <TextView
-                        android:id="@+id/tvTotalMovimientosResumen"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="0"
-                        android:textSize="14sp"
-                        android:textColor="#666666" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- Sección: Tracking de Movimientos -->
-            <LinearLayout
-                android:id="@+id/layoutTrackingResumen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:background="@drawable/border_layout"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="HISTORIAL DE MOVIMIENTOS"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#1976D2"
-                    android:layout_marginBottom="12dp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvTrackingMovimientos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false" />
-
-            </LinearLayout>
-
-            <!-- Botón Regresar -->
-            <Button
-                android:id="@+id/btnRegresarResumen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="REGRESAR"
-                android:textColor="#FFFFFF"
-                android:backgroundTint="#757575"
-                android:layout_marginTop="16dp" />
 
         </LinearLayout>
 
-    </ScrollView>
-
-    <!-- Overlay de Carga (Progress) -->
-    <FrameLayout
-        android:id="@+id/progressOverlayResumen"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#CC000000"
-        android:clickable="true"
-        android:focusable="true"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
+        <!-- INFORMACIÓN DEL VEHÍCULO -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/layoutInfoVehiculoResumen"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:orientation="vertical"
+            android:background="#C8E6C9"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📋 Datos del Vehículo"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2E7D32"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvBlResumen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="MBL: -"
+                android:textSize="16sp"
+                android:textColor="#1B5E20"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvMarcaModeloResumen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="- M9, 0"
+                android:textSize="14sp"
+                android:textColor="#1B5E20"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvColorExteriorResumen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Color Ext.: -"
+                android:textSize="14sp"
+                android:textColor="#1B5E20"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvColorInteriorResumen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Color Int.: -"
+                android:textSize="14sp"
+                android:textColor="#1B5E20"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvNumeroMotorResumen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Combustible: -"
+                android:textSize="14sp"
+                android:textColor="#1B5E20"
+                android:layout_marginBottom="4dp" />
+
+            <View
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:background="#1B5E20"
+                android:layout_width="match_parent"
+                android:layout_height="2dp" />
+
+            <TextView
+                android:id="@+id/tvDiasEstadiaResumen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0 días"
+                android:textSize="16sp"
+                android:textColor="#1B5E20"
+                android:textStyle="bold"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+        <!-- Status Actual -->
+        <LinearLayout
+            android:id="@+id/layoutStatusResumen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚡ Actual"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#FF6F00"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvStatusActualResumen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Posicionado, Col.: 4, Fila: 5"
+                android:textSize="14sp"
+                android:textColor="#424242"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvFechaMovimientoResumen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="10/09/2025 09:20"
+                android:textSize="14sp"
+                android:textColor="#424242"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Entrada:"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#1976D2" />
+
+                <TextView
+                    android:id="@+id/tvFechaEntradaResumen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="  01/SEP/2025 10:00"
+                    android:textSize="14sp"
+                    android:textColor="#424242" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Salida:"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#1976D2" />
+
+                <TextView
+                    android:id="@+id/tvFechaSalidaResumen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="  15/SEP/2025 10:30"
+                    android:textSize="14sp"
+                    android:textColor="#424242" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Movimientos:"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#1976D2" />
+
+                <TextView
+                    android:id="@+id/tvTotalMovimientosResumen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="  4"
+                    android:textSize="14sp"
+                    android:textColor="#424242" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Tracking -->
+        <LinearLayout
+            android:id="@+id/layoutTrackingResumen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚡ Tracking"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#FF6F00"
+                android:layout_marginBottom="12dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTrackingMovimientos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false" />
+
+        </LinearLayout>
+
+        <!-- Loading -->
+        <LinearLayout
+            android:id="@+id/progressOverlayResumen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
             android:padding="24dp"
-            android:background="@drawable/border_layout">
+            android:visibility="gone">
 
             <ProgressBar
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:indeterminateTint="#1976D2" />
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                style="?android:attr/progressBarStyleLarge"
+                android:indeterminateTint="#2196F3" />
 
             <TextView
                 android:id="@+id/tvLoadingTextResumen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:layout_marginTop="16dp"
-                android:text="Cargando..."
+                android:text="Consultando vehículo..."
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#1976D2" />
+                android:textColor="#2196F3" />
 
         </LinearLayout>
 
-    </FrameLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- MENSAJE DE ERROR -->
+        <LinearLayout
+            android:id="@+id/layoutErrorResumen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="VEHÍCULO NO VÁLIDO PARA POSICIONADO"
+                android:textColor="#F44336"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvMensajeErrorResumen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="El vehículo no existe o no tiene un status válido para posicionado."
+                android:textColor="#C62828"
+                android:textSize="14sp"
+                android:gravity="center"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
