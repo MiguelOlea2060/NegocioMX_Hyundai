@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.Bloque
 import com.example.negociomx_hyundai.BE.BloqueColumnaFilaUso
+import com.example.negociomx_hyundai.BE.MovimientoTracking
 import com.example.negociomx_hyundai.BE.Paso1SOCItem
 import com.example.negociomx_hyundai.BE.PasoLogVehiculo
 import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
@@ -1077,6 +1078,179 @@ class DALPasoLogVehiculo {
             }
         }
     }
+
+
+    // CONSULTAR RESUMEN COMPLETO DEL VEHÍCULO
+    suspend fun consultarResumenCompleto(vin: String): Map<String, Any?> = withContext(Dispatchers.IO) {
+        val resultado = mutableMapOf<String, Any?>()
+        var conexion: Connection? = null
+
+        try {
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) return@withContext resultado
+
+            // Query principal: datos del vehículo + fecha entrada + status actual
+            val queryPrincipal = """
+            SELECT TOP 1
+                v.VIN, v.BL, v.Marca, v.Modelo, v.Anio,
+                v.ColorExterior, v.ColorInterior, v.TipoCombustible,
+                v.NumeroMotor,
+                plv.FechaAlta as FechaEntrada,
+                plv.IdStatusActual,
+                s.Nombre as StatusActual,
+                DATEDIFF(DAY, plv.FechaAlta, GETDATE()) as DiasEstadia
+            FROM Vehiculo v
+            INNER JOIN PasoLogVehiculo plv ON v.IdVehiculo = plv.IdVehiculo
+            LEFT JOIN Status s ON plv.IdStatusActual = s.IdStatus
+            WHERE v.VIN = ?
+        """.trimIndent()
+
+            val stmtPrincipal = conexion.prepareStatement(queryPrincipal)
+            stmtPrincipal.setString(1, vin)
+            val rsPrincipal = stmtPrincipal.executeQuery()
+
+            if (rsPrincipal.next()) {
+                resultado["VIN"] = rsPrincipal.getString("VIN")
+                resultado["BL"] = rsPrincipal.getString("BL")
+                resultado["Marca"] = rsPrincipal.getString("Marca")
+                resultado["Modelo"] = rsPrincipal.getString("Modelo")
+                resultado["Anio"] = rsPrincipal.getInt("Anio")
+                resultado["ColorExterior"] = rsPrincipal.getString("ColorExterior")
+                resultado["ColorInterior"] = rsPrincipal.getString("ColorInterior")
+                resultado["TipoCombustible"] = rsPrincipal.getString("TipoCombustible")
+                resultado["NumeroMotor"] = rsPrincipal.getString("NumeroMotor")
+                resultado["FechaEntrada"] = rsPrincipal.getString("FechaEntrada")
+                resultado["StatusActual"] = rsPrincipal.getString("StatusActual")
+                resultado["DiasEstadia"] = rsPrincipal.getInt("DiasEstadia")
+            }
+
+            rsPrincipal.close()
+            stmtPrincipal.close()
+
+            // Query: fecha de salida (si existe)
+            val querySalida = """
+            SELECT TOP 1 FechaMovimiento
+            FROM PasoLogVehiculoDet plvd
+            INNER JOIN PasoLogVehiculo plv ON plvd.IdPasoLogVehiculo = plv.IdPasoLogVehiculo
+            INNER JOIN Vehiculo v ON plv.IdVehiculo = v.IdVehiculo
+            WHERE v.VIN = ? AND plvd.IdStatus = 173
+            ORDER BY plvd.FechaMovimiento DESC
+        """.trimIndent()
+
+            val stmtSalida = conexion.prepareStatement(querySalida)
+            stmtSalida.setString(1, vin)
+            val rsSalida = stmtSalida.executeQuery()
+
+            if (rsSalida.next()) {
+                resultado["FechaSalida"] = rsSalida.getString("FechaMovimiento")
+            }
+
+            rsSalida.close()
+            stmtSalida.close()
+
+            // Query: contador de movimientos (excluyendo entrada y salida)
+            val queryContador = """
+            SELECT COUNT(*) as TotalMovimientos
+            FROM PasoLogVehiculoDet plvd
+            INNER JOIN PasoLogVehiculo plv ON plvd.IdPasoLogVehiculo = plv.IdPasoLogVehiculo
+            INNER JOIN Vehiculo v ON plv.IdVehiculo = v.IdVehiculo
+            WHERE v.VIN = ? AND plvd.IdStatus NOT IN (171, 173)
+        """.trimIndent()
+
+            val stmtContador = conexion.prepareStatement(queryContador)
+            stmtContador.setString(1, vin)
+            val rsContador = stmtContador.executeQuery()
+
+            if (rsContador.next()) {
+                resultado["TotalMovimientos"] = rsContador.getInt("TotalMovimientos")
+            }
+
+            rsContador.close()
+            stmtContador.close()
+
+        } catch (e: Exception) {
+            Log.e("DALPasoLogVehiculo", "Error consultando resumen: ${e.message}")
+        } finally {
+            conexion?.close()
+        }
+
+        return@withContext resultado
+    }
+
+    // CONSULTAR TRACKING DE MOVIMIENTOS
+    suspend fun consultarTrackingMovimientos(vin: String): List<MovimientoTracking> = withContext(Dispatchers.IO) {
+        val movimientos = mutableListOf<MovimientoTracking>()
+        var conexion: Connection? = null
+
+        try {
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) return@withContext movimientos
+
+            val query = """
+            SELECT 
+                plvd.IdPasoLogVehiculoDet,
+                CONVERT(VARCHAR, plvd.FechaMovimiento, 103) as Fecha,
+                CONVERT(VARCHAR, plvd.FechaMovimiento, 108) as Hora,
+                s.Nombre as Status,
+                ISNULL(tm.Nombre, '') as TipoMovimiento,
+                ISNULL(pd.Nombre, '') as ParteDanno,
+                ISNULL(plvd.Observacion, '') as Observacion,
+                ISNULL(u.NombreCompleto, '') as Usuario
+            FROM PasoLogVehiculoDet plvd
+            INNER JOIN PasoLogVehiculo plv ON plvd.IdPasoLogVehiculo = plv.IdPasoLogVehiculo
+            INNER JOIN Vehiculo v ON plv.IdVehiculo = v.IdVehiculo
+            INNER JOIN Status s ON plvd.IdStatus = s.IdStatus
+            LEFT JOIN TipoMovimiento tm ON plvd.IdTipoMovimiento = tm.IdTipoMovimiento
+            LEFT JOIN ParteDanno pd ON plvd.IdParteDanno = pd.IdParteDanno
+            LEFT JOIN Usuario u ON plvd.IdUsuarioMovimiento = u.IdUsuario
+            WHERE v.VIN = ?
+            ORDER BY plvd.FechaMovimiento ASC
+        """.trimIndent()
+
+            val stmt = conexion.prepareStatement(query)
+            stmt.setString(1, vin)
+            val rs = stmt.executeQuery()
+
+            while (rs.next()) {
+                val detalle = buildString {
+                    val tipoMov = rs.getString("TipoMovimiento")
+                    val parte = rs.getString("ParteDanno")
+                    val obs = rs.getString("Observacion")
+
+                    if (tipoMov.isNotEmpty()) append("$tipoMov")
+                    if (parte.isNotEmpty()) {
+                        if (isNotEmpty()) append(" | ")
+                        append("Parte: $parte")
+                    }
+                    if (obs.isNotEmpty()) {
+                        if (isNotEmpty()) append(" | ")
+                        append(obs)
+                    }
+                }
+
+                movimientos.add(MovimientoTracking(
+                    IdMovimiento = rs.getInt("IdPasoLogVehiculoDet"),
+                    FechaMovimiento = rs.getString("Fecha"),
+                    HoraMovimiento = rs.getString("Hora"),
+                    NombreStatus = rs.getString("Status"),
+                    Detalle = detalle,
+                    Usuario = rs.getString("Usuario")
+                ))
+            }
+
+            rs.close()
+            stmt.close()
+
+        } catch (e: Exception) {
+            Log.e("DALPasoLogVehiculo", "Error consultando tracking: ${e.message}")
+        } finally {
+            conexion?.close()
+        }
+
+        return@withContext movimientos
+    }
+
+
 
 
 

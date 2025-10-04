@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="6dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Header: Fecha y Hora -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvFechaTracking"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="01/01/2024"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#1976D2" />
+
+            <TextView
+                android:id="@+id/tvHoraTracking"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="14:30:00"
+                android:textSize="14sp"
+                android:textColor="#666666" />
+
+        </LinearLayout>
+
+        <!-- Status -->
+        <TextView
+            android:id="@+id/tvStatusTracking"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ENTRADA"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#2E7D32"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Detalle -->
+        <TextView
+            android:id="@+id/tvDetalleTracking"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Detalle del movimiento"
+            android:textSize="14sp"
+            android:textColor="#424242"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Usuario -->
+        <TextView
+            android:id="@+id/tvUsuarioTracking"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Usuario: Juan Pérez"
+            android:textSize="12sp"
+            android:textColor="#999999"
+            android:textStyle="italic" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

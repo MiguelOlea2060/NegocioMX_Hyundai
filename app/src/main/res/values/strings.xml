@@ -10,4 +10,13 @@
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="registarse"><u>Registrarse</u></string>
+
+    <!-- PasoResumen Activity -->
+    <string name="resumen_titulo">Resumen del Vehículo</string>
+    <string name="resumen_escanear">Escanear QR</string>
+    <string name="resumen_consultar">Consultar</string>
+    <string name="resumen_vehiculo_no_registrado">Vehículo no registrado</string>
+    <string name="resumen_sin_registros">No hay registros para este vehículo</string>
+    <string name="resumen_error_consulta">Error consultando vehículo</string>
+    <string name="resumen_ingrese_vin">Ingrese un VIN</string>
 </resources>

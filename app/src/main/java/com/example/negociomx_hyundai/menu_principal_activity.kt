@@ -136,7 +136,7 @@ class menu_principal_activity : AppCompatActivity() {
         val vLinea1 = findViewById<View>(R.id.linea1)
         val vLinea2 = findViewById<View>(R.id.linea2)
         val vLinea3 = findViewById<View>(R.id.linea3)
-
+        val btnPasoResumen = findViewById<Button>(R.id.btnMenuResumenPasos)
         var  privilegioAdmin:Boolean=false
         if(ParametrosSistema.usuarioLogueado.IdRol!=null)
             privilegioAdmin=ParametrosSistema.usuarioLogueado.IdRol?.toInt()==1
@@ -298,6 +298,10 @@ class menu_principal_activity : AppCompatActivity() {
         }
         btnConsultaPaso3.setOnClickListener{
             val intent = Intent(this, ConsultaPaso3Repuve_Activity::class.java)
+            startActivity(intent)
+        }
+        btnPasoResumen.setOnClickListener{
+            val intent = Intent(this, PasoResumen_Activity::class.java)
             startActivity(intent)
         }
 
