@@ -107,7 +107,6 @@ class PasoResumen_Activity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                // <CHANGE> Usar el nuevo metodo con query completo
                 val resumen = dalPasoLog.consultarResumenCompletoConQuery(vin)
 
                 if (resumen == null || resumen.Movimientos.isEmpty()) {
@@ -115,12 +114,9 @@ class PasoResumen_Activity : AppCompatActivity() {
                     mostrarError("No hay registros para este vehículo")
                     return@launch
                 }
-
-                // <CHANGE> Mostrar datos usando el nuevo objeto ResumenCompletoConQuery
                 mostrarDatosVehiculoNuevo(resumen)
                 mostrarStatusResumenNuevo(resumen)
                 mostrarTrackingNuevo(resumen.Movimientos)
-
                 ocultarCarga()
 
             } catch (e: Exception) {
@@ -133,13 +129,13 @@ class PasoResumen_Activity : AppCompatActivity() {
 
     private fun mostrarDatosVehiculoNuevo(resumen: ResumenCompletoConQuery) {
         binding.apply {
-            // <CHANGE> Datos del vehículo desde ResumenCompletoConQuery
-            tvBlResumen.text = "MBL: ${resumen.BL}"
+            //  Datos del vehículo desde
+            tvBlResumen.text = "BL: ${resumen.BL}"
             tvMarcaModeloResumen.text = "${resumen.Marca} ${resumen.Modelo}"
             tvColorExteriorResumen.text = "Color Ext.: ${resumen.ColorExterior}"
             tvColorInteriorResumen.text = "Color Int.: ${resumen.ColorInterior}"
 
-            // <CHANGE> Calcular días de estadía desde el primer movimiento
+            // Calculo de días de estadía desde el primer movimiento
             val diasEstadia = calcularDiasEstadia(resumen.Movimientos)
             tvDiasEstadiaResumen.text = formatearDiasEstadia(diasEstadia)
 
@@ -149,7 +145,7 @@ class PasoResumen_Activity : AppCompatActivity() {
 
     private fun mostrarStatusResumenNuevo(resumen: ResumenCompletoConQuery) {
         binding.apply {
-            // <CHANGE> Obtener el último movimiento (status actual)
+            // status actual
             val ultimoMovimiento = resumen.Movimientos.lastOrNull()
 
             if (ultimoMovimiento != null) {
@@ -165,13 +161,12 @@ class PasoResumen_Activity : AppCompatActivity() {
                 tvFechaMovimientoResumen.text = formatearFecha(ultimoMovimiento.FechaMovimiento)
             }
 
-            // <CHANGE> Fecha de entrada (primer movimiento)
             val primerMovimiento = resumen.Movimientos.firstOrNull()
             tvFechaEntradaResumen.text = if (primerMovimiento != null) {
                 formatearFecha(primerMovimiento.FechaMovimiento)
             } else "—"
 
-            // <CHANGE> Fecha de salida (buscar movimiento con status "Salida" o similar)
+
             val movimientoSalida = resumen.Movimientos.find {
                 it.NombreStatusMovimiento.contains("Salida", ignoreCase = true)
             }
@@ -179,9 +174,9 @@ class PasoResumen_Activity : AppCompatActivity() {
                 formatearFecha(movimientoSalida.FechaMovimiento)
             } else "—"
 
+
             // Total de movimientos
             tvTotalMovimientosResumen.text = resumen.Movimientos.size.toString()
-
             layoutStatusResumen.visibility = View.VISIBLE
         }
     }
@@ -190,8 +185,7 @@ class PasoResumen_Activity : AppCompatActivity() {
             binding.layoutTrackingResumen.visibility = View.GONE
             return
         }
-
-        // <CHANGE> Convertir MovimientoCompleto a MovimientoTracking con nombres correctos
+        // Tracking con nombres
         val movimientosTracking = movimientos.map { mov ->
             MovimientoTracking(
                 fecha = mov.FechaMovimiento,
@@ -209,7 +203,7 @@ class PasoResumen_Activity : AppCompatActivity() {
                         append("Transporte: ${mov.NombreTransporte}")
                     }
                 },
-                usuario = "" // No viene en el query, dejar vacío
+               // usuario = "" // No viene en el query, dejar vacío
             )
         }
 
@@ -259,12 +253,11 @@ class PasoResumen_Activity : AppCompatActivity() {
             val primerMovimiento = movimientos.firstOrNull() ?: return 0
             val fechaEntrada = formatoFecha.parse(primerMovimiento.FechaMovimiento) ?: return 0
 
-            // <CHANGE> Buscar fecha de salida o usar fecha actual
             val movimientoSalida = movimientos.find {
                 it.NombreStatusMovimiento.contains("Salida", ignoreCase = true)
             }
 
-            // <CHANGE> Calcular diferencia correctamente
+            // resta
             val fechaSalidaMillis = if (movimientoSalida != null) {
                 val fechaSalidaDate = formatoFecha.parse(movimientoSalida.FechaMovimiento)
                 fechaSalidaDate?.time ?: System.currentTimeMillis()
