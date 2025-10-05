@@ -7,18 +7,19 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.negociomx_hyundai.BE.MovimientoTracking
 import com.example.negociomx_hyundai.R
+import com.example.negociomx_hyundai.Utils.Utils
 
 class TrackingAdapter(
     private var movimientos: List<MovimientoTracking>
 ) : RecyclerView.Adapter<TrackingAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvFecha: TextView = view.findViewById(R.id.tvFechaTracking)
-        val tvHora: TextView = view.findViewById(R.id.tvHoraTracking)
+        val tvFecha: TextView = view.findViewById(R.id.tvFechaHoraTracking)
         val tvStatus: TextView = view.findViewById(R.id.tvStatusTracking)
         val tvDetalle: TextView = view.findViewById(R.id.tvDetalleTracking)
-        val tvUsuario: TextView = view.findViewById(R.id.tvUsuarioTracking)
     }
+
+    val util=Utils()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -29,11 +30,19 @@ class TrackingAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val movimiento = movimientos[position]
 
-        holder.tvFecha.text = movimiento.fecha
-     //   holder.tvHora.text = movimiento.HoraMovimiento
+        var fechaHora:String=""
+        if(movimiento.fecha.toString().isNotEmpty()) {
+            fechaHora=util.formatearFecha(movimiento.fecha)
+        }
+
+        var detalles:String=""
+        if (movimiento.detalle.isNotEmpty()) {
+            detalles= movimiento.detalle
+        }
+
+        holder.tvFecha.text = fechaHora
         holder.tvStatus.text = movimiento.status
-        holder.tvDetalle.text = if (movimiento.detalle.isNotEmpty()) movimiento.detalle else "Sin detalles"
-        holder.tvUsuario.text = "Usuario: ${movimiento.usuario}"
+        holder.tvDetalle.text = detalles
     }
 
     override fun getItemCount() = movimientos.size

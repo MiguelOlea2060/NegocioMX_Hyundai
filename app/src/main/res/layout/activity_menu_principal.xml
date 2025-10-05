@@ -359,10 +359,10 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:src="@drawable/menu_adminusers_4px"
+                android:src="@drawable/status_estadia_50px"
                 android:id="@+id/imgMenuResumenPasos"
-                android:layout_width="64dp"
-                android:layout_height="wrap_content">
+                android:layout_width="60dp"
+                android:layout_height="60dp">
             </ImageView>
 
             <Button

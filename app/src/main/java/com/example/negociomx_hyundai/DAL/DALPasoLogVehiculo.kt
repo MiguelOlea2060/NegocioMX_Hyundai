@@ -1098,13 +1098,12 @@ class DALPasoLogVehiculo {
 
             val query = """
             SELECT v.VIN, v.IdVehiculo, v.IdMarca, ma.Nombre Marca, v.IdModelo, mo.Nombre Modelo, BL,
-                vc.IdColor idcolorexterior, cole.Nombre colorexterior, vc.IdColorInterior, coli.Nombre colorinterior,
-                plv.IdStatusActual,
-                pd.IdTransporte, trans.Nombre NombreTransporte, pd.IdStatus IdStatusMovimiento, s.Nombre as NombreStatusActual, 
-                sd.Nombre NombreStatusMovimiento,
-                pd.FechaMovimiento,
-                pd.IdBloque, blo.nombre NombreBloque, pd.Columna, pd.Fila,
-                pd.IdParteDanno, par.Nombre NombreParteDanno, pd.IdTipoMovimiento, tm.Nombre NombreTipoMovimiento
+                vc.IdColor idcolorexterior, cole.Nombre colorexterior, vc.IdColorInterior, 
+                coli.Nombre colorinterior, plv.IdStatusActual, pd.IdTransporte, trans.Nombre NombreTransporte,
+                pd.IdStatus IdStatusMovimiento, s.Nombre as NombreStatusActual, sd.Nombre NombreStatusMovimiento,
+                pd.FechaMovimiento, pd.IdBloque, blo.nombre NombreBloque, pd.Columna, pd.Fila,
+                pd.IdParteDanno, par.Nombre NombreParteDanno, pd.IdTipoMovimiento, 
+                tm.Nombre NombreTipoMovimiento
             FROM Vehiculo v
                 inner join dbo.VehiculoColor vc on v.IdVehiculo=vc.IdVehiculo
                 inner join dbo.Color cole on vc.IdColor=cole.IdColor
@@ -1158,8 +1157,8 @@ class DALPasoLogVehiculo {
                     FechaMovimiento = resultSet.getString("FechaMovimiento") ?: "",
                     IdBloque = resultSet.getObject("IdBloque") as? Int,
                     NombreBloque = resultSet.getString("NombreBloque") ?: "",
-                    Columna = resultSet.getObject("Columna") as? Short,
-                    Fila = resultSet.getObject("Fila") as? Short,
+                    Columna = resultSet.getShort("Columna") ?:0,
+                    Fila = resultSet.getShort("Fila") ?:0,
                     IdParteDanno = resultSet.getObject("IdParteDanno") as? Int,
                     NombreParteDanno = resultSet.getString("NombreParteDanno") ?: "",
                     IdTipoMovimiento = resultSet.getObject("IdTipoMovimiento") as? Int,

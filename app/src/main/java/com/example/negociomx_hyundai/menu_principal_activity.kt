@@ -304,6 +304,10 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, PasoResumen_Activity::class.java)
             startActivity(intent)
         }
+        binding.imgMenuResumenPasos.setOnClickListener{
+            val intent = Intent(this, PasoResumen_Activity::class.java)
+            startActivity(intent)
+        }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {

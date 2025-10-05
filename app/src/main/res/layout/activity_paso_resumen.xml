@@ -14,27 +14,42 @@
         android:orientation="vertical"
         android:padding="10dp">
 
+    <LinearLayout
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#1565C0"
+        android:orientation="horizontal"
+        android:padding="8dp"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:src="@drawable/regresar_icono_64x64"
+            android:id="@+id/btnRegresarResumen"
+            android:layout_width="48dp"
+            android:layout_height="48dp">
+
+        </ImageView>
         <!-- HEADER -->
         <TextView
-            android:padding="8dp"
-            android:background="@color/naranja_ligero"
-            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Estadía"
-            android:textSize="24sp"
+            android:text="Resumen de Vehiculo"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#2E7D32"
-            android:gravity="center"
-            android:layout_marginBottom="16dp" />
+            android:textColor="#FFFFFF"
+            android:gravity="center"/>
 
+    </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/card_background"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
+            android:padding="18dp"
+            android:layout_marginBottom="8dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -82,8 +97,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="#C8E6C9"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp"
+            android:padding="12dp"
+            android:layout_marginBottom="8dp"
             android:visibility="gone">
 
             <TextView
@@ -131,15 +146,6 @@
                 android:textColor="#1B5E20"
                 android:layout_marginBottom="4dp" />
 
-            <TextView
-                android:id="@+id/tvNumeroMotorResumen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Combustible: -"
-                android:textSize="14sp"
-                android:textColor="#1B5E20"
-                android:layout_marginBottom="4dp" />
-
             <View
                 android:layout_marginRight="10dp"
                 android:layout_marginLeft="10dp"
@@ -167,36 +173,43 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/card_background"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp"
+            android:padding="12dp"
+            android:layout_marginBottom="10dp"
             android:visibility="gone">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⚡ Actual"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#FF6F00"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:id="@+id/tvStatusActualResumen"
+            <LinearLayout
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Posicionado, Col.: 4, Fila: 5"
-                android:textSize="14sp"
-                android:textColor="#424242"
-                android:layout_marginBottom="4dp" />
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/tvFechaMovimientoResumen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="10/09/2025 09:20"
-                android:textSize="14sp"
-                android:textColor="#424242"
-                android:layout_marginBottom="12dp" />
+                <TextView
+                    android:layout_width="90dp"
+                    android:layout_height="wrap_content"
+                    android:text="⚡ Actual: "
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#FF6F00"/>
+
+                <TextView
+                    android:layout_weight="1"
+                    android:textStyle="bold"
+                    android:id="@+id/tvStatusActualResumen"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Posicionado, Col.: 4, Fila: 5"
+                    android:textSize="18sp"
+                    android:textColor="#424242"/>
+
+                <TextView
+                    android:id="@+id/tvFechaMovimientoResumen"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:text="10/09/2025 09:20"
+                    android:textSize="16sp"
+                    android:textColor="#424242"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -294,8 +307,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvTrackingMovimientos"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
@@ -355,8 +367,7 @@
                 android:text="El vehículo no existe o no tiene un status válido para posicionado."
                 android:textColor="#C62828"
                 android:textSize="14sp"
-                android:gravity="center"
-                />
+                android:gravity="center"/>
 
         </LinearLayout>
 

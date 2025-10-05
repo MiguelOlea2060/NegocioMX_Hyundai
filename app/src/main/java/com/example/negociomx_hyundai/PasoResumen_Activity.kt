@@ -17,6 +17,7 @@ import com.example.negociomx_hyundai.BE.ResumenCompletoConQuery
 import com.example.negociomx_hyundai.BE.Vehiculo
 import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
 import com.example.negociomx_hyundai.DAL.DALVehiculo
+import com.example.negociomx_hyundai.Utils.Utils
 import com.example.negociomx_hyundai.adapters.TrackingAdapter
 import com.example.negociomx_hyundai.databinding.ActivityPasoResumenBinding
 import com.google.zxing.integration.android.IntentIntegrator
@@ -34,6 +35,7 @@ class PasoResumen_Activity : AppCompatActivity() {
     private val dalVehiculo = DALVehiculo()
     private val dalPasoLog = DALPasoLogVehiculo()
 
+    val util=Utils()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -69,8 +71,9 @@ class PasoResumen_Activity : AppCompatActivity() {
             }
             consultarVehiculo(vin)
         }
-
-
+        binding.btnRegresarResumen.setOnClickListener {
+            finish()
+        }
     }
 
     private fun configurarRecyclerView() {
@@ -79,17 +82,6 @@ class PasoResumen_Activity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(this@PasoResumen_Activity)
             adapter = trackingAdapter
         }
-    }
-
-    private fun iniciarEscaneoQR() {
-        val integrator = IntentIntegrator(this)
-        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
-        integrator.setPrompt("Escanea el código QR del vehículo")
-        integrator.setCameraId(0)
-        integrator.setBeepEnabled(true)
-        integrator.setBarcodeImageEnabled(false)
-        integrator.setOrientationLocked(false)
-        integrator.initiateScan()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -158,12 +150,12 @@ class PasoResumen_Activity : AppCompatActivity() {
                 tvStatusActualResumen.text = statusTexto
 
                 // Fecha del último movimiento
-                tvFechaMovimientoResumen.text = formatearFecha(ultimoMovimiento.FechaMovimiento)
+                tvFechaMovimientoResumen.text =util.formatearFecha(ultimoMovimiento.FechaMovimiento)
             }
 
             val primerMovimiento = resumen.Movimientos.firstOrNull()
             tvFechaEntradaResumen.text = if (primerMovimiento != null) {
-                formatearFecha(primerMovimiento.FechaMovimiento)
+                util.formatearFecha(primerMovimiento.FechaMovimiento)
             } else "—"
 
 
@@ -171,12 +163,14 @@ class PasoResumen_Activity : AppCompatActivity() {
                 it.NombreStatusMovimiento.contains("Salida", ignoreCase = true)
             }
             tvFechaSalidaResumen.text = if (movimientoSalida != null) {
-                formatearFecha(movimientoSalida.FechaMovimiento)
+                util.formatearFecha(movimientoSalida.FechaMovimiento)
             } else "—"
 
 
             // Total de movimientos
-            tvTotalMovimientosResumen.text = resumen.Movimientos.size.toString()
+            val totalMovimientos=resumen.Movimientos.filter { it.IdStatusMovimiento!=168
+                    && it.IdStatusMovimiento!=169}.count()
+            tvTotalMovimientosResumen.text = totalMovimientos.toString()
             layoutStatusResumen.visibility = View.VISIBLE
         }
     }
@@ -191,19 +185,29 @@ class PasoResumen_Activity : AppCompatActivity() {
                 fecha = mov.FechaMovimiento,
                 status = mov.NombreStatusMovimiento,
                 detalle = buildString {
-                    if (mov.NombreBloque.isNotEmpty()) {
-                        append("${mov.NombreBloque} Col. ${mov.Columna}, Fila ${mov.Fila}")
+                    if(mov.IdStatusMovimiento==168) {
+                        append("Ingresado por: ${mov.NombreTransporte}")
                     }
-                    if (mov.NombreParteDanno.isNotEmpty()) {
-                        if (isNotEmpty()) append(" - ")
-                        append("Parte: ${mov.NombreParteDanno}")
+                    else if(mov.IdStatusMovimiento==169) {
+                        append("Retirado por: ${mov.NombreTransporte}")
                     }
-                    if (mov.NombreTransporte.isNotEmpty()) {
-                        if (isNotEmpty()) append(" - ")
-                        append("Transporte: ${mov.NombreTransporte}")
+                    else if(mov.IdStatusMovimiento==170) {//STATUS -> POSICIONADO
+                        if (mov.NombreBloque.isNotEmpty()) {
+                            append("${mov.NombreBloque} Col. ${mov.Columna}, Fila ${mov.Fila}")
+                        }
+                    }
+                    else if(mov.IdStatusMovimiento==171) {//// EN TALLER
+                        if (mov.NombreParteDanno.isNotEmpty()) {
+                            if (isNotEmpty()) append(" - ")
+                            append("Parte: ${mov.NombreParteDanno}")
+                        }
+                    }
+                    else if(mov.IdStatusMovimiento==172) {///MOVIMIENTO LOCAL
+                        if (mov.NombreTipoMovimiento.isNotEmpty()) {
+                            append("${mov.NombreTipoMovimiento}")
+                        }
                     }
                 },
-               // usuario = "" // No viene en el query, dejar vacío
             )
         }
 
@@ -235,16 +239,6 @@ class PasoResumen_Activity : AppCompatActivity() {
         }
     }
 
-    private fun formatearFecha(fecha: String): String {
-        return try {
-            val formatoEntrada = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-            val formatoSalida = SimpleDateFormat("dd/MMM/yyyy HH:mm", Locale.getDefault())
-            val date = formatoEntrada.parse(fecha)
-            formatoSalida.format(date!!)
-        } catch (e: Exception) {
-            fecha
-        }
-    }
     private fun calcularDiasEstadia(movimientos: List<MovimientoCompleto>): Int {
         if (movimientos.isEmpty()) return 0
 
