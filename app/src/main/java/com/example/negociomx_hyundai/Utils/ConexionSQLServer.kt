@@ -5,17 +5,18 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 object ConexionSQLServer {
-    private const val SERVER = "P3NWPLSK12SQL-v13.shr.prod.phx3.secureserver.net"
-    private const val DATABASE = "NegocioMX_Concentradora"
-    private const val USERNAME = "NegocioMX_Concentradora"
-    private const val PASSWORD = "NITr11ziu7#"
+    private const val SERVER = "179.61.12.164"
+    private const val DATABASE = "softsyst_n3goc10_hyunda1"
+    private const val USERNAME = "softsyst_samx02"
+    private const val PASSWORD = "NITr11ziu7#.MXL1z34@"
     private const val PORT = "1433"
 
     fun obtenerConexion(): Connection? {
         return try {
             Class.forName("net.sourceforge.jtds.jdbc.Driver")
 
-            val connectionString = "jdbc:jtds:sqlserver://$SERVER:$PORT/$DATABASE;instance=SQLEXPRESS;user=$USERNAME;password=$PASSWORD"
+            val connectionString = "jdbc:jtds:sqlserver://$SERVER:$PORT/$DATABASE;instance=SQLEXPRESS;user=$USERNAME;" +
+                    "password=$PASSWORD"
 
             Log.d("ConexionSQLServer", "🔗 Intentando conectar a: $SERVER")
 

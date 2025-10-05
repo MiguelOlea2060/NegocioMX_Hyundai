@@ -146,7 +146,7 @@ class acceso_activity : AppCompatActivity() {
                             Log.e("AccesoActivity", "❌ LOGIN FALLIDO")
                             mainHandler.post {
                                 resetLoginUI()
-                                bllUtil.MessageShow(this, "El usuario o contraseña son incorrectas, o hay un problema de conectividad con Firebase.", "Aviso") { res -> }
+                                bllUtil.MessageShow(this, "El usuario o contraseña son incorrectas, o hay un problema de conectividad con la Base de datos.", "Aviso") { res -> }
                             }
                         }
                     }
