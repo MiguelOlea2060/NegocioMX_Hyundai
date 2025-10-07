@@ -1,6 +1,7 @@
 package com.example.negociomx_hyundai.DAL
 
 import android.util.Log
+import com.example.negociomx_hyundai.BE.CfgGlo
 import com.example.negociomx_hyundai.BE.Usuario
 import com.example.negociomx_hyundai.BE.UsuarioNube
 import com.example.negociomx_hyundai.Utils.ConexionSQLServer
@@ -11,41 +12,65 @@ import java.sql.ResultSet
 
 class DALUsuarioSQL {
 
-    suspend fun getUsuarioByEmailAndPassword(email: String, password: String): UsuarioNube? = withContext(Dispatchers.IO) {
+    suspend fun getUsuarioByEmailAndPassword(email: String): Pair<UsuarioNube?,CfgGlo?>
+    = withContext(Dispatchers.IO) {
         Log.d("DALUsuarioSQL", "🔍 Buscando usuario: $email")
 
         var usuario: UsuarioNube? = null
+        var cfg: CfgGlo? = null
         var connection = ConexionSQLServer.obtenerConexion()
 
         try {
             if (connection != null) {
                 val query = """
-                    SELECT u.IdUsuario, u.NombreCompleto, u.Email, u.IdRol, u.IdEmpresa, u.Activo, u.CuentaVerificada
-                        , u.Contrasena, e.razonsocial, e.nombrecomercial, e.Rfc
-                    FROM Usuario u with (nolock) left join dbo.empresa e on u.idempresa=e.idempresa 
-                    WHERE Email = ? AND Contrasena = ? AND Activo = 1
+                SELECT u.IdUsuario, u.NombreCompleto, u.Email, u.IdRol, u.IdEmpresa, u.Activo, u.CuentaVerificada
+                    , u.Contrasena, e.razonsocial, e.nombrecomercial, e.Rfc, c.ManejaGuardadoArxhivosEnBD
+                    , c.ManejaSeleccionBloquePosXTablero, c.FormatoCarpetaArchivos, c.IdCfgApp, c.IdConfiguracion
+                    , c.reglasnotificaciones, c.urlguardadoarchivos
+                FROM Usuario u with (nolock) left join dbo.empresa e on u.idempresa=e.idempresa
+                    left join dbo.CfgApp c on u.IdEmpresa=c.IdEmpresa
+                WHERE Email = ? AND Activo = 1
+
                 """
 
                 val statement: PreparedStatement = connection.prepareStatement(query)
                 statement.setString(1, email)
-                statement.setString(2, password) // En producción, usar hash
+                //statement.setString(2, password) // En producción, usar hash
 
                 val resultSet: ResultSet = statement.executeQuery()
 
                 if (resultSet.next()) {
+                    val idEmpresa=resultSet.getInt("IdEmpresa")
+                    val rfcEmpresa=resultSet.getString("Rfc")?:""
                     usuario = UsuarioNube().apply {
                         Id = resultSet.getInt("IdUsuario").toString()
                         NombreCompleto = resultSet.getString("NombreCompleto")
                         Email = resultSet.getString("Email")
                         IdRol = resultSet.getInt("IdRol").toString()
-                        IdEmpresa = resultSet.getInt("IdEmpresa").toString()
+                        IdEmpresa = idEmpresa.toString()
                         Activo = resultSet.getBoolean("Activo")
                         CuentaVerificada = resultSet.getBoolean("CuentaVerificada")
                         Password = resultSet.getString("Contrasena")
 
                         NombreComercialEmpresa=resultSet.getString("NombreComercial")?:""
                         RazonSocialEmpresa=resultSet.getString("RazonSocial")?:""
-                        RfcEmpresa=resultSet.getString("Rfc")?:""
+                        RfcEmpresa=rfcEmpresa
+                    }
+                    val idCfgApp=resultSet.getShort("IdCfgApp")?:0
+                    if(idCfgApp>0) {
+                        cfg = CfgGlo(
+                            IdCfgApp = idCfgApp,
+                            IdConfiguracion = resultSet.getInt("IdCfgApp")?:0,
+                            IdEmpresa = idEmpresa,
+                            ManejaSeleccionBloquePosXTablero = resultSet.getBoolean("ManejaSeleccionBloquePosXTablero")?:false,
+                            urlGuardadoArchivos = resultSet.getString("urlguardadoarchivos")?:"",
+                            ManejaGuardadoArchivosEnBD = resultSet.getBoolean("ManejaGuardadoArxhivosEnBD")?:false,
+                            FormatoCarpetaArchivos = resultSet.getString("FormatoCarpetaArchivos")?:"",
+                            ReglasNotificaciones = resultSet.getString("reglasnotificaciones")?:"",
+                            RfcEmpresa = rfcEmpresa,
+                            ManejaSeleccionObsMovimientoLocal = resultSet.getBoolean("ManejaSeleccionObsMovimientoLocal")?:false,
+                            ManejaSeleccionObsEnTaller = resultSet.getBoolean("ManejaSeleccionObsEnTaller")?:false
+                        )
                     }
                     Log.d("DALUsuarioSQL", "✅ Usuario encontrado: ${usuario.NombreCompleto}")
                 }
@@ -59,7 +84,7 @@ class DALUsuarioSQL {
             connection?.close()
         }
 
-        return@withContext usuario
+        return@withContext Pair(usuario,cfg)
     }
 
     suspend fun getUsuarioByEmail(email: String): Usuario? = withContext(Dispatchers.IO) {

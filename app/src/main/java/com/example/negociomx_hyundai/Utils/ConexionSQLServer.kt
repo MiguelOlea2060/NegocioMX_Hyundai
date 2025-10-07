@@ -5,7 +5,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 object ConexionSQLServer {
-    private const val SERVER = "179.61.12.164"
+    private const val SERVER = "softsystemmx.com"
     private const val DATABASE = "softsyst_n3goc10_hyunda1"
     private const val USERNAME = "softsyst_samx02"
     private const val PASSWORD = "NITr11ziu7#.MXL1z34@"

@@ -13,6 +13,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.negociomx_hyundai.BE.CfgGlo
 import com.example.negociomx_hyundai.BE.UsuarioNube
+import com.example.negociomx_hyundai.BLL.BLLCifrado
 import com.example.negociomx_hyundai.DAL.DALDispotivioAcceso
 import com.example.negociomx_hyundai.DAL.DALUsuario
 import com.example.negociomx_hyundai.Utils.ParametrosSistema
@@ -40,6 +41,8 @@ class acceso_activity : AppCompatActivity() {
 
     private var loginInProgress = false
     private val mainHandler = Handler(Looper.getMainLooper())
+
+    val bllCif=BLLCifrado()
 
     private  val  startForResult=
         registerForActivityResult(ActivityResultContracts.StartActivityForResult())
@@ -136,7 +139,11 @@ class acceso_activity : AppCompatActivity() {
                             prefs.saveUsername(nombreUsuarioEmail)
                             prefs.savePassword(pwd)
 
-                            ParametrosSistema.CfgGloSql= CfgGlo(ManejaSeleccionBloquePosXTablero = true)
+                            ParametrosSistema.CfgGloSql= CfgGlo(ManejaSeleccionBloquePosXTablero = true,
+                                urlGuardadoArchivos = "",
+                                FormatoCarpetaArchivos = "",
+                                ManejaGuardadoArchivosEnBD = false,
+                                RfcEmpresa = "")
                             mainHandler.post {
                                 val intent = Intent(applicationContext, menu_principal_activity::class.java)
                                 startForResult.launch(intent)
@@ -190,23 +197,31 @@ class acceso_activity : AppCompatActivity() {
 
         CoroutineScope(Dispatchers.Main).launch {
             try {
-                val usuario = dalUsuSQL.getUsuarioByEmailAndPassword(email, pwd)
+                val (usuario,cfg) = dalUsuSQL.getUsuarioByEmailAndPassword(email)
 
                 if (usuario != null) {
+ /*                   val cadCifrada= bllCif.cifrar(usuario?.Password!!)
+                    val cadDes= bllCif.cifrar(cadCifrada!!)*/
+
                     Log.d("AccesoActivity", "✅ Usuario encontrado en SQL Server")
                     Log.d("AccesoActivity", "👤 Usuario: ${usuario.Email}")
                     Log.d("AccesoActivity", "🟢 Activo: ${usuario.Activo}")
                     Log.d("AccesoActivity", "✅ Verificado: ${usuario.CuentaVerificada}")
 
                     // Validar estado del usuario
-                    if (usuario.CuentaVerificada != true) {
+                    if (!usuario.Password.equals(pwd)) {
+                        Log.w("AccesoActivity", "⚠️ Acceso invalido")
+                        bllUtil.MessageShow(this@acceso_activity, "El usuario o la contraseña son incorrectas. Favor de verificarlo", "Aviso") { res -> }
+                        onLoginFinish(false)
+                        return@launch
+                    }
+                    else if (usuario.CuentaVerificada != true) {
                         Log.w("AccesoActivity", "⚠️ Cuenta no verificada")
                         bllUtil.MessageShow(this@acceso_activity, "La cuenta no se encuentra verificada. Comunicarse con el Administrador", "Aviso") { res -> }
                         onLoginFinish(false)
                         return@launch
                     }
-
-                    if (usuario.Activo != true) {
+                    else if (usuario.Activo != true) {
                         Log.w("AccesoActivity", "⚠️ Cuenta no activa")
                         bllUtil.MessageShow(this@acceso_activity, "La cuenta no se encuentra Activa. Comunicarse con el Administrador", "Aviso") { res -> }
                         onLoginFinish(false)
@@ -214,6 +229,8 @@ class acceso_activity : AppCompatActivity() {
                     }
 
                     // Configurar usuario logueado
+                    ParametrosSistema.CfgGloSql=cfg
+
                     ParametrosSistema.usuarioLogueado = usuario
                     Log.d("AccesoActivity", "✅ Login exitoso")
                     onLoginFinish(true)
