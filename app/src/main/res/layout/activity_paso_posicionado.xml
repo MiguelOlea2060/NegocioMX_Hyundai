@@ -8,7 +8,7 @@
     tools:context=".PasoPosicionado_Activity">
 
     <LinearLayout
-        android:id="@+id/main"
+        android:id="@+id/mainPosicionado"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -44,10 +44,10 @@
 
         <!-- INFORMACIÓN DEL VEHÍCULO -->
         <LinearLayout
-            android:id="@+id/layoutInfoVehiculo"
+            android:id="@+id/layoutInfoVehiculoPosicionado"
+            android:background="@drawable/edittext_background"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
             android:orientation="vertical"
             android:padding="16dp"
             android:layout_marginBottom="16dp"
@@ -65,8 +65,8 @@
                 android:layout_marginBottom="12dp" />
 
             <TextView
+                android:id="@+id/tvVinVehiculoPosicionado"
                 android:background="@drawable/edittext_background"
-                android:id="@+id/tvVinVehiculo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Vin: "
@@ -76,7 +76,7 @@
                 />
 
             <TextView
-                android:id="@+id/tvBlVehiculo"
+                android:id="@+id/tvBlVehiculoPosicionado"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="BL: "
@@ -86,7 +86,7 @@
                 android:layout_marginBottom="4dp" />
 
             <TextView
-                android:id="@+id/tvMarcaModeloAnnio"
+                android:id="@+id/tvMarcaModeloAnnioPosicionado"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Marca:    Modelo:     Año: "
@@ -100,7 +100,7 @@
                 android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tvColorExterior"
+                android:id="@+id/tvColorExteriorPosicionado"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -109,7 +109,7 @@
                 android:textColor="#37474F" />
 
             <TextView
-                android:id="@+id/tvColorInteriorVehiculo"
+                android:id="@+id/tvColorInteriorVehiculoPosicionado"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -159,14 +159,14 @@
 
                 <Spinner
                     android:layout_weight="1"
-                    android:id="@+id/spinnerBloque"
+                    android:id="@+id/spinnerBloquePosicionado"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:background="@drawable/edittext_border" />
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/llSeleccionaPosicionTablero"
+                android:id="@+id/llSeleccionaPosicionTableroPosicionado"
                 android:layout_marginBottom="10dp"
                 android:gravity="center_vertical"
                 android:orientation="vertical"
@@ -181,8 +181,8 @@
 
                 </Button>
                 <TextView
+                    android:id="@+id/lblBloquePosicionSeleccionadaPosicionado"
                     android:layout_marginTop="10dp"
-                    android:id="@+id/lblBloquePosicionSeleccionada"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Bloque, posición a seleccionar"
@@ -193,7 +193,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/llSeleccionaPosicionSpinner"
+                android:id="@+id/llSeleccionaPosicionSpinnerPosicionado"
                 android:layout_marginBottom="10dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -209,8 +209,8 @@
                     android:textStyle="bold"/>
 
                 <Spinner
+                    android:id="@+id/spinnerPosicionPosicionado"
                     android:layout_weight="1"
-                    android:id="@+id/spinnerPosicion"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:background="@drawable/edittext_border"/>
@@ -232,14 +232,14 @@
                 android:layout_marginBottom="8dp" />
 
             <Spinner
-                android:id="@+id/spinnerPersonal"
+                android:id="@+id/spinnerPersonalPosicionado"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/edittext_border"
                 android:layout_marginBottom="12dp" />
 
             <TextView
-                android:id="@+id/tvEmpleadoReceptor"
+                android:id="@+id/tvEmpleadoReceptorPosicionado"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Empleado receptor: [Se llenará automáticamente]"
@@ -247,8 +247,8 @@
                 android:layout_marginBottom="12dp" />
 
             <TextView
+                android:id="@+id/tvFechaMovimientoPosicionado"
                 android:textStyle="bold"
-                android:id="@+id/tvFechaMovimiento"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Fecha de movimiento: [Se llenará automáticamente]"
@@ -261,8 +261,8 @@
                 android:layout_height="2dp"/>
 
             <Button
-                android:layout_marginTop="10dp"
                 android:id="@+id/btnGuardarPosicionado"
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:text="GUARDAR"
@@ -273,7 +273,7 @@
 
         <!-- OVERLAY DE CARGA -->
         <LinearLayout
-            android:id="@+id/loadingContainer"
+            android:id="@+id/loadingContainerPosicionado"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -285,14 +285,14 @@
             android:layout_marginTop="16dp">
 
             <ProgressBar
-                android:id="@+id/progressBar"
+                android:id="@+id/progressBarPosicionado"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 style="?android:attr/progressBarStyleLarge"
                 android:indeterminateTint="#1565C0" />
 
             <TextView
-                android:id="@+id/tvLoadingText"
+                android:id="@+id/tvLoadingTextPosicionado"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -302,7 +302,7 @@
                 android:textColor="#1565C0" />
 
             <TextView
-                android:id="@+id/tvLoadingSubtext"
+                android:id="@+id/tvLoadingSubtextPosicionado"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -314,7 +314,7 @@
 
         <!-- MENSAJE DE ERROR -->
         <LinearLayout
-            android:id="@+id/layoutError"
+            android:id="@+id/layoutErrorPosicionado"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#FFFFFF"
@@ -334,7 +334,7 @@
                 android:layout_marginBottom="12dp" />
 
             <TextView
-                android:id="@+id/tvMensajeError"
+                android:id="@+id/tvMensajeErrorPosicionado"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="El vehículo no existe o no tiene un status válido para posicionado."

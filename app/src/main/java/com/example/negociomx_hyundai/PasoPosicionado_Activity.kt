@@ -37,7 +37,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class PasoPosicionado_Activity : AppCompatActivity() {
-
     private lateinit var binding: ActivityPasoPosicionadoBinding
     private val dalPasoLog = DALPasoLogVehiculo()
     private val dalCliente = DALCliente()
@@ -45,26 +44,13 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private var vehiculoActual: VehiculoPasoLog? = null
     private var statusActual: PasoLogVehiculoDet? = null
     private var empleados = listOf<Empleado>()
-
-    // Variables para overlay de carga
-    private lateinit var loadingContainer: LinearLayout
-    private lateinit var tvLoadingText: TextView
-    private lateinit var tvLoadingSubtext: TextView
-
-   // var IdVehiculo: Int? = null
     var bllBlo: BLLBloque? = null
-
-    // Variables para hora dinámica
     private lateinit var timerHandler: Handler
     private lateinit var timerRunnable: Runnable
-
     var fechaActual: String = ""
     private lateinit var bloques: List<Bloque>
     private var posiciones = listOf<PosicionBloque>()
-
     val gson = Gson()
-
-    // Variable para manejar resultado de selección de posición
     private val seleccionPosicionLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -85,7 +71,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         binding = ActivityPasoPosicionadoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainPosicionado)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -97,24 +83,17 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         inicializarComponentes()
         configurarEventos()
         cargarDatosIniciales()
-        inicializarHoraDinamica()
     }
 
     private fun inicializarComponentes() {
         if (ParametrosSistema.CfgGloSql != null &&
             ParametrosSistema.CfgGloSql?.ManejaSeleccionBloquePosXTablero == true
-        )
-            leeBloquesSistema()
-
-        loadingContainer = findViewById(R.id.loadingContainer)
-        tvLoadingText = findViewById(R.id.tvLoadingText)
-        tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
-        binding.tvEmpleadoReceptor.text = "Empleado receptor: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
-
+        )leeBloquesSistema()
+        binding.tvEmpleadoReceptorPosicionado.text = "Empleado receptor: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
+        inicializarHoraDinamica()
     }
 
     private fun configurarEventos() {
-        // Botón guardar posicionado
         binding.btnGuardarPosicionado.setOnClickListener {
             guardarStatusPosicionado()
         }
@@ -134,38 +113,33 @@ class PasoPosicionado_Activity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                // Obtener datos del vehículo por Intent
                 obtenerDatosVehiculo()
-
 
                 empleados = dalEmp.consultarEmpleados(105,null)
                 // Cargar personal
                 cargarPersonal()
 
-
                 if(ParametrosSistema.CfgGloSql!=null &&
                     ParametrosSistema?.CfgGloSql!!.ManejaSeleccionBloquePosXTablero==true) {
-                    binding.llSeleccionaPosicionTablero.visibility = View.VISIBLE
-                    binding.llSeleccionaPosicionSpinner.visibility=View.GONE
+                    binding.llSeleccionaPosicionTableroPosicionado.visibility = View.VISIBLE
+                    binding.llSeleccionaPosicionSpinnerPosicionado.visibility=View.GONE
                     binding.llSeleccionBloquesPosicionado.visibility=View.GONE
                 }
                 else{
-                    binding.llSeleccionaPosicionTablero.visibility = View.GONE
-                    binding.llSeleccionaPosicionSpinner.visibility=View.VISIBLE
+                    binding.llSeleccionaPosicionTableroPosicionado.visibility = View.GONE
+                    binding.llSeleccionaPosicionSpinnerPosicionado.visibility=View.VISIBLE
                     binding.llSeleccionBloquesPosicionado.visibility=View.VISIBLE
-                    // <CHANGE> Cargar datos para spinners
                     cargarBloques()
                 }
 
-
                 ocultarCarga()
                 mostrarFormularios()
-                Log.d("PasoSalida_Activity", "✅ Datos iniciales cargados correctamente")
+                Log.d("PasoPosicionado_Activity", "✅ Datos iniciales cargados correctamente")
 
             } catch (e: Exception) {
                 ocultarCarga()
                 mostrarError("Error cargando datos iniciales: ${e.message}")
-                Log.e("PasoSalida_Activity", "Error cargando datos: ${e.message}")
+                Log.e("PasoPosicionado_Activity", "Error cargando datos: ${e.message}")
             }
         }
     }
@@ -193,12 +167,12 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         vehiculoActual?.let { vehiculo ->
             // <CHANGE> Optimizado usando apply para reducir accesos al binding
             binding.apply {
-                tvVinVehiculo.text = "VIN: ${vehiculo.VIN}"
-                tvBlVehiculo.text = "BL: ${vehiculo.BL}"
-                tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones}   Año: ${vehiculo.Anio}"
-                tvColorExterior.text = "Color Ext: ${vehiculo.ColorExterior}"
-                tvColorInteriorVehiculo.text = "Color Int: ${vehiculo.ColorInterior}"
-                layoutInfoVehiculo.visibility = View.VISIBLE
+                tvVinVehiculoPosicionado.text = "VIN: ${vehiculo.VIN}"
+                tvBlVehiculoPosicionado.text = "BL: ${vehiculo.BL}"
+                tvMarcaModeloAnnioPosicionado.text = "${vehiculo.Especificaciones}   Año: ${vehiculo.Anio}"
+                tvColorExteriorPosicionado.text = "Color Ext: ${vehiculo.ColorExterior}"
+                tvColorInteriorVehiculoPosicionado.text = "Color Int: ${vehiculo.ColorInterior}"
+                layoutInfoVehiculoPosicionado.visibility = View.VISIBLE
             }
         }
     }
@@ -206,19 +180,12 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private fun mostrarFormularios() {
         // <CHANGE> Mostrar información del vehículo cuando se muestran los formularios
         binding.layoutFormularioPosicionado.visibility = View.VISIBLE
-        binding.layoutError.visibility = View.GONE
+        binding.layoutErrorPosicionado.visibility = View.GONE
         Toast.makeText(this, "✅ Vehículo válido para status->Posicionado", Toast.LENGTH_SHORT).show()
     }
 
 
     private fun inicializarFormulario() {
-
-
-     /*   if(vehiculoActual!=null && vehiculoActual?.Id?.toInt()!!>0) {
-            binding.tvVinVehiculo.setText(vehiculoActual?.VIN)
-        }*/
-
-
         mostrarInformacionVehiculo(vehiculoActual!!)
         mostrarFormularioPosicionado()
     }
@@ -233,18 +200,18 @@ class PasoPosicionado_Activity : AppCompatActivity() {
 
     private fun mostrarInformacionVehiculo(vehiculo: VehiculoPasoLog) {
         binding.apply {
-            tvVinVehiculo.text = "VIN: ${vehiculo.VIN}"
-            tvBlVehiculo.text = "BL: ${vehiculo.BL}"
-            tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones}, Año: ${vehiculo.Anio}"
-            tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
-            tvColorInteriorVehiculo.text = "Color Int.: ${vehiculo.ColorInterior}"
-            layoutInfoVehiculo.visibility = View.VISIBLE
+            tvVinVehiculoPosicionado.text = "VIN: ${vehiculo.VIN}"
+            tvBlVehiculoPosicionado.text = "BL: ${vehiculo.BL}"
+            tvMarcaModeloAnnioPosicionado.text = "${vehiculo.Especificaciones}, Año: ${vehiculo.Anio}"
+            tvColorExteriorPosicionado.text = "Color Ext.: ${vehiculo.ColorExterior}"
+            tvColorInteriorVehiculoPosicionado.text = "Color Int.: ${vehiculo.ColorInterior}"
+            layoutInfoVehiculoPosicionado.visibility = View.VISIBLE
         }
     }
 
     private fun mostrarFormularioPosicionado() {
         binding.layoutFormularioPosicionado.visibility = View.VISIBLE
-        binding.layoutError.visibility = View.GONE
+        binding.layoutErrorPosicionado.visibility = View.GONE
         Toast.makeText(this, "✅ Vehículo válido para posicionado", Toast.LENGTH_SHORT).show()
     }
 
@@ -262,7 +229,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
 
                 if(ParametrosSistema.CfgGloSql!=null &&
                     ParametrosSistema.CfgGloSql?.ManejaSeleccionBloquePosXTablero==false) {
-                    val posicionBloque = binding.spinnerBloque.selectedItemPosition
+                    val posicionBloque = binding.spinnerBloquePosicionado.selectedItemPosition
                     val bloque = bloques[posicionBloque - 1]
                     idBloque = bloque.IdBloque
                     nombreBloque=bloque.Nombre
@@ -274,7 +241,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                     nombreBloque=bloque.Nombre
                 }
 
-                val posicionEmpleado=binding.spinnerPersonal.selectedItemPosition
+                val posicionEmpleado=binding.spinnerPersonalPosicionado.selectedItemPosition
                 val empleado= empleados[posicionEmpleado-1]
                 val idEmpleadoPosiciono=empleado.IdEmpleado
                 val nombrePersonalMovimiento = empleado.NombreCompleto
@@ -340,7 +307,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
 
     private fun validarFormularioPosicionado(): Boolean {
         if (ParametrosSistema.CfgGloSql?.ManejaSeleccionBloquePosXTablero==false &&
-            binding.spinnerBloque.selectedItemPosition == 0) {
+            binding.spinnerBloquePosicionado.selectedItemPosition == 0) {
             Toast.makeText(this, "Seleccione el bloque", Toast.LENGTH_SHORT).show()
             return false
         }
@@ -348,7 +315,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
             Toast.makeText(this, "Seleccione la posición", Toast.LENGTH_SHORT).show()
             return false
         }
-        if (binding.spinnerPersonal.selectedItemPosition == 0) {
+        if (binding.spinnerPersonalPosicionado.selectedItemPosition == 0) {
             Toast.makeText(this, "Seleccione el personal que lo manejará", Toast.LENGTH_SHORT).show()
             return false
         }
@@ -362,7 +329,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
             override fun run() {
                 fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
                 val fechaActualAux = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
-                binding.tvFechaMovimiento.text = "Fecha actual: $fechaActualAux"
+                binding.tvFechaMovimientoPosicionado.text = "Fecha actual: $fechaActualAux"
                 timerHandler.postDelayed(this, 1000)
             }
         }
@@ -390,7 +357,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                     nombresPersonal
                 )
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.spinnerPersonal.adapter = adapter
+                binding.spinnerPersonalPosicionado.adapter = adapter
 
             } catch (e: Exception) {
                 Log.e("PasoPosicionado", "Error cargando personal: ${e.message}")
@@ -400,18 +367,22 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     }
 
     private fun mostrarCargaGuardado() {
-        loadingContainer.visibility = View.VISIBLE
-        binding.btnGuardarPosicionado.isEnabled = false
-        binding.btnGuardarPosicionado.alpha = 0.5f
+        binding.apply {
+            loadingContainerPosicionado.visibility = View.VISIBLE
+            btnGuardarPosicionado.isEnabled = false
+            btnGuardarPosicionado.alpha = 0.5f
+            tvLoadingTextPosicionado.text = "Guardando posicionado..."
+            tvLoadingSubtextPosicionado.text = "Actualizando status del vehículo"
+        }
 
-        tvLoadingText.text = "Guardando posicionado..."
-        tvLoadingSubtext.text = "Actualizando status del vehículo"
     }
 
     private fun ocultarCargaGuardado() {
-        loadingContainer.visibility = View.GONE
-        binding.btnGuardarPosicionado.isEnabled = true
-        binding.btnGuardarPosicionado.alpha = 1.0f
+        binding.apply {
+            loadingContainerPosicionado.visibility = View.GONE
+            btnGuardarPosicionado.isEnabled = true
+            btnGuardarPosicionado.alpha = 1.0f
+        }
     }
 
     private fun leeBloquesSistema() {
@@ -442,9 +413,9 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                     nombresBloques
                 )
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.spinnerBloque.adapter = adapter
+                binding.spinnerBloquePosicionado.adapter = adapter
 
-                binding.spinnerBloque.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                binding.spinnerBloquePosicionado.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                         if (position > 0) {
                             // Abrir pantalla gráfica de posiciones
@@ -453,7 +424,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                             else
                                 cargarPosiciones(position )
                         } else {
-                            binding.spinnerPosicion.adapter = null
+                            binding.spinnerPosicionPosicionado.adapter = null
                             posicionSeleccionadaManual = null
                         }
                     }
@@ -484,7 +455,7 @@ class PasoPosicionado_Activity : AppCompatActivity() {
                     nombresPosiciones
                 )
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                binding.spinnerPosicion.adapter = adapter
+                binding.spinnerPosicionPosicionado.adapter = adapter
 
             } catch (e: Exception) {
                 Log.e("PasoPosicionado", "Error cargando posiciones: ${e.message}")
@@ -496,12 +467,11 @@ class PasoPosicionado_Activity : AppCompatActivity() {
 
 
     private fun mostrarCarga(mensaje: String, submensaje: String = "") {
-        // <CHANGE> Optimizado usando apply para reducir accesos al binding
         binding.apply {
-            loadingContainer.visibility = View.VISIBLE
-            tvLoadingText.text = mensaje
-            tvLoadingSubtext.text = submensaje
-            tvLoadingSubtext.visibility = if(submensaje.isNotEmpty()) View.VISIBLE else View.GONE
+            loadingContainerPosicionado.visibility = View.VISIBLE
+            tvLoadingTextPosicionado.text = mensaje
+            tvLoadingSubtextPosicionado.text = submensaje
+            tvLoadingSubtextPosicionado.visibility = if(submensaje.isNotEmpty()) View.VISIBLE else View.GONE
             btnGuardarPosicionado.isEnabled = false
             btnGuardarPosicionado.alpha = 0.5f
         }
@@ -510,28 +480,27 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     private fun ocultarCarga() {
         //Optimizado usando apply para reducir accesos al binding
         binding.apply {
-            loadingContainer.visibility = View.GONE
+            loadingContainerPosicionado.visibility = View.GONE
             btnGuardarPosicionado.isEnabled = true
             btnGuardarPosicionado.alpha = 1.0f
         }
     }
 
     private fun mostrarError(mensaje: String) {
-        // <CHANGE> Optimizado usando apply para reducir accesos al binding
         binding.apply {
-            tvMensajeError.text = mensaje
-            layoutError.visibility = View.VISIBLE
+            tvMensajeErrorPosicionado.text = mensaje
+            layoutErrorPosicionado.visibility = View.VISIBLE
         }
     }
     private fun limpiarFormulario() {
-        binding.spinnerBloque.setSelection(0)
-        binding.spinnerPosicion.setSelection(0)
-        binding.spinnerPersonal.setSelection(0)
-
-        binding.layoutInfoVehiculo.visibility = View.GONE
-        binding.layoutFormularioPosicionado.visibility = View.GONE
-        binding.layoutError.visibility = View.GONE
-
+        binding.apply {
+            binding.spinnerBloquePosicionado.setSelection(0)
+            spinnerPosicionPosicionado.setSelection(0)
+            spinnerPersonalPosicionado.setSelection(0)
+            layoutInfoVehiculoPosicionado.visibility = View.GONE
+            layoutFormularioPosicionado.visibility = View.GONE
+            layoutErrorPosicionado.visibility = View.GONE
+        }
         vehiculoActual = null
         statusActual = null
     }
@@ -540,12 +509,9 @@ class PasoPosicionado_Activity : AppCompatActivity() {
         try {
             val gson=Gson()
             val jsonBloques=gson.toJson(bloques)
-
             val intent = Intent(this, PosicionGrafica_Activity::class.java)
             intent.putExtra("bloques", jsonBloques)
-
             seleccionPosicionLauncher.launch(intent)
-
         } catch (e: Exception) {
             Log.e("PasoPosicionado", "Error abriendo pantalla gráfica: ${e.message}")
             Toast.makeText(this, "Error abriendo selección de posiciones", Toast.LENGTH_SHORT).show()
@@ -553,22 +519,16 @@ class PasoPosicionado_Activity : AppCompatActivity() {
     }
 
     private fun actualizarSpinnerConPosicionSeleccionada(posicion: PosicionBloque) {
-        // Guardar la posición seleccionada
         val bloque=bloques.filter { it.IdBloque==posicion.IdBloque }.firstOrNull()
         if(bloque!=null) {
             posicionSeleccionadaManual = posicion
             var nombrePosicion: String = "Bloque: ${bloque.Nombre}, " +
                     "Col.: ${posicion.Columna} -> Fila: ${posicion.Fila}"
-
-            binding.lblBloquePosicionSeleccionada.setText(nombrePosicion)
-
-            // Crear adapter con la posición seleccionada
+            binding.lblBloquePosicionSeleccionadaPosicionado.setText(nombrePosicion)
             Toast.makeText(this, "Posición seleccionada: $nombrePosicion", Toast.LENGTH_SHORT)
                 .show()
         }
     }
-
-
     override fun onDestroy() {
         super.onDestroy()
         detenerHoraDinamica()
