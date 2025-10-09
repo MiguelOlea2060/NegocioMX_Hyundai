@@ -92,6 +92,18 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
         layoutError = findViewById(R.id.layoutError)
         loadingContainer = findViewById(R.id.loadingContainer)
 
+        val visible=ParametrosSistema.CfgGloSql!=null
+                && ParametrosSistema?.CfgGloSql!!.ManejaSeleccionObsMovimientoLocal==true
+        if(visible) {
+            binding.llSelObservacionMovimiento.visibility = View.VISIBLE
+            binding.llObservacionManualMovimiento.visibility=View.GONE
+        }
+        else
+        {
+            binding.llSelObservacionMovimiento.visibility = View.GONE
+            binding.llObservacionManualMovimiento.visibility=View.VISIBLE
+        }
+
         // Información del vehículo
         tvBlVehiculo = findViewById(R.id.tvBlVehiculo)
         tvMarcaModeloAnnio = findViewById(R.id.tvMarcaModeloAnnio)

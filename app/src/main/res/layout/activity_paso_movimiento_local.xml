@@ -133,7 +133,6 @@
             android:padding="16dp"
             android:layout_marginBottom="16dp">
 
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -177,29 +176,56 @@
                 android:background="@drawable/edittext_border"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Observación -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Observación (opcional)"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#37474F"
-                android:layout_marginBottom="8dp" />
 
-            <EditText
-                android:id="@+id/etObservacion"
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/llSelObservacionMovimiento"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:background="@drawable/edittext_border"
-                android:padding="12dp"
-                android:gravity="top"
-                android:inputType="textMultiLine"
-                android:lines="4"
-                android:hint="Escriba observaciones adicionales..."
-                android:textSize="14sp"
-                android:textColor="#37474F"
-                android:layout_marginBottom="16dp" />
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/btnSeleccionaObservacionMovimiento"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="Sel. Observación"
+                    android:backgroundTint="#757575"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="8dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llObservacionManualMovimiento"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <!-- Observación -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Observación (opcional)"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#37474F"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/etObservacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:background="@drawable/edittext_border"
+                    android:padding="12dp"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    android:lines="4"
+                    android:hint="Escriba observaciones adicionales..."
+                    android:textSize="14sp"
+                    android:textColor="#37474F"
+                    android:layout_marginBottom="16dp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"

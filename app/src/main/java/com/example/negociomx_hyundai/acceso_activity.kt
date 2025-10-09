@@ -12,23 +12,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.negociomx_hyundai.BE.CfgGlo
-import com.example.negociomx_hyundai.BE.UsuarioNube
 import com.example.negociomx_hyundai.BLL.BLLCifrado
 import com.example.negociomx_hyundai.DAL.DALDispotivioAcceso
-import com.example.negociomx_hyundai.DAL.DALUsuario
 import com.example.negociomx_hyundai.Utils.ParametrosSistema
 import com.example.negociomx_hyundai.Utils.negociomx_posApplication.Companion.prefs
 import com.example.negociomx_hyundai.databinding.ActivityAccesoBinding
 import com.example.negociomx_hyundai.room.BLL.BLLUtil
 import com.example.negociomx_hyundai.room.db.POSDatabase
-import com.google.firebase.auth.FirebaseAuth
 
 // sql server login
 import com.example.negociomx_hyundai.DAL.DALUsuarioSQL
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class acceso_activity : AppCompatActivity() {

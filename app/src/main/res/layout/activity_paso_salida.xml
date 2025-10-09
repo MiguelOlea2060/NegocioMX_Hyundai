@@ -301,7 +301,7 @@
                 android:id="@+id/tvEmpleadoReceptorSalida"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Empleado receptor: [Se llenará automáticamente]"
+                android:text="Empleado inspector: [Se llenará automáticamente]"
                 android:textSize="18sp"
                 android:layout_marginBottom="12dp" />
 
@@ -397,8 +397,7 @@
                 android:text="El vehículo no existe o no tiene un status válido para posicionado."
                 android:textColor="#C62828"
                 android:textSize="14sp"
-                android:gravity="center"
-                 />
+                android:gravity="center"/>
 
         </LinearLayout>
 
