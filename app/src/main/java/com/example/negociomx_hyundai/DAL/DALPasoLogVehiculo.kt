@@ -1001,7 +1001,7 @@ class DALPasoLogVehiculo {
     suspend fun crearRegistroMovimientoLocal(
         idVehiculo: Int,
         idUsuario: Int,
-        idPersonalMovimiento: Int,
+        PersonaHaraMovimiento: String,
         idTipoMovimiento: Int,
         observacion: String,
         fechaMovimiento: String,
@@ -1053,7 +1053,7 @@ class DALPasoLogVehiculo {
 
             statementDetalle = conexion.prepareStatement(queryDetalle)
             statementDetalle.setInt(1, idPasoLogVehiculo)
-            statementDetalle.setString(2, "ID:$idPersonalMovimiento")
+            statementDetalle.setString(2, PersonaHaraMovimiento)
             statementDetalle.setInt(3, idTipoMovimiento)
             statementDetalle.setString(4, observacion)
             statementDetalle.setString(5, fechaMovimiento)

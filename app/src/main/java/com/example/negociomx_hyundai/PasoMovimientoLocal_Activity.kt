@@ -185,7 +185,13 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
             try {
                 val idVehiculo = vehiculoActual?.Id?.toIntOrNull() ?: 0
                 val idUsuario = 1 // En implementación real, obtener del usuario logueado
-                val idPersonalMovimiento = empleados[binding.spinnerPersonalMovLoc.selectedItemPosition - 1].IdEmpleado
+           //     val idPersonalMovimiento = empleados[binding.spinnerPersonalMovLoc.selectedItemPosition - 1].IdEmpleado
+
+                val posicionEmpleado=binding.spinnerPersonalMovLoc.selectedItemPosition
+                val empleado= empleados[posicionEmpleado-1]
+                val idEmpleadoPosiciono=empleado.IdEmpleado
+                val nombrePersonalMovimiento = empleado.NombreCompleto
+
                 val idTipoMovimiento = tiposMovimiento[binding.spinnerTipoMovimientoMovLoc.selectedItemPosition - 1].IdTipoMovimiento
                 val observacion = binding.etObservacionMovLoc.text.toString().trim()
                 val placa=""
@@ -193,7 +199,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
                 val resultado = dalPasoLogVehiculo.crearRegistroMovimientoLocal(
                     idVehiculo = idVehiculo,
                     idUsuario = idUsuario,
-                    idPersonalMovimiento = idPersonalMovimiento,
+                    PersonaHaraMovimiento = nombrePersonalMovimiento,
                     idTipoMovimiento = idTipoMovimiento,
                     observacion = observacion,
                     fechaMovimiento = fechaActual,
