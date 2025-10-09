@@ -25,42 +25,14 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class PasoMovimientoLocal_Activity : AppCompatActivity() {
-
     lateinit var binding:ActivityPasoMovimientoLocalBinding
-    // Variables de UI
-    private lateinit var layoutInfoVehiculo: LinearLayout
-    private lateinit var layoutFormularioMovimiento: LinearLayout
-    private lateinit var layoutBotones: LinearLayout
-    private lateinit var layoutError: LinearLayout
-    private lateinit var loadingContainer: LinearLayout
-
-    private lateinit var tvBlVehiculo: TextView
-    private lateinit var tvMarcaModeloAnnio: TextView
-    private lateinit var tvColorExterior: TextView
-    private lateinit var tvColorInterior: TextView
-    private lateinit var spinnerPersonalMovimiento: Spinner
-    private lateinit var spinnerTipoMovimiento: Spinner
-    private lateinit var etObservacion: EditText
-    private lateinit var tvFechaMovimiento: TextView
-    private lateinit var tvEmpleadoRegistra: TextView
-    private lateinit var btnLimpiar: Button
-    private lateinit var btnGuardarMovimiento: Button
-    private lateinit var tvLoadingText: TextView
-    private lateinit var tvLoadingSubtext: TextView
-    private lateinit var tvError: TextView
-
-    // Variables de datos
     private var vehiculoActual: VehiculoPasoLog? = null
     private var empleados = listOf<Empleado>()
     private var tiposMovimiento = listOf<TipoMovimiento>()
-   // private var usuarioActual = "Sistema" // En implementación real, obtener del usuario logueado
-
-    // DALs
     private val dalVehiculo = DALVehiculo()
     private val dalEmpleado = DALEmpleadoSQL()
     private val dalPasoLogVehiculo = DALPasoLogVehiculo()
     var fechaActual:String=""
-    // Handler para actualizar fecha en tiempo real
     private lateinit var handlerFecha: Handler
     private lateinit var runnableFecha: Runnable
 
@@ -70,77 +42,32 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding=ActivityPasoMovimientoLocalBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.mainMovLoc)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
         inicializarComponentes()
         configurarEventos()
         cargarDatosIniciales()
-        iniciarActualizacionFecha()
+
     }
 
     private fun inicializarComponentes() {
-        // Layouts
-        layoutInfoVehiculo = findViewById(R.id.layoutInfoVehiculo)
-        layoutFormularioMovimiento = findViewById(R.id.layoutFormularioMovimiento)
-
-        layoutBotones = findViewById(R.id.layoutBotones)
-        layoutError = findViewById(R.id.layoutError)
-        loadingContainer = findViewById(R.id.loadingContainer)
-
-        val visible=ParametrosSistema.CfgGloSql!=null
-                && ParametrosSistema?.CfgGloSql!!.ManejaSeleccionObsMovimientoLocal==true
-        if(visible) {
-            binding.llSelObservacionMovimiento.visibility = View.VISIBLE
-            binding.llObservacionManualMovimiento.visibility=View.GONE
-        }
-        else
-        {
-            binding.llSelObservacionMovimiento.visibility = View.GONE
-            binding.llObservacionManualMovimiento.visibility=View.VISIBLE
-        }
-
-        // Información del vehículo
-        tvBlVehiculo = findViewById(R.id.tvBlVehiculo)
-        tvMarcaModeloAnnio = findViewById(R.id.tvMarcaModeloAnnio)
-        tvColorExterior = findViewById(R.id.tvColorExterior)
-        tvColorInterior = findViewById(R.id.tvColorInterior)
-
-        // Formulario
-        spinnerPersonalMovimiento = findViewById(R.id.spinnerPersonalMovimiento)
-        spinnerTipoMovimiento = findViewById(R.id.spinnerTipoMovimiento)
-        etObservacion = findViewById(R.id.etObservacion)
-        tvFechaMovimiento = findViewById(R.id.tvFechaMovimiento)
-        tvEmpleadoRegistra = findViewById(R.id.tvEmpleadoRegistra)
-
-        // Botones de acción
-        btnLimpiar = findViewById(R.id.btnLimpiar)
-        btnGuardarMovimiento = findViewById(R.id.btnGuardarMovimiento)
-
-        // Loading y error
-        tvLoadingText = findViewById(R.id.tvLoadingText)
-        tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
-        tvError = findViewById(R.id.tvError)
-
-        // Configurar empleado que registra
-        binding.tvEmpleadoRegistra.text = "Empleado receptor: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
-
+        binding.tvEmpleadoRegistraMovLoc.text = "Empleado receptor: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
+        iniciarActualizacionFecha()
     }
 
     private fun configurarEventos() {
-        binding.btnRegresarPaso1Entrada.setOnClickListener {
+        binding.btnRegresarPaso1EntradaMovLoc.setOnClickListener {
             finish()
         }
 
-        btnLimpiar.setOnClickListener {
+        binding.btnLimpiarMovLoc.setOnClickListener {
             limpiarFormulario()
         }
 
-        btnGuardarMovimiento.setOnClickListener {
+        binding.btnGuardarMovLoc.setOnClickListener {
             guardarStatusMovimientoLocal()
         }
     }
@@ -180,7 +107,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, nombresEmpleados)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerPersonalMovimiento.adapter = adapter
+        binding.spinnerPersonalMovLoc.adapter = adapter
     }
 
     private fun configurarSpinnerTiposMovimiento() {
@@ -189,7 +116,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, nombresTipos)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerTipoMovimiento.adapter = adapter
+        binding.spinnerTipoMovimientoMovLoc.adapter = adapter
     }
 
 
@@ -212,26 +139,30 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
     private fun mostrarInfoVehiculo() {
         vehiculoActual?.let { vehiculo ->
-            binding.tvVinVehiculoMovimiento.text="VIN: ${vehiculo.VIN}"
-            tvBlVehiculo.text = "BL: ${vehiculo.BL}"
-            tvMarcaModeloAnnio.text = "${vehiculo.Especificaciones}   Año: ${vehiculo.Anio}"
-            tvColorExterior.text = "Color Ext: ${vehiculo.ColorExterior}"
-            tvColorInterior.text = "Color Int: ${vehiculo.ColorInterior}"
-            layoutInfoVehiculo.visibility = View.VISIBLE
+            binding.tvVinVehiculoMovLoc.text="VIN: ${vehiculo.VIN}"
+            binding.tvBlVehiculoMovLoc.text = "BL: ${vehiculo.BL}"
+            binding.tvMarcaModeloAnnioMovLoc.text = "${vehiculo.Especificaciones}   Año: ${vehiculo.Anio}"
+            binding.tvColorExteriorMovLoc.text = "Color Ext: ${vehiculo.ColorExterior}"
+            binding.tvColorInteriorMovLoc.text = "Color Int: ${vehiculo.ColorInterior}"
+            binding.layoutInfoVehiculoMovLoc.visibility = View.VISIBLE
         }
     }
 
     private fun mostrarFormularios() {
-        // <CHANGE> Mostrar información del vehículo cuando se muestran los formularios
+        binding.apply {
+            layoutFormularioMovLoc.visibility = View.VISIBLE
+            layoutBotonesMovLoc.visibility = View.VISIBLE
+        }
 
-        layoutFormularioMovimiento.visibility = View.VISIBLE
-        layoutBotones.visibility = View.VISIBLE
     }
 
     private fun ocultarFormularios() {
-        layoutInfoVehiculo.visibility = View.GONE
-        layoutFormularioMovimiento.visibility = View.GONE
-        layoutBotones.visibility = View.GONE
+        binding.apply {
+            layoutInfoVehiculoMovLoc.visibility = View.GONE
+            layoutFormularioMovLoc.visibility = View.GONE
+            layoutBotonesMovLoc.visibility = View.GONE
+        }
+
     }
 
     private fun iniciarActualizacionFecha() {
@@ -240,7 +171,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
             override fun run() {
                 fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
                 val fechaActualAux = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
-                tvFechaMovimiento.text = fechaActualAux.format(Date())
+                binding.tvFechaMovLoc.text = fechaActualAux.format(Date())
                 handlerFecha.postDelayed(this, 1000) // Actualizar cada segundo
             }
         }
@@ -249,16 +180,14 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
     private fun guardarStatusMovimientoLocal() {
         if (!validarFormulario()) return
-
         mostrarCarga("Guardando status->Movimiento local...", "Registrando en base de datos")
-
         lifecycleScope.launch {
             try {
                 val idVehiculo = vehiculoActual?.Id?.toIntOrNull() ?: 0
                 val idUsuario = 1 // En implementación real, obtener del usuario logueado
-                val idPersonalMovimiento = empleados[spinnerPersonalMovimiento.selectedItemPosition - 1].IdEmpleado
-                val idTipoMovimiento = tiposMovimiento[spinnerTipoMovimiento.selectedItemPosition - 1].IdTipoMovimiento
-                val observacion = etObservacion.text.toString().trim()
+                val idPersonalMovimiento = empleados[binding.spinnerPersonalMovLoc.selectedItemPosition - 1].IdEmpleado
+                val idTipoMovimiento = tiposMovimiento[binding.spinnerTipoMovimientoMovLoc.selectedItemPosition - 1].IdTipoMovimiento
+                val observacion = binding.etObservacionMovLoc.text.toString().trim()
                 val placa=""
 
                 val resultado = dalPasoLogVehiculo.crearRegistroMovimientoLocal(
@@ -301,13 +230,13 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
         }
 
         // Validar personal
-        if (spinnerPersonalMovimiento.selectedItemPosition <= 0) {
+        if (binding.spinnerPersonalMovLoc.selectedItemPosition <= 0) {
             mostrarError("Seleccione el personal que hace el movimiento")
             return false
         }
 
         // Validar tipo de movimiento
-        if (spinnerTipoMovimiento.selectedItemPosition <= 0) {
+        if (binding.spinnerTipoMovimientoMovLoc.selectedItemPosition <= 0) {
             mostrarError("Seleccione el tipo de movimiento")
             return false
         }
@@ -317,41 +246,50 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
     private fun limpiarFormulario() {
         vehiculoActual = null
-        spinnerPersonalMovimiento.setSelection(0)
-        spinnerTipoMovimiento.setSelection(0)
-        etObservacion.setText("")
-     //   ocultarFormularios() // No ocultar formularios, solo limpiar campos
+        binding.apply {
+            spinnerPersonalMovLoc.setSelection(0)
+            spinnerTipoMovimientoMovLoc.setSelection(0)
+            etObservacionMovLoc.setText("")
+        }
         ocultarError()
     }
 
     // MÉTODOS DE UI
     private fun mostrarCarga(mensaje: String, submensaje: String = "") {
-        tvLoadingText.text = mensaje
-        tvLoadingSubtext.text = submensaje
-        tvLoadingSubtext.visibility = if (submensaje.isNotEmpty()) View.VISIBLE else View.GONE
-        loadingContainer.visibility = View.VISIBLE
-        btnGuardarMovimiento.isEnabled = false
-        btnGuardarMovimiento.alpha = 0.5f
+        binding.apply {
+            tvLoadingTextMovLoc.text = mensaje
+            tvLoadingSubtextMovLoc.text = submensaje
+            tvLoadingSubtextMovLoc.visibility = if (submensaje.isNotEmpty()) View.VISIBLE else View.GONE
+            loadingContainerMovLoc.visibility = View.VISIBLE
+            btnGuardarMovLoc.isEnabled = false
+            btnGuardarMovLoc.alpha = 0.5f
+        }
+
     }
 
     private fun ocultarCarga() {
-        loadingContainer.visibility = View.GONE
-        btnGuardarMovimiento.isEnabled = true
-        btnGuardarMovimiento.alpha = 1.0f
+        binding.apply {
+            loadingContainerMovLoc.visibility = View.GONE
+            btnGuardarMovLoc.isEnabled = true
+            btnGuardarMovLoc.alpha = 1.0f
+        }
+
     }
 
     private fun mostrarError(mensaje: String) {
-        tvError.text = mensaje
-        layoutError.visibility = View.VISIBLE
+        binding.apply {
+            tvErrorMovLoc.text = mensaje
+            layoutErrorMovLoc.visibility = View.VISIBLE
+        }
+
     }
 
     private fun ocultarError() {
-        layoutError.visibility = View.GONE
+        binding.layoutErrorMovLoc.visibility = View.GONE
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // Detener actualización de fecha
         if (::handlerFecha.isInitialized) {
             handlerFecha.removeCallbacks(runnableFecha)
         }

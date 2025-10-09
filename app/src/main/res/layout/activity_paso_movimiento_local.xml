@@ -8,7 +8,7 @@
     tools:context=".PasoMovimientoLocal_Activity">
 
     <LinearLayout
-        android:id="@+id/main"
+        android:id="@+id/mainMovLoc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -24,8 +24,8 @@
             android:layout_marginBottom="12dp">
 
             <ImageView
+                android:id="@+id/btnRegresarPaso1EntradaMovLoc"
                 android:src="@drawable/regresar_icono_64x64"
-                android:id="@+id/btnRegresarPaso1Entrada"
                 android:layout_width="48dp"
                 android:layout_height="48dp">
             </ImageView>
@@ -47,8 +47,8 @@
 
         <!-- INFORMACIÓN DEL VEHÍCULO -->
         <LinearLayout
+            android:id="@+id/layoutInfoVehiculoMovLoc"
             android:background="@drawable/edittext_background"
-            android:id="@+id/layoutInfoVehiculo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -66,8 +66,8 @@
                 android:layout_marginBottom="12dp" />
 
             <TextView
+                android:id="@+id/tvVinVehiculoMovLoc"
                 android:background="@drawable/edittext_background"
-                android:id="@+id/tvVinVehiculoMovimiento"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Vin: "
@@ -76,7 +76,7 @@
                 android:layout_marginBottom="4dp" />
 
             <TextView
-                android:id="@+id/tvBlVehiculo"
+                android:id="@+id/tvBlVehiculoMovLoc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="BL: "
@@ -86,7 +86,7 @@
                 android:layout_marginBottom="4dp" />
 
             <TextView
-                android:id="@+id/tvMarcaModeloAnnio"
+                android:id="@+id/tvMarcaModeloAnnioMovLoc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Marca:    Modelo:     Año: "
@@ -101,7 +101,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/tvColorExterior"
+                    android:id="@+id/tvColorExteriorMovLoc"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -110,7 +110,7 @@
                     android:textColor="#37474F" />
 
                 <TextView
-                    android:id="@+id/tvColorInterior"
+                    android:id="@+id/tvColorInteriorMovLoc"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -124,14 +124,15 @@
 
         <!-- FORMULARIO DE MOVIMIENTO LOCAL -->
         <LinearLayout
+            android:id="@+id/layoutFormularioMovLoc"
             android:background="@drawable/edittext_background"
-            android:id="@+id/layoutFormularioMovimiento"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="gone"
             android:padding="16dp"
             android:layout_marginBottom="16dp">
+
 
             <TextView
                 android:layout_width="match_parent"
@@ -153,7 +154,7 @@
                 android:layout_marginBottom="8dp" />
 
             <Spinner
-                android:id="@+id/spinnerTipoMovimiento"
+                android:id="@+id/spinnerTipoMovimientoMovLoc"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/edittext_border"
@@ -170,62 +171,35 @@
                 android:layout_marginBottom="8dp" />
 
             <Spinner
-                android:id="@+id/spinnerPersonalMovimiento"
+                android:id="@+id/spinnerPersonalMovLoc"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/edittext_border"
                 android:layout_marginBottom="16dp" />
 
-
-            <LinearLayout
-                android:visibility="gone"
-                android:id="@+id/llSelObservacionMovimiento"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <Button
-                    android:id="@+id/btnSeleccionaObservacionMovimiento"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:text="Sel. Observación"
-                    android:backgroundTint="#757575"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginEnd="8dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/llObservacionManualMovimiento"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
             <!-- Observación -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Observación (opcional)"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="#37474F"
-                    android:layout_marginBottom="8dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Observación (opcional)"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#37474F"
+                android:layout_marginBottom="8dp" />
 
-                <EditText
-                    android:id="@+id/etObservacion"
-                    android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:background="@drawable/edittext_border"
-                    android:padding="12dp"
-                    android:gravity="top"
-                    android:inputType="textMultiLine"
-                    android:lines="4"
-                    android:hint="Escriba observaciones adicionales..."
-                    android:textSize="14sp"
-                    android:textColor="#37474F"
-                    android:layout_marginBottom="16dp" />
-            </LinearLayout>
+            <EditText
+                android:id="@+id/etObservacionMovLoc"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="@drawable/edittext_border"
+                android:padding="12dp"
+                android:gravity="top"
+                android:inputType="textMultiLine"
+                android:lines="4"
+                android:hint="Escriba observaciones adicionales..."
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:layout_marginBottom="16dp" />
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -245,7 +219,7 @@
 
                 <TextView
                     android:layout_weight="1"
-                    android:id="@+id/tvFechaMovimiento"
+                    android:id="@+id/tvFechaMovLoc"
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:text="15/01/2024 14:30:25"
@@ -261,7 +235,7 @@
 
             <!-- Empleado que registra -->
             <TextView
-                android:id="@+id/tvEmpleadoRegistra"
+                android:id="@+id/tvEmpleadoRegistraMovLoc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Empleado que registra: Juan Pérez"
@@ -275,7 +249,7 @@
 
         <!-- BOTONES DE ACCIÓN -->
         <LinearLayout
-            android:id="@+id/layoutBotones"
+            android:id="@+id/layoutBotonesMovLoc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -283,7 +257,7 @@
             android:visibility="gone">
 
             <Button
-                android:id="@+id/btnLimpiar"
+                android:id="@+id/btnLimpiarMovLoc"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
@@ -293,7 +267,7 @@
                 android:layout_marginEnd="8dp" />
 
             <Button
-                android:id="@+id/btnGuardarMovimiento"
+                android:id="@+id/btnGuardarMovLoc"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
@@ -307,7 +281,7 @@
 
         <!-- OVERLAY DE CARGA -->
         <LinearLayout
-            android:id="@+id/loadingContainer"
+            android:id="@+id/loadingContainerMovLoc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -318,14 +292,14 @@
             android:layout_marginTop="16dp">
 
             <ProgressBar
-                android:id="@+id/progressBar"
+                android:id="@+id/progressBarMovLoc"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 style="?android:attr/progressBarStyleLarge"
                 android:indeterminateTint="#1565C0" />
 
             <TextView
-                android:id="@+id/tvLoadingText"
+                android:id="@+id/tvLoadingTextMovLoc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -335,7 +309,7 @@
                 android:textColor="#1565C0" />
 
             <TextView
-                android:id="@+id/tvLoadingSubtext"
+                android:id="@+id/tvLoadingSubtextMovLoc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -347,7 +321,7 @@
 
         <!-- MENSAJE DE ERROR -->
         <LinearLayout
-            android:id="@+id/layoutError"
+            android:id="@+id/layoutErrorMovLoc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#FFEBEE"
@@ -357,7 +331,7 @@
             android:visibility="gone">
 
             <TextView
-                android:id="@+id/tvError"
+                android:id="@+id/tvErrorMovLoc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Error: No se pudo procesar la solicitud"
