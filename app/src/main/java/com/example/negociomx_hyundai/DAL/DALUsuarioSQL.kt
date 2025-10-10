@@ -24,7 +24,7 @@ class DALUsuarioSQL {
             if (connection != null) {
                 val query = """
                 SELECT u.IdUsuario, u.NombreCompleto, u.Email, u.IdRol, u.IdEmpresa, u.Activo, u.CuentaVerificada
-                    , u.Contrasena, e.razonsocial, e.nombrecomercial, e.Rfc, c.ManejaGuardadoArchivosEnBD
+                    , u.Contrasena, e.razonsocial, e.nombrecomercial, e.Rfc, c.ManejaGuardadoArxhivosEnBD
                     , c.ManejaSeleccionBloquePosXTablero, c.FormatoCarpetaArchivos, c.IdCfgApp, c.IdConfiguracion
                     , c.reglasnotificaciones, c.urlguardadoarchivos
                 FROM Usuario u with (nolock) left join dbo.empresa e on u.idempresa=e.idempresa
@@ -64,7 +64,7 @@ class DALUsuarioSQL {
                             IdEmpresa = idEmpresa,
                             ManejaSeleccionBloquePosXTablero = resultSet.getBoolean("ManejaSeleccionBloquePosXTablero")?:false,
                             urlGuardadoArchivos = resultSet.getString("urlguardadoarchivos")?:"",
-                            ManejaGuardadoArchivosEnBD = resultSet.getBoolean("ManejaGuardadoArchivosEnBD")?:false,
+                            ManejaGuardadoArchivosEnBD = resultSet.getBoolean("ManejaGuardadoArxhivosEnBD")?:false,
                             FormatoCarpetaArchivos = resultSet.getString("FormatoCarpetaArchivos")?:"",
                             ReglasNotificaciones = resultSet.getString("reglasnotificaciones")?:"",
                             RfcEmpresa = rfcEmpresa,

@@ -37,9 +37,6 @@
         tools:ignore="MissingClass"
         tools:targetApi="31">
         <activity
-            android:name=".SeleccionObservacion_Activity"
-            android:exported="false" />
-        <activity
             android:name=".PasoResumen_Activity"
             android:exported="false" />
         <activity
