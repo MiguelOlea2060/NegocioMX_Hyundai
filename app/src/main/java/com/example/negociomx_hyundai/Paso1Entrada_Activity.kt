@@ -233,8 +233,11 @@ class Paso1Entrada_Activity : AppCompatActivity() {
 
                     // <CHANGE> Consultar status actual para determinar el flujo
                     if (vehiculoActual?.IdPasoLogVehiculo == 0) {
-                        // No tiene registros en PasoLogVehiculo
-                        mostrarFormularioEntrada()
+                        val codigoRespuesta=101
+                        val jsonVeh=gson.toJson(vehiculoActual)
+                        val intent = Intent(this@Paso1Entrada_Activity, PasoEntrada_Activity::class.java)
+                        intent.putExtra("vehiculo", jsonVeh)
+                        startActivityForResult(intent, codigoRespuesta)
                     } else {
                         // Ya tiene registros, consultar status actual
                         mostrarOpcionesTransicion()
@@ -502,7 +505,7 @@ class Paso1Entrada_Activity : AppCompatActivity() {
             try {
                 Log.d("Paso1Entrada", "📝 Registrando nuevo VIN: $vin")
 
-                // USAR EL MÉTODO REAL PARA REGISTRAR VIN
+                // USAR EL MetodoDO REAL PARA REGISTRAR VIN
                 val exito = dalVehiculo.registrarVINBasico(vin)
 
                 ocultarCargaRegistro()
