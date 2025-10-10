@@ -549,40 +549,68 @@ class DALPasoLogVehiculo {
                 return@withContext false
             }
 
+            var queryPrincipal = ""
             conexion.autoCommit = false
-            // 1. Actualizar status actual en PasoLogVehiculo
-            var queryPrincipal = """
+            if(paso?.IdPasoLogVehiculo!!>0) {
+                // 1. Actualizar status actual en PasoLogVehiculo
+                queryPrincipal = """
                 UPDATE PasoLogVehiculo  SET IdStatusActual = ?  WHERE IdPasoLogVehiculo = ?
             """.trimIndent()
 
-            statementPrincipal = conexion.prepareStatement(queryPrincipal)
-            statementPrincipal.setInt(1, paso?.IdStatus!!)
-            statementPrincipal.setInt(2, paso?.IdPasoLogVehiculo!!)
-            statementPrincipal.executeUpdate()
+                statementPrincipal = conexion.prepareStatement(queryPrincipal)
+                statementPrincipal.setInt(1, paso?.IdStatus!!)
+                statementPrincipal.setInt(2, paso?.IdPasoLogVehiculo!!)
+                statementPrincipal.executeUpdate()
+            }
+            else
+            {
+                // 1. Actualizar status actual en PasoLogVehiculo
+                queryPrincipal = """
+                INSERT INTO PasoLogVehiculo (IdVehiculo, IdStatusActual, FechaAlta, IdUsuarioAlta) 
+                values(?, ?, ?, ?)
+            """.trimIndent()
+
+                statementPrincipal = conexion.prepareStatement(queryPrincipal,PreparedStatement.RETURN_GENERATED_KEYS)
+                statementPrincipal.setInt(1, paso?.IdVehiculo!!)
+                statementPrincipal.setInt(2, paso?.IdStatus!!)
+                statementPrincipal.setString(3, paso?.FechaMovimiento!!)
+                statementPrincipal.setInt(4, paso?.IdUsuarioMovimiento!!)
+                statementPrincipal.executeUpdate()
+
+                var rs = statementPrincipal.generatedKeys
+                var idPasoLogVehiculo=0
+                if (rs.next()) {
+                    idPasoLogVehiculo = rs.getInt(1)
+                }
+                paso.IdPasoLogVehiculo=idPasoLogVehiculo
+            }
 
             // 2. Insertar un registro en tabla dbo.BloqueColumnaFilaUso si el status es diferente de Salida -> 169
             //    esta tanla define que posiciones se encuentra ocupadas
-            queryPrincipal = """
-                INSERT INTO dbo.BloqueColumnaFilaUso(IdBloque, NumColumna, NumFila, Nombre, IdVehiculo, Activa) 
-                values (?, ?, ?, ?, ?, ?)
-            """.trimIndent()
-            if (paso?.IdStatus == 169) {
-                queryPrincipal = """
-                DELETE from dbo.BloqueColumnaFilaUso where IDVEHICULO =  ?
-            """.trimIndent()
 
-                statementBloque = conexion.prepareStatement(queryPrincipal)
-                statementBloque.setInt(1, paso?.IdVehiculo!!)
-            } else {
-                statementBloque = conexion.prepareStatement(queryPrincipal)
-                statementBloque.setShort(1, paso?.IdBloque!!)
-                statementBloque.setShort(2, paso?.Columna!!)
-                statementBloque.setShort(3, paso?.Fila!!)
-                statementBloque.setString(4, "Col-> ${paso?.Columna}, Fila-> ${paso?.Fila}")
-                statementBloque.setInt(5, paso?.IdVehiculo!!)
-                statementBloque.setBoolean(6, true)
+            if(paso?.IdStatus!=168) {
+                queryPrincipal = """
+                    INSERT INTO dbo.BloqueColumnaFilaUso(IdBloque, NumColumna, NumFila, Nombre, IdVehiculo, Activa) 
+                    values (?, ?, ?, ?, ?, ?)
+                """.trimIndent()
+                if (paso?.IdStatus == 169 || paso?.IdStatus == 172 || paso?.IdStatus == 171) {
+                    queryPrincipal = """
+                    DELETE from dbo.BloqueColumnaFilaUso where IDVEHICULO =  ?
+                """.trimIndent()
+
+                    statementBloque = conexion.prepareStatement(queryPrincipal)
+                    statementBloque.setInt(1, paso?.IdVehiculo!!)
+                } else {
+                    statementBloque = conexion.prepareStatement(queryPrincipal)
+                    statementBloque.setShort(1, paso?.IdBloque!!)
+                    statementBloque.setShort(2, paso?.Columna!!)
+                    statementBloque.setShort(3, paso?.Fila!!)
+                    statementBloque.setString(4, "Col-> ${paso?.Columna}, Fila-> ${paso?.Fila}")
+                    statementBloque.setInt(5, paso?.IdVehiculo!!)
+                    statementBloque.setBoolean(6, true)
+                }
+                statementBloque.executeUpdate()
             }
-            statementBloque.executeUpdate()
 
             // 2. Insertar detalle de posicionado
             // <CHANGE> Agregar campos faltantes: IdTipoMovimiento y PersonaQueHaraMovimiento
