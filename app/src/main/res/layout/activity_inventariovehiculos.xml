@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    tools:context=".inventariovehiculos_activity">
+
+    <LinearLayout
+        android:id="@+id/mainInventarioVehiculos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- HEADER -->
+        <LinearLayout
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1565C0"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:id="@+id/btnRegresarInventario"
+                android:src="@drawable/regresar_icono_64x64"
+                android:layout_width="50dp"
+                android:layout_height="50dp">
+
+            </ImageView>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="INVENTARIO"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- OVERLAY DE CARGA -->
+        <LinearLayout
+            android:id="@+id/loadingContainerInventario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:padding="24dp"
+            android:layout_marginTop="16dp">
+
+            <ProgressBar
+                android:id="@+id/progressBarInventario"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                style="?android:attr/progressBarStyleLarge"
+                android:indeterminateTint="#1565C0" />
+
+            <TextView
+                android:id="@+id/tvLoadingTextInventario"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Consultando vehículo..."
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1565C0" />
+
+            <TextView
+                android:id="@+id/tvLoadingSubtextInventario"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Verificando información en base de datos"
+                android:textSize="12sp"
+                android:textColor="#37474F" />
+
+        </LinearLayout>
+
+        <!-- MENSAJE DE ERROR -->
+        <LinearLayout
+            android:id="@+id/layoutErrorInventario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="VEHÍCULO NO VÁLIDO PARA POSICIONADO"
+                android:textColor="#F44336"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvMensajeErrorInventario"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="El vehículo no existe o no tiene un status válido para posicionado."
+                android:textSize="14sp"
+                android:textColor="#37474F"
+                android:gravity="center"
+                android:layout_marginBottom="16dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

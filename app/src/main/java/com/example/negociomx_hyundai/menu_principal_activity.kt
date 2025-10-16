@@ -288,6 +288,14 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this,ConsultaPaso1Soc_Activity::class.java)
             startActivity(intent)
         }
+        binding.imgInventarioVehiculos.setOnClickListener {
+            val intent = Intent(this,inventariovehiculos_activity::class.java)
+            startActivity(intent)
+        }
+        binding.btnIventarioVehiculos.setOnClickListener{
+            val intent = Intent(this,inventariovehiculos_activity::class.java)
+            startActivity(intent)
+        }
         btnConsultaMovimiento.setOnClickListener{
             val intent = Intent(this, ConsultaPaso1Soc_Activity::class.java)
             startActivity(intent)

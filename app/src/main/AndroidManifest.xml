@@ -37,6 +37,9 @@
         tools:ignore="MissingClass"
         tools:targetApi="31">
         <activity
+            android:name=".inventariovehiculos_activity"
+            android:exported="false" />
+        <activity
             android:name=".PasoEntrada_Activity"
             android:exported="false" />
         <activity
