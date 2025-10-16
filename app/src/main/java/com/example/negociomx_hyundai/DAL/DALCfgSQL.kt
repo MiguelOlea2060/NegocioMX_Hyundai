@@ -27,8 +27,12 @@ class DALCfgSQL {
 
             // Consultar Configuracion del sistema por IdEmpresa
             var query = """
-                SELECT IdConfiguracion, IdEmpresa, ManejaSeleccionBloquePosXTablero
-                FROM dbo.Configuracion
+                SELECT IdConfiguracion, IdEmpresa, ManejaSeleccionBloquePosXTablero, ManejaGuardadoArchivosEnBD,
+                        UrlGuardadoArchivos, UrlAPIControllerGuardadoArchivos, CarpetaGuardadoArchivosNube,
+                        FormatoCarpetaArchivos, ManejaSeleccionObsMovimientoLocal, ManejaStatusInspeccionEntrada,
+                        ManejaStatusInspeccionSalida, ManejaFotosEnInspeccionEntrada, ManejaFotosEnInspeccionSalida,
+                        ManejaSeleccionObsEnTaller
+                FROM dbo.cfgapp
             """.trimIndent()
             if(idEmpresa!=null)
                 query+=" WHERE IDEMPRESA = ?"
@@ -43,7 +47,15 @@ class DALCfgSQL {
                 val empresa = CfgGlo(
                     IdConfiguracion = resultSet.getInt("IdConfiguracion"),
                     IdEmpresa = resultSet.getInt("IdEmpresa")?:0,
-                    ManejaSeleccionBloquePosXTablero = resultSet.getBoolean("Nombre") ?: false,
+                    ManejaSeleccionBloquePosXTablero = resultSet.getBoolean("ManejaSeleccionBloquePosXTablero") ?: false,
+                    ManejaSeleccionObsEnTaller = resultSet.getBoolean("ManejaSeleccionObsEnTaller")?:false,
+                    ManejaSeleccionObsMovimientoLocal = resultSet.getBoolean("ManejaSeleccionObsMovimientoLocal")?:false,
+                    ManejaFotosEnInspeccionEntrada = resultSet.getBoolean("ManejaStatusInspeccionEntrada")?:false,
+                    ManejaFotosEnInspeccionSalida = resultSet.getBoolean("ManejaStatusInspeccionSalida")?:false,
+                    ManejaGuardadoArchivosEnBD = resultSet.getBoolean("ManejaGuardadoArchivosEnBD")?:false,
+                    ManejaStatusInspeccionSalida = resultSet.getBoolean("ManejaStatusInspeccionSalida")?:false,
+                    ManejaStatusInspeccionEntrada = resultSet.getBoolean("ManejaStatusInspeccionEntrada")?:false,
+                    ManejaNotificaciones = resultSet.getBoolean("ManejaNotificaciones")?:false
                 )
             }
 

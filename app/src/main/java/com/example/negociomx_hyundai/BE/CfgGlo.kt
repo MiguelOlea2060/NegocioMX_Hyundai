@@ -13,5 +13,12 @@ data class CfgGlo(
     var ManejaSeleccionObsEnTaller:Boolean?=null,
     var FormatoCarpetaArchivos:String="",
     var urlGuardadoArchivos:String="",
-    var ReglasNotificaciones :String=""
+    var ReglasNotificaciones :String="",
+
+    var ManejaStatusInspeccionEntrada:Boolean?=null,
+    var ManejaStatusInspeccionSalida:Boolean?=null,
+    var ManejaFotosEnInspeccionEntrada:Boolean?=null,
+    var ManejaFotosEnInspeccionSalida:Boolean?=null,
+    var ManejaNotificaciones:Boolean?=null,
+    var ManejaNotififacionesEnWeb:Boolean?=null
 )

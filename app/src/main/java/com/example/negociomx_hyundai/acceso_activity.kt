@@ -196,9 +196,6 @@ class acceso_activity : AppCompatActivity() {
                 val (usuario,cfg) = dalUsuSQL.getUsuarioByEmailAndPassword(email)
 
                 if (usuario != null) {
- /*                   val cadCifrada= bllCif.cifrar(usuario?.Password!!)
-                    val cadDes= bllCif.cifrar(cadCifrada!!)*/
-
                     Log.d("AccesoActivity", "✅ Usuario encontrado en SQL Server")
                     Log.d("AccesoActivity", "👤 Usuario: ${usuario.Email}")
                     Log.d("AccesoActivity", "🟢 Activo: ${usuario.Activo}")

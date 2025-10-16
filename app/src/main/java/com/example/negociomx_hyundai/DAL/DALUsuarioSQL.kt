@@ -23,14 +23,7 @@ class DALUsuarioSQL {
         try {
             if (connection != null) {
                 val query = """
-                SELECT u.IdUsuario, u.NombreCompleto, u.Email, u.IdRol, u.IdEmpresa, u.Activo, u.CuentaVerificada
-                    , u.Contrasena, e.razonsocial, e.nombrecomercial, e.Rfc, c.ManejaGuardadoArchivosEnBD
-                    , c.ManejaSeleccionBloquePosXTablero, c.FormatoCarpetaArchivos, c.IdCfgApp, c.IdConfiguracion
-                    , c.reglasnotificaciones, c.urlguardadoarchivos
-                FROM Usuario u with (nolock) left join dbo.empresa e on u.idempresa=e.idempresa
-                    left join dbo.CfgApp c on u.IdEmpresa=c.IdEmpresa
-                WHERE Email = ? AND Activo = 1
-
+                exec getUsuarioAndCfgApp ?
                 """
 
                 val statement: PreparedStatement = connection.prepareStatement(query)
@@ -69,7 +62,12 @@ class DALUsuarioSQL {
                             ReglasNotificaciones = resultSet.getString("reglasnotificaciones")?:"",
                             RfcEmpresa = rfcEmpresa,
                             ManejaSeleccionObsMovimientoLocal = resultSet.getBoolean("ManejaSeleccionObsMovimientoLocal")?:false,
-                            ManejaSeleccionObsEnTaller = resultSet.getBoolean("ManejaSeleccionObsEnTaller")?:false
+                            ManejaSeleccionObsEnTaller = resultSet.getBoolean("ManejaSeleccionObsEnTaller")?:false,
+                            ManejaFotosEnInspeccionEntrada = resultSet.getBoolean("ManejaStatusInspeccionEntrada")?:false,
+                            ManejaFotosEnInspeccionSalida = resultSet.getBoolean("ManejaStatusInspeccionSalida")?:false,
+                            ManejaStatusInspeccionSalida = resultSet.getBoolean("ManejaStatusInspeccionSalida")?:false,
+                            ManejaStatusInspeccionEntrada = resultSet.getBoolean("ManejaStatusInspeccionEntrada")?:false,
+                            ManejaNotificaciones = resultSet.getBoolean("ManejaNotificaciones")?:false
                         )
                     }
                     Log.d("DALUsuarioSQL", "✅ Usuario encontrado: ${usuario.NombreCompleto}")
