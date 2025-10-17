@@ -10,6 +10,7 @@ import com.example.negociomx_hyundai.BE.MovimientoTracking
 import com.example.negociomx_hyundai.BE.Paso1SOCItem
 import com.example.negociomx_hyundai.BE.PasoLogVehiculo
 import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
+import com.example.negociomx_hyundai.BE.PasoLogVehiculoPDI
 import com.example.negociomx_hyundai.BE.PosicionBloque
 import com.example.negociomx_hyundai.BE.ResumenCompletoConQuery
 import com.example.negociomx_hyundai.BE.TipoMovimiento
@@ -1214,6 +1215,99 @@ class DALPasoLogVehiculo {
         return@withContext resultado
     }
 
+
+    suspend fun insertarFotosInspeccion(fotos: List<PasoLogVehiculoPDI>): Boolean = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+
+        try {
+            Log.d("DALPasoLog", "🔍 === INICIO GUARDADO DE FOTOS EN BD ===")
+            Log.d("DALPasoLog", "🔍 Cantidad de fotos a guardar: ${fotos.size}")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALPasoLog", "No se pudo obtener conexión")
+                return@withContext false
+            }
+
+            // <CHANGE> Query actualizado según el esquema real de la BD
+            val query = """
+            INSERT INTO dbo.PasoLogVehiculoPDI 
+            (IdPasoLogVehiculo, IdTipoEvidencia, IdParteDanno, IdGradoSeveridad, 
+             Consecutivo, IdDescEvidencia, IdTransporte, IdEmpleadoTransporte, NombreFotoEvidencia)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+
+            fotos.forEachIndexed { index, foto ->
+                Log.d("DALPasoLog", "🔍 Foto ${index + 1}:")
+                Log.d("DALPasoLog", "   - IdPasoLogVehiculo: ${foto.IdPasoLogVehiculo}")
+                Log.d("DALPasoLog", "   - NombreFotoEvidencia: ${foto.NombreFotoEvidencia}")
+                Log.d("DALPasoLog", "   - Consecutivo: ${foto.Consecutivo}")
+            }
+            fotos.forEach { foto ->
+                statement.setInt(1, foto.IdPasoLogVehiculo)
+                statement.setShort(2, foto.IdTipoEvidencia)
+
+                // Campos opcionales
+                if (foto.IdParteDanno != null) {
+                    statement.setShort(3, foto.IdParteDanno!!)
+                } else {
+                    statement.setNull(3, java.sql.Types.SMALLINT)
+                }
+
+                if (foto.IdGradoSeveridad != null) {
+                    statement.setShort(4, foto.IdGradoSeveridad!!)
+                } else {
+                    statement.setNull(4, java.sql.Types.SMALLINT)
+                }
+
+                statement.setShort(5, foto.Consecutivo)
+
+                if (foto.IdDescEvidencia != null) {
+                    statement.setInt(6, foto.IdDescEvidencia!!)
+                } else {
+                    statement.setNull(6, java.sql.Types.INTEGER)
+                }
+
+                statement.setInt(7, foto.IdTransporte)
+
+                if (foto.IdEmpleadoTransporte != null) {
+                    statement.setInt(8, foto.IdEmpleadoTransporte!!)
+                } else {
+                    statement.setNull(8, java.sql.Types.INTEGER)
+                }
+
+                statement.setString(9, foto.NombreFotoEvidencia)
+
+                statement.addBatch()
+            }
+
+            val resultados = statement.executeBatch()
+            val exito = resultados.all { it > 0 }
+
+            if (exito) {
+                Log.d("DALPasoLog", "Metadatos de fotos guardados exitosamente en BD")
+            } else {
+                Log.e("DALPasoLog", "Error guardando metadatos de algunas fotos")
+            }
+
+            return@withContext exito
+
+        } catch (e: Exception) {
+            Log.e("DALPasoLog", "Error insertando metadatos de fotos: ${e.message}")
+            e.printStackTrace()
+            return@withContext false
+        } finally {
+            try {
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALPasoLog", "Error cerrando recursos: ${e.message}")
+            }
+        }
+    }
 
 
 

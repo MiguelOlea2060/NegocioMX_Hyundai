@@ -17,6 +17,7 @@ class ParametrosSistema {
     companion object{
 
         lateinit var usuarioLogueado:UsuarioNube
+
         lateinit var empresaNube:EmpresaNube
         var empresaLocal:Empresa?=null
         lateinit var cfg:CfgNube
@@ -27,5 +28,6 @@ class ParametrosSistema {
         var cfgNVLocal:CfgNV?=null
         val NombreBD:String="NEGOCIOMX-FB"
         var marcaAutoPre=MarcaAuto(IdMarcaAuto = 35, Nombre = "Hyundai")
+
     }
 }

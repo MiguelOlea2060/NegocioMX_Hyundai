@@ -17,6 +17,7 @@ data class VehiculoPasoLog(
     var TipoCombustible:String="",
     var TipoVehiculo:String="",
     var BL:String="",
+    var IdTransporte: Int=0,
 
     // ✅ CAMPOS SOC (State of Charge)
     var IdPasoLogVehiculo:Int=0,

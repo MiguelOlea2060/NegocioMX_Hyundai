@@ -85,4 +85,7 @@ dependencies {
 
     ////Libreria para la serializacion de objetos
     implementation ("com.google.code.gson:gson:2.8.5")
+
+    //para guardar en web api
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
 }
