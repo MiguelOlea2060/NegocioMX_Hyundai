@@ -23,6 +23,7 @@ class ParametrosSistema {
         lateinit var cfg:CfgNube
         var cfgLocal:Config?=null
         var CfgGloSql:CfgGlo?=null
+
         var TipoUsoSistema=TipoUsoSistemaEnum.OnLine
         lateinit var cfgNV:CfgNVNube
         var cfgNVLocal:CfgNV?=null

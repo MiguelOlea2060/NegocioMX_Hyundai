@@ -78,7 +78,7 @@ class PasoEntrada_Activity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        if (ParametrosSistema.CfgGloSql == null) {
+       /* if (ParametrosSistema.CfgGloSql == null) {
             ParametrosSistema.CfgGloSql = CfgGlo().apply {
                 urlGuardadoArchivos = "https://softsystemmx.com/api/Upload/UploadFile"
                 FormatoCarpetaArchivos = "~/imgs"
@@ -87,7 +87,7 @@ class PasoEntrada_Activity : AppCompatActivity() {
             Log.d("Paso1Entrada", "CfgGloSql inicializado")
             Log.d("Paso1Entrada", "  URL: ${ParametrosSistema.CfgGloSql?.urlGuardadoArchivos}")
             Log.d("Paso1Entrada", "  Carpeta: ${ParametrosSistema.CfgGloSql?.FormatoCarpetaArchivos}")
-        }
+        }*/
         inicializarComponentes()
         configurarEventos()
         cargarDatosIniciales()
@@ -691,13 +691,18 @@ class PasoEntrada_Activity : AppCompatActivity() {
         }
     }
     private suspend fun guardarFotosEnWebAPI(): Boolean = withContext(Dispatchers.IO) {
+      /*  ParametrosSistema.CfgGloSql = CfgGlo().apply {
+            urlGuardadoArchivos = "https://softsystemmx.com/api/Upload/UploadFile"
+            FormatoCarpetaArchivos = "~/imgs"
+            ManejaGuardadoArchivosEnBD = false
+        }*/
         return@withContext try {
             Log.d("PasoEntrada", "🔍 Iniciando guardado de fotos en WebAPI")
             Log.d("PasoEntrada", "🔍 IdPasoLogVehiculo: ${vehiculoActual?.IdPasoLogVehiculo}")
             Log.d("PasoEntrada", "🔍 Cantidad de fotos: ${fotosInspeccion?.size}")
 
             // <CHANGE> Validar que exista IdPasoLogVehiculo
-            if (vehiculoActual?.IdPasoLogVehiculo == null || vehiculoActual?.IdPasoLogVehiculo == 0) {
+            if (vehiculoActual?.IdPasoLogVehiculo == null ) {
                 Log.e("PasoEntrada", "❌ Error: IdPasoLogVehiculo no disponible")
                 return@withContext false
             }
@@ -707,7 +712,8 @@ class PasoEntrada_Activity : AppCompatActivity() {
                 return@withContext true
             }
 
-            val urlBase = ParametrosSistema.CfgGloSql?.urlGuardadoArchivos
+            val urlBase = ParametrosSistema.CfgGloSql!!.urlGuardadoArchivos + '/' +
+                    ParametrosSistema.CfgGloSql!!.UrlAPIControllerGuardadoArchivos
             Log.d("PasoEntrada", "🔍 URL Base: $urlBase")
             Log.d("PasoEntrada", "🔍 Carpeta: ${ParametrosSistema.CfgGloSql?.FormatoCarpetaArchivos}")
 

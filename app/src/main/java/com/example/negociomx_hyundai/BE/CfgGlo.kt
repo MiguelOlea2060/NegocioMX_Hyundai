@@ -20,5 +20,6 @@ data class CfgGlo(
     var ManejaFotosEnInspeccionEntrada:Boolean?=null,
     var ManejaFotosEnInspeccionSalida:Boolean?=null,
     var ManejaNotificaciones:Boolean?=null,
-    var ManejaNotififacionesEnWeb:Boolean?=null
+    var ManejaNotififacionesEnWeb:Boolean?=null,
+    var UrlAPIControllerGuardadoArchivos:String=""
 )
