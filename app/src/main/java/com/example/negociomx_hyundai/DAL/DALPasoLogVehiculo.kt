@@ -1216,19 +1216,47 @@ class DALPasoLogVehiculo {
     }
 
 
-    suspend fun insertarFotosInspeccion(fotos: List<PasoLogVehiculoPDI>): Boolean = withContext(Dispatchers.IO) {
+    suspend fun insertarFotosInspeccion(fotos: List<PasoLogVehiculoPDI>, idVehiculo: Int): Boolean = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
+        var statementConsulta: PreparedStatement? = null
+        var resultSet: ResultSet? = null
 
         try {
             Log.d("DALPasoLog", "🔍 === INICIO GUARDADO DE FOTOS EN BD ===")
+            Log.d("DALPasoLog", "🔍 IdVehiculo: $idVehiculo")
             Log.d("DALPasoLog", "🔍 Cantidad de fotos a guardar: ${fotos.size}")
 
             conexion = ConexionSQLServer.obtenerConexion()
             if (conexion == null) {
-                Log.e("DALPasoLog", "No se pudo obtener conexión")
+                Log.e("DALPasoLog", "❌ No se pudo obtener conexión")
                 return@withContext false
             }
+
+// <CHANGE> Consultar el IdPasoLogVehiculo más reciente para este IdVehiculo
+            val queryConsulta = """
+    SELECT TOP 1 IdPasoLogVehiculo 
+    FROM dbo.PasoLogVehiculo 
+    WHERE IdVehiculo = ?
+    ORDER BY IdPasoLogVehiculo DESC
+""".trimIndent()
+
+            statementConsulta = conexion.prepareStatement(queryConsulta)
+            statementConsulta.setInt(1, idVehiculo)
+            resultSet = statementConsulta.executeQuery()
+
+            val idPasoLogVehiculoReal: Int
+            if (resultSet.next()) {
+                idPasoLogVehiculoReal = resultSet.getInt("IdPasoLogVehiculo")
+                Log.d("DALPasoLog", "✅ IdPasoLogVehiculo encontrado: $idPasoLogVehiculoReal")
+            } else {
+                Log.e("DALPasoLog", "❌ No se encontró IdPasoLogVehiculo para IdVehiculo: $idVehiculo")
+                return@withContext false
+            }
+
+            // Cerrar recursos de consulta
+            resultSet?.close()
+            statementConsulta?.close()
 
             // <CHANGE> Query actualizado según el esquema real de la BD
             val query = """
@@ -1246,9 +1274,15 @@ class DALPasoLogVehiculo {
                 Log.d("DALPasoLog", "   - NombreFotoEvidencia: ${foto.NombreFotoEvidencia}")
                 Log.d("DALPasoLog", "   - Consecutivo: ${foto.Consecutivo}")
             }
-            fotos.forEach { foto ->
-                statement.setInt(1, foto.IdPasoLogVehiculo)
+            fotos.forEachIndexed { index, foto ->
+                // <CHANGE> Usar el IdPasoLogVehiculo real obtenido de la BD
+                statement.setInt(1, idPasoLogVehiculoReal)
                 statement.setShort(2, foto.IdTipoEvidencia)
+
+                Log.d("DALPasoLog", "🔍 Foto ${index + 1}:")
+                Log.d("DALPasoLog", "   - IdPasoLogVehiculo: $idPasoLogVehiculoReal")
+                Log.d("DALPasoLog", "   - NombreFotoEvidencia: ${foto.NombreFotoEvidencia}")
+                Log.d("DALPasoLog", "   - Consecutivo: ${foto.Consecutivo}")
 
                 // Campos opcionales
                 if (foto.IdParteDanno != null) {
@@ -1288,9 +1322,11 @@ class DALPasoLogVehiculo {
             val exito = resultados.all { it > 0 }
 
             if (exito) {
-                Log.d("DALPasoLog", "Metadatos de fotos guardados exitosamente en BD")
+                Log.d("DALPasoLog", "✅ === FOTOS GUARDADAS EXITOSAMENTE EN BD ===")
+                Log.d("DALPasoLog", "✅ Total de fotos guardadas: ${fotos.size}")
+                Log.d("DALPasoLog", "✅ IdPasoLogVehiculo usado: $idPasoLogVehiculoReal")
             } else {
-                Log.e("DALPasoLog", "Error guardando metadatos de algunas fotos")
+                Log.e("DALPasoLog", "❌ Error guardando metadatos de algunas fotos")
             }
 
             return@withContext exito

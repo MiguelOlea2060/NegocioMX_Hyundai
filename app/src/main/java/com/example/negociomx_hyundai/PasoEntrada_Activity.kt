@@ -78,16 +78,8 @@ class PasoEntrada_Activity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-       /* if (ParametrosSistema.CfgGloSql == null) {
-            ParametrosSistema.CfgGloSql = CfgGlo().apply {
-                urlGuardadoArchivos = "https://softsystemmx.com/api/Upload/UploadFile"
-                FormatoCarpetaArchivos = "~/imgs"
-                ManejaGuardadoArchivosEnBD = false
-            }
-            Log.d("Paso1Entrada", "CfgGloSql inicializado")
-            Log.d("Paso1Entrada", "  URL: ${ParametrosSistema.CfgGloSql?.urlGuardadoArchivos}")
-            Log.d("Paso1Entrada", "  Carpeta: ${ParametrosSistema.CfgGloSql?.FormatoCarpetaArchivos}")
-        }*/
+
+
         inicializarComponentes()
         configurarEventos()
         cargarDatosIniciales()
@@ -691,11 +683,7 @@ class PasoEntrada_Activity : AppCompatActivity() {
         }
     }
     private suspend fun guardarFotosEnWebAPI(): Boolean = withContext(Dispatchers.IO) {
-      /*  ParametrosSistema.CfgGloSql = CfgGlo().apply {
-            urlGuardadoArchivos = "https://softsystemmx.com/api/Upload/UploadFile"
-            FormatoCarpetaArchivos = "~/imgs"
-            ManejaGuardadoArchivosEnBD = false
-        }*/
+
         return@withContext try {
             Log.d("PasoEntrada", "🔍 Iniciando guardado de fotos en WebAPI")
             Log.d("PasoEntrada", "🔍 IdPasoLogVehiculo: ${vehiculoActual?.IdPasoLogVehiculo}")
@@ -723,7 +711,7 @@ class PasoEntrada_Activity : AppCompatActivity() {
             }
 
             // Verificar conexión primero
-            val conectado = ApiUploadUtil.verificarConexion(urlBase)
+            val conectado = ApiUploadUtil.verificarConexion(ParametrosSistema?.CfgGloSql!!.urlGuardadoArchivos)
             if (!conectado) {
                 Log.e("PasoEntrada", "No hay conexión con el servidor")
                 return@withContext false
@@ -756,7 +744,7 @@ class PasoEntrada_Activity : AppCompatActivity() {
                         Log.d("PasoEntrada", "Foto ${index + 1} subida: $mensaje")
 
                         // <CHANGE> Preparar metadatos para guardar en BD SIN el Base64
-                        val fotoConMetadatos = foto.copy(
+                         val fotoConMetadatos = foto.copy(
                             IdPasoLogVehiculo = vehiculoActual?.IdPasoLogVehiculo ?: 0,
                             IdTipoEvidencia = 1,
                             Consecutivo = (index + 1).toShort(),
@@ -783,7 +771,10 @@ class PasoEntrada_Activity : AppCompatActivity() {
 
             // <CHANGE> Si todas las fotos se subieron, guardar metadatos en BD
             if (exitoTotal && fotosSubidas.isNotEmpty()) {
-                val exitoBD = dalPasoLog.insertarFotosInspeccion(fotosSubidas)
+                // <CHANGE> Pasar el VIN para que el DAL obtenga el IdPasoLogVehiculo correcto
+// <CHANGE> Pasar el IdVehiculo para que el DAL obtenga el IdPasoLogVehiculo correcto
+                val idVehiculo = vehiculoActual?.Id?.toIntOrNull() ?: 0
+                val exitoBD = dalPasoLog.insertarFotosInspeccion(fotosSubidas, idVehiculo)
                 if (!exitoBD) {
                     Log.e("PasoEntrada", "Fotos subidas pero error guardando metadatos en BD")
                     exitoTotal = false
@@ -855,9 +846,9 @@ class PasoEntrada_Activity : AppCompatActivity() {
                 }
             }
 
-            // <CHANGE> Luego guardar los metadatos en la base de datos
-            val exito = dalPasoLog.insertarFotosInspeccion(fotosGuardadas)
-
+            // <CHANGE> Pasar el IdVehiculo para que el DAL obtenga el IdPasoLogVehiculo correcto
+            val idVehiculo = vehiculoActual?.Id?.toIntOrNull() ?: 0
+            val exito = dalPasoLog.insertarFotosInspeccion(fotosGuardadas, idVehiculo)
             if (exito) {
                 Log.d("PasoEntrada", "Fotos y metadatos guardados exitosamente")
             } else {

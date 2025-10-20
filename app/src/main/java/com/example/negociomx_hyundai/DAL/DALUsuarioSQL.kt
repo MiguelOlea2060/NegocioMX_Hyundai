@@ -57,6 +57,7 @@ class DALUsuarioSQL {
                             IdEmpresa = idEmpresa,
                             ManejaSeleccionBloquePosXTablero = resultSet.getBoolean("ManejaSeleccionBloquePosXTablero")?:false,
                             urlGuardadoArchivos = resultSet.getString("urlguardadoarchivos")?:"",
+                            UrlAPIControllerGuardadoArchivos=resultSet.getString("urlapicontrollerguardadoarchivos")?:"",
                             ManejaGuardadoArchivosEnBD = resultSet.getBoolean("ManejaGuardadoArchivosEnBD")?:false,
                             FormatoCarpetaArchivos = resultSet.getString("FormatoCarpetaArchivos")?:"",
                             ReglasNotificaciones = resultSet.getString("reglasnotificaciones")?:"",

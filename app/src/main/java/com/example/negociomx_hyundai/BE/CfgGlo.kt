@@ -14,7 +14,6 @@ data class CfgGlo(
     var FormatoCarpetaArchivos:String="",
     var urlGuardadoArchivos:String="",
     var ReglasNotificaciones :String="",
-
     var ManejaStatusInspeccionEntrada:Boolean?=null,
     var ManejaStatusInspeccionSalida:Boolean?=null,
     var ManejaFotosEnInspeccionEntrada:Boolean?=null,

@@ -30,5 +30,6 @@ class ParametrosSistema {
         val NombreBD:String="NEGOCIOMX-FB"
         var marcaAutoPre=MarcaAuto(IdMarcaAuto = 35, Nombre = "Hyundai")
 
+
     }
 }

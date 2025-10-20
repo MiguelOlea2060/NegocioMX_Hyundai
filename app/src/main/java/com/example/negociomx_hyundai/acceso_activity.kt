@@ -135,11 +135,19 @@ class acceso_activity : AppCompatActivity() {
                             prefs.saveUsername(nombreUsuarioEmail)
                             prefs.savePassword(pwd)
 
-                            ParametrosSistema.CfgGloSql= CfgGlo(ManejaSeleccionBloquePosXTablero = true,
-                                urlGuardadoArchivos = "",
-                                FormatoCarpetaArchivos = "",
-                                ManejaGuardadoArchivosEnBD = false,
-                                RfcEmpresa = "")
+
+                            Log.d("AccesoActivity", "🔍 Verificando CfgGloSql:")
+                            Log.d("AccesoActivity", "  - urlGuardadoArchivos: ${ParametrosSistema.CfgGloSql?.urlGuardadoArchivos}")
+                            Log.d("AccesoActivity", "  - UrlAPIControllerGuardadoArchivos: ${ParametrosSistema.CfgGloSql?.UrlAPIControllerGuardadoArchivos}")
+                            Log.d("AccesoActivity", "  - FormatoCarpetaArchivos: ${ParametrosSistema.CfgGloSql?.FormatoCarpetaArchivos}")
+                            Log.d("AccesoActivity", "  - ManejaGuardadoArchivosEnBD: ${ParametrosSistema.CfgGloSql?.ManejaGuardadoArchivosEnBD}")
+
+                            if (ParametrosSistema.CfgGloSql == null) {
+                                Log.e("AccesoActivity", "⚠️ ADVERTENCIA: CfgGloSql es null")
+                            } else if (ParametrosSistema.CfgGloSql?.urlGuardadoArchivos.isNullOrEmpty()) {
+                                Log.w("AccesoActivity", "⚠️ ADVERTENCIA: urlGuardadoArchivos está vacío")
+                            }
+
                             mainHandler.post {
                                 val intent = Intent(applicationContext, menu_principal_activity::class.java)
                                 startForResult.launch(intent)
