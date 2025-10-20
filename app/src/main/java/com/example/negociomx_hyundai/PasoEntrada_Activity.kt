@@ -723,7 +723,7 @@ class PasoEntrada_Activity : AppCompatActivity() {
             fotosInspeccion!!.forEachIndexed { index, foto ->
                 try {
                     // Construir nombre del archivo según formato configurado
-                    val nombreArchivo = construirNombreArchivo(foto, index + 1)
+                    val nombreArchivo = construirNombreArchivo(foto, index)
 
                     // Decodificar Base64 a bytes y crear archivo temporal
                     val bytes = android.util.Base64.decode(foto.FotoBase64, android.util.Base64.DEFAULT)
@@ -865,34 +865,25 @@ class PasoEntrada_Activity : AppCompatActivity() {
     }
 
 
-    private fun construirNombreArchivo(foto: PasoLogVehiculoPDI, numeroFoto: Int): String {
+    private fun construirNombreArchivo(foto: PasoLogVehiculoPDI, index: Int): String {
         return try {
-            val formato = ParametrosSistema.CfgGloSql?.FormatoCarpetaArchivos ?: ""
+            // <CHANGE> Nuevo formato: VIN_PasoEntrada_Fot_NumeroFoto.jpg
+            val vin = vehiculoActual?.VIN ?: "SinVIN"
+            val numeroFoto = index + 1 // index empieza en 0, pero queremos 1, 2, 3, 4, 5
 
-            if (formato.isNotEmpty()) {
-                // Reemplazar variables en el formato
-                // Ejemplo: "{VIN}_{PASO}_{NUMERO}.jpg" -> "ABC123_ENTRADA_1.jpg"
-                formato
-                    .replace("{VIN}", vehiculoActual?.VIN ?: "SINVIN")
-                    .replace("{PASO}", "ENTRADA")
-                    .replace("{NUMERO}", numeroFoto.toString())
-                    .replace("{FECHA}", SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date()))
-                    .replace("{HORA}", SimpleDateFormat("HHmmss", Locale.getDefault()).format(Date()))
-            } else {
-                // Formato por defecto
-                "${vehiculoActual?.VIN}_ENTRADA_$numeroFoto.jpg"
-            }
+            val nombreArchivo = "${vin}_PasoEntrada_Foto_${numeroFoto}.jpg"
+
+            Log.d("PasoEntrada", "Nombre de archivo generado: $nombreArchivo")
+
+            nombreArchivo
         } catch (e: Exception) {
             Log.e("PasoEntrada", "Error construyendo nombre de archivo: ${e.message}")
-            "${vehiculoActual?.VIN}_ENTRADA_$numeroFoto.jpg"
+            // Formato de respaldo en caso de error
+            "PasoEntrada_Fot_${index + 1}.jpg"
         }
     }
 
-    private fun construirNombreArchivo(foto: PasoLogVehiculoPDI): String {
-        val formato = ParametrosSistema.CfgGloSql?.FormatoCarpetaArchivos ?: ""
-        // Implementar lógica según el formato configurado
-        return "${foto.NombreFotoEvidencia}.jpg"
-    }
+
 
     private fun ocultarCargaGuardado() {
         binding.loadingContainerEntrada.visibility = View.GONE
