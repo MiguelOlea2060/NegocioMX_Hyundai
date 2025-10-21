@@ -19,6 +19,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.CfgGlo
 import com.example.negociomx_hyundai.BE.Cliente
@@ -183,13 +184,24 @@ class PasoEntrada_Activity : AppCompatActivity() {
 
     private fun mostrarFormularios() {
         binding.apply {
-            binding.apply {
-                layoutFormularioEntrada.visibility = View.VISIBLE
-                layoutErrorEntrada.visibility = View.GONE
+            layoutFormularioEntrada.visibility = View.VISIBLE
+            layoutErrorEntrada.visibility = View.GONE
+
+            if (ParametrosSistema.CfgGloSql?.ManejaStatusInspeccionEntrada == false &&
+                ParametrosSistema.CfgGloSql?.ManejaFotosEnInspeccionEntrada == false) {
+                btnInspeccionar.isVisible = false
+                btnDannos.isVisible = false
             }
 
-            Toast.makeText(this@PasoEntrada_Activity, "✅ Vehículo válido para status->Entrada", Toast.LENGTH_SHORT).show()
+
+            if (ParametrosSistema.CfgGloSql?.ManejaStatusInspeccionEntrada == true &&
+                ParametrosSistema.CfgGloSql?.ManejaFotosEnInspeccionEntrada == true) {
+                btnInspeccionar.isVisible = true
+                btnDannos.isVisible = true
+            }
         }
+
+        Toast.makeText(this@PasoEntrada_Activity, "✅ Vehículo válido para status->Entrada", Toast.LENGTH_SHORT).show()
     }
 
     private fun inicializarFormulario() {
@@ -565,7 +577,7 @@ class PasoEntrada_Activity : AppCompatActivity() {
         }
     }
 
-    private fun guardarStatusSalida() {
+   /* private fun guardarStatusSalida() {
         if (!validarFormularioStatusSalida()) {
             return
         }
@@ -574,6 +586,7 @@ class PasoEntrada_Activity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 Log.d("Status->Entrada de Vehiculo", "💾 Guardando Status->Entrada del vehículo")
+
 
                 val posicionTransporte=binding.spinnerEmpresaMadrinaEntrada.selectedItemPosition
                 val transporte= transportistas[posicionTransporte-1]
@@ -588,12 +601,13 @@ class PasoEntrada_Activity : AppCompatActivity() {
                 val idVehiculoPlacas=placa.IdVehiculoPlacas
                 var placas=placa.Placas
                 var tipoEntradaSalida = 1
-                if(binding.rbEnMadrinaEntrada.isSelected) tipoEntradaSalida=2
+                if(binding.rbEnMadrinaEntrada.isChecked) tipoEntradaSalida=2
                 val idBloque:Short? =  null
                 val fila:Short? =  null
                 val columna:Short? =  null
                 var numeroEconomico = binding.etNumeroEconomicoEntrada.text.toString().trim()
                 var idUsuario=ParametrosSistema.usuarioLogueado.Id?.toInt()
+
 
                 val paso=PasoLogVehiculoDet(
                     IdPasoLogVehiculo = vehiculoActual?.IdPasoLogVehiculo,
@@ -620,49 +634,197 @@ class PasoEntrada_Activity : AppCompatActivity() {
                     IdVehiculo = vehiculoActual!!.Id.toInt(),
                     IdVehiculoPlacas = idVehiculoPlacas,
                 )
+
                 val exito = dalPasoLog.insertaStatusNuevoPasoLogVehiculo(paso)
 
                 ocultarCargaGuardado()
 
+                if (ParametrosSistema.CfgGloSql?.ManejaStatusInspeccionEntrada == false &&
+                    ParametrosSistema.CfgGloSql?.ManejaFotosEnInspeccionEntrada == false) {
+                    if (exito) {
+                        Log.d("PasoEntrada", "✅ Status guardado, procediendo a guardar fotos...")
 
-                if (exito) {
-                    Log.d("PasoEntrada", "✅ Status guardado, procediendo a guardar fotos...")
+                        if (ParametrosSistema.CfgGloSql?.ManejaStatusInspeccionEntrada == true &&
+                            ParametrosSistema.CfgGloSql?.ManejaFotosEnInspeccionEntrada == true) {
 
-                    // <CHANGE> Guardar fotos y esperar resultado
-                    val exitoFotos = guardarFotosInspeccion()
+                            val exitoFotos = guardarFotosInspeccion()
 
-                    Log.d("PasoEntrada", "🔍 Resultado guardado de fotos: $exitoFotos")
+                            Log.d("PasoEntrada", "🔍 Resultado guardado de fotos: $exitoFotos")
 
-                    if (exitoFotos) {
-                        Toast.makeText(
-                            this@PasoEntrada_Activity,
-                            "✅ Vehículo con Status->Entrada y fotos guardadas exitosamente",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                            if (exitoFotos) {
+                                Toast.makeText(
+                                    this@PasoEntrada_Activity,
+                                    "✅ Vehículo con Status->Entrada y fotos guardadas exitosamente",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            else {
+                                Toast.makeText(
+                                    this@PasoEntrada_Activity,
+                                    "⚠️ Vehículo guardado pero error guardando fotos",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+
+                        }
+
+
+                        Toast.makeText(this@PasoEntrada_Activity, "✅ Vehículo con Status->Entrada exitosamente", Toast.LENGTH_SHORT).show()
+
+                        val data = Intent()
+                        data.putExtra("Refrescar", true);
+                        data.putExtra("Vin", vehiculoActual?.VIN);
+                        setResult(Activity.RESULT_OK,data)
+                        finish() // Cerrar la actividad actual
                     }
                     else {
-                        Toast.makeText(
-                            this@PasoEntrada_Activity,
-                            "⚠️ Vehículo guardado pero error guardando fotos",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Toast.makeText(this@PasoEntrada_Activity, "❌ Error guardando status -> Entrada", Toast.LENGTH_SHORT).show()
                     }
 
-
-                    Toast.makeText(this@PasoEntrada_Activity, "✅ Vehículo con Status->Entrada exitosamente", Toast.LENGTH_SHORT).show()
-
-                    val data = Intent()
-                    data.putExtra("Refrescar", true);
-                    data.putExtra("Vin", vehiculoActual?.VIN);
-                    setResult(Activity.RESULT_OK,data)
-                    finish() // Cerrar la actividad actual
-                } else {
-                    Toast.makeText(this@PasoEntrada_Activity, "❌ Error guardando status -> Entrada", Toast.LENGTH_SHORT).show()
                 }
 
             } catch (e: Exception) {
                 ocultarCargaGuardado()
                 Log.e("PasoSalida", "💥 Error guardando status->Entrada: ${e.message}")
+                Toast.makeText(this@PasoEntrada_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }*/
+
+    private fun guardarStatusSalida() {
+        if (!validarFormularioStatusSalida()) {
+            return
+        }
+
+        mostrarCargaGuardado()
+        lifecycleScope.launch {
+            try {
+                Log.d("Status->Entrada de Vehiculo", "💾 Guardando Status->Entrada del vehículo")
+
+                // <CHANGE> Declarar variables que se usarán según el tipo de entrada
+                var idTransporteSalida: Int? = null
+                var idEmpleadoTransporteSalida: Int? = null
+                var idVehiculoPlacas: Int? = null
+                var placas: String? = ""
+                var numeroEconomico: String? = null
+                var tipoEntradaSalida = 1 // 1 = Rodando, 2 = En Madrina
+
+                // <CHANGE> Verificar qué radio button está seleccionado
+                if (binding.rbRodandoEntrada.isChecked) {
+                    // CASO 1: RODANDO - Solo obtener la empresa transportista
+                    Log.d("PasoEntrada", "📦 Guardando con tipo: RODANDO")
+
+                    val posicionTransporte = binding.spinnerEmpresaRodandoEntrada.selectedItemPosition
+                    val transporte = transportistas[posicionTransporte - 1]
+                    idTransporteSalida = transporte.IdCliente
+
+                    //lo demas null
+                    tipoEntradaSalida = 1
+
+                } else if (binding.rbEnMadrinaEntrada.isChecked) {
+                    // CASO 2: EN MADRINA - Obtener todos los datos (lógica existente)
+                    Log.d("PasoEntrada", "🚛 Guardando con tipo: EN MADRINA")
+
+                    val posicionTransporte = binding.spinnerEmpresaMadrinaEntrada.selectedItemPosition
+                    val transporte = transportistas[posicionTransporte - 1]
+                    idTransporteSalida = transporte.IdCliente
+
+                    val posicionEmpleado = binding.spinnerConductorEntrada.selectedItemPosition
+                    val empleado = empleados[posicionEmpleado - 1]
+                    idEmpleadoTransporteSalida = empleado.IdEmpleado
+
+                    val posicionPlaca = binding.spinnerPlacaTransporteEntrada.selectedItemPosition
+                    val placa = transportistaSeleccionado?.Placas!![posicionPlaca - 1]
+                    idVehiculoPlacas = placa.IdVehiculoPlacas
+                    placas = placa.Placas
+
+                    numeroEconomico = binding.etNumeroEconomicoEntrada.text.toString().trim()
+                    tipoEntradaSalida = 2
+                }
+
+                // <CHANGE> Crear el objeto PasoLogVehiculoDet con los datos correspondientes
+                val idBloque: Short? = null
+                val fila: Short? = null
+                val columna: Short? = null
+                val idUsuario = ParametrosSistema.usuarioLogueado.Id?.toInt()
+
+                val paso = PasoLogVehiculoDet(
+                    IdPasoLogVehiculo = vehiculoActual?.IdPasoLogVehiculo,
+                    IdEmpleadoTransporte = idEmpleadoTransporteSalida, // null para Rodando
+                    IdEmpleadoPosiciono = null,
+                    Fila = fila,
+                    Columna = columna,
+                    IdBloque = idBloque,
+                    IdStatus = 168,
+                    IdTransporte = idTransporteSalida, // Siempre se llena (Rodando o Madrina)
+                    IdTipoMovimiento = null,
+                    IdUsuarioMovimiento = idUsuario,
+                    IdPasoLogVehiculoDet = 0,
+                    IdParteDanno = null,
+                    IdTipoEntradaSalida = tipoEntradaSalida, // 1 = Rodando, 2 = Madrina
+                    EnviadoAInterface = null,
+                    FechaEnviado = null,
+                    Observacion = null,
+                    FechaMovimiento = fechaActual,
+                    NumeroEconomico = numeroEconomico, // null para Rodando
+                    Bloque = null,
+                    Placa = placas, // null para Rodando
+                    PersonaQueHaraMovimiento = null,
+                    IdVehiculo = vehiculoActual!!.Id.toInt(),
+                    IdVehiculoPlacas = idVehiculoPlacas, // null para Rodando
+                )
+
+                val exito = dalPasoLog.insertaStatusNuevoPasoLogVehiculo(paso)
+
+                ocultarCargaGuardado()
+
+                if (exito) {
+                    Log.d("PasoEntrada", "✅ Status guardado exitosamente")
+
+                    // <CHANGE> Verificar si se deben guardar fotos
+                    if (ParametrosSistema.CfgGloSql?.ManejaStatusInspeccionEntrada == true &&
+                        ParametrosSistema.CfgGloSql?.ManejaFotosEnInspeccionEntrada == true) {
+
+                        val exitoFotos = guardarFotosInspeccion()
+
+                        if (exitoFotos) {
+                            Toast.makeText(
+                                this@PasoEntrada_Activity,
+                                "✅ Vehículo con Status->Entrada y fotos guardadas exitosamente",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                this@PasoEntrada_Activity,
+                                "⚠️ Vehículo guardado pero error guardando fotos",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    } else {
+                        Toast.makeText(
+                            this@PasoEntrada_Activity,
+                            "✅ Vehículo con Status->Entrada exitosamente",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    val data = Intent()
+                    data.putExtra("Refrescar", true)
+                    data.putExtra("Vin", vehiculoActual?.VIN)
+                    setResult(Activity.RESULT_OK, data)
+                    finish()
+
+                } else {
+                    Toast.makeText(
+                        this@PasoEntrada_Activity,
+                        "❌ Error guardando status -> Entrada",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+            } catch (e: Exception) {
+                ocultarCargaGuardado()
+                Log.e("PasoEntrada", "💥 Error guardando status->Entrada: ${e.message}")
                 Toast.makeText(this@PasoEntrada_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
@@ -892,26 +1054,84 @@ class PasoEntrada_Activity : AppCompatActivity() {
     }
 
     private fun validarFormularioStatusSalida(): Boolean {
-        if (fotosInspeccion == null || fotosInspeccion?.size != 5) {
-            Toast.makeText(this, "Debe capturar las 5 fotos de inspección antes de guardar", Toast.LENGTH_LONG).show()
-            return false
+
+
+        if(binding.rbRodandoEntrada.isChecked){
+
+            if (ParametrosSistema.CfgGloSql?.ManejaStatusInspeccionSalida == true &&
+                ParametrosSistema.CfgGloSql?.ManejaFotosEnInspeccionSalida == true) {
+                if (fotosInspeccion == null || fotosInspeccion?.size != 5) {
+                    Toast.makeText(this, "Debe capturar las 5 fotos de inspección antes de guardar", Toast.LENGTH_LONG).show()
+                    return false
+                }
+                if (binding.spinnerEmpresaRodandoEntrada.selectedItemPosition == 0) {
+                    Toast.makeText(this, "Seleccione la empresa que se llevara el Vehiculo", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+
+            }
+
+            if (ParametrosSistema.CfgGloSql?.ManejaStatusInspeccionEntrada == false &&
+                ParametrosSistema.CfgGloSql?.ManejaFotosEnInspeccionEntrada == false) {
+
+                if (binding.spinnerEmpresaRodandoEntrada.selectedItemPosition == 0) {
+                    Toast.makeText(this, "Seleccione la empresa que se llevara el Vehiculo", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+
+
+            }
+
         }
-        if (binding.spinnerEmpresaMadrinaEntrada.selectedItemPosition == 0) {
-            Toast.makeText(this, "Seleccione el el transporte que se llevara el Vehiculo", Toast.LENGTH_SHORT).show()
-            return false
+
+        if(binding.rbEnMadrinaEntrada.isChecked){
+
+            if (ParametrosSistema.CfgGloSql?.ManejaStatusInspeccionEntrada == true &&
+                ParametrosSistema.CfgGloSql?.ManejaFotosEnInspeccionEntrada== true) {
+                if (fotosInspeccion == null || fotosInspeccion?.size != 5) {
+                    Toast.makeText(this, "Debe capturar las 5 fotos de inspección antes de guardar", Toast.LENGTH_LONG).show()
+                    return false
+                }
+                if (binding.spinnerEmpresaMadrinaEntrada.selectedItemPosition == 0) {
+                    Toast.makeText(this, "Seleccione el el transporte que se llevara el Vehiculo", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+                else if (binding.spinnerConductorEntrada.selectedItemPosition == 0) {
+                    Toast.makeText(this, "Seleccione el conductor que manejará el Transporte", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+                else if (binding.spinnerPlacaTransporteEntrada.selectedItemPosition == 0) {
+                    Toast.makeText(this, "Seleccione las placas del Transporte", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+                else if (binding.etNumeroEconomicoEntrada.text.isEmpty()) {
+                    Toast.makeText(this, "Suministre el numero economico del Transporte", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+            }
+
+            if (ParametrosSistema.CfgGloSql?.ManejaStatusInspeccionEntrada == false &&
+                ParametrosSistema.CfgGloSql?.ManejaFotosEnInspeccionEntrada == false) {
+                if (binding.spinnerEmpresaMadrinaEntrada.selectedItemPosition == 0) {
+                    Toast.makeText(this, "Seleccione el el transporte que se llevara el Vehiculo", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+                else if (binding.spinnerConductorEntrada.selectedItemPosition == 0) {
+                    Toast.makeText(this, "Seleccione el conductor que manejará el Transporte", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+                else if (binding.spinnerPlacaTransporteEntrada.selectedItemPosition == 0) {
+                    Toast.makeText(this, "Seleccione las placas del Transporte", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+                else if (binding.etNumeroEconomicoEntrada.text.isEmpty()) {
+                    Toast.makeText(this, "Suministre el numero economico del Transporte", Toast.LENGTH_SHORT).show()
+                    return false
+                }
+            }
+
         }
-        else if (binding.spinnerConductorEntrada.selectedItemPosition == 0) {
-            Toast.makeText(this, "Seleccione el conductor que manejará el Transporte", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        else if (binding.spinnerPlacaTransporteEntrada.selectedItemPosition == 0) {
-            Toast.makeText(this, "Seleccione las placas del Transporte", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        else if (binding.etNumeroEconomicoEntrada.text.isEmpty()) {
-            Toast.makeText(this, "Suministre el numero economico del Transporte", Toast.LENGTH_SHORT).show()
-            return false
-        }
+
         return true
     }
 

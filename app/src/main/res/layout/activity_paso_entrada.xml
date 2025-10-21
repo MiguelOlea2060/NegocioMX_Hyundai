@@ -129,8 +129,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            android:layout_marginBottom="16dp"
             android:visibility="gone"
+            android:layout_marginBottom="16dp"
+
             >
 
             <TextView
@@ -167,6 +168,25 @@
                 android:visibility="gone"
                 android:layout_marginTop="8dp"/>
 
+
+            <Button
+                android:layout_marginTop="10dp"
+                android:id="@+id/btnDannos"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text=" Daños"
+                android:backgroundTint="#FF6F00"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="8dp"/>
+            <TextView
+                android:id="@+id/tvDannos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Daños Inspeccionado"
+                android:textSize="14sp"
+                android:textColor="@color/black"
+                android:visibility="gone"
+                android:layout_marginTop="8dp"/>
 
             <TextView
                 android:layout_width="match_parent"
