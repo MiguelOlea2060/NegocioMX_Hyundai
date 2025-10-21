@@ -33,8 +33,8 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
     private val dalEmpleado = DALEmpleadoSQL()
     private val dalPasoLogVehiculo = DALPasoLogVehiculo()
     var fechaActual:String=""
-    private lateinit var handlerFecha: Handler
-    private lateinit var runnableFecha: Runnable
+    private lateinit var timerHandler: Handler
+    private lateinit var timerRunnable: Runnable
 
     val gson= Gson()
 
@@ -55,7 +55,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
     private fun inicializarComponentes() {
         binding.tvEmpleadoRegistraMovLoc.text = "Empleado receptor: ${ParametrosSistema.usuarioLogueado.NombreCompleto}"
-        iniciarActualizacionFecha()
+        inicializarHoraDinamica()
     }
 
     private fun configurarEventos() {
@@ -165,7 +165,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
     }
 
-    private fun iniciarActualizacionFecha() {
+   /* private fun iniciarActualizacionFecha() {
         handlerFecha = Handler(Looper.getMainLooper())
         runnableFecha = object : Runnable {
             override fun run() {
@@ -176,7 +176,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
             }
         }
         handlerFecha.post(runnableFecha)
-    }
+    }*/
 
     private fun guardarStatusMovimientoLocal() {
         if (!validarFormulario()) return
@@ -184,7 +184,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val idVehiculo = vehiculoActual?.Id?.toIntOrNull() ?: 0
-                val idUsuario = 1 // En implementación real, obtener del usuario logueado
+                val idUsuario = 1 // En implementación real, obtener del usuario logueado ///checar con martin
            //     val idPersonalMovimiento = empleados[binding.spinnerPersonalMovLoc.selectedItemPosition - 1].IdEmpleado
 
                 val posicionEmpleado=binding.spinnerPersonalMovLoc.selectedItemPosition
@@ -290,14 +290,31 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
     }
 
+
+    private fun inicializarHoraDinamica() {
+        timerHandler = Handler(Looper.getMainLooper())
+        timerRunnable = object : Runnable {
+            override fun run() {
+                fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                var fechaActualAux = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(Date())
+                binding.tvFechaMovimientoLocal.text = "Fecha de movimiento: $fechaActualAux"
+                timerHandler.postDelayed(this, 1000)
+            }
+        }
+        timerHandler.post(timerRunnable)
+    }
+
+    private fun detenerHoraDinamica() {
+        if (::timerHandler.isInitialized) {
+            timerHandler.removeCallbacks(timerRunnable)
+        }
+    }
     private fun ocultarError() {
         binding.layoutErrorMovLoc.visibility = View.GONE
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (::handlerFecha.isInitialized) {
-            handlerFecha.removeCallbacks(runnableFecha)
-        }
+        detenerHoraDinamica()
     }
 }

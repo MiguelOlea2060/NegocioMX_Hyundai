@@ -129,7 +129,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
-            android:visibility="gone"
+android:visibility="gone"
             android:layout_marginBottom="16dp"
 
             >
@@ -364,7 +364,7 @@
                 android:id="@+id/btnGuardarEntrada"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:text="GUARDAR"
+                android:text=" GUARDAR "
                 android:backgroundTint="#FF6F00"
                 android:textColor="#FFFFFF" />
 
