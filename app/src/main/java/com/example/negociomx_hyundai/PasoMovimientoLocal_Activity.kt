@@ -13,6 +13,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_hyundai.BE.*
+import com.example.negociomx_hyundai.BE.PasoLogVehiculoDet
 import com.example.negociomx_hyundai.DAL.DALEmpleadoSQL
 import com.example.negociomx_hyundai.DAL.DALPasoLogVehiculo
 import com.example.negociomx_hyundai.DAL.DALVehiculo
@@ -25,6 +26,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class PasoMovimientoLocal_Activity : AppCompatActivity() {
+    private val dalPasoLog = DALPasoLogVehiculo()
     lateinit var binding:ActivityPasoMovimientoLocalBinding
     private var vehiculoActual: VehiculoPasoLog? = null
     private var empleados = listOf<Empleado>()
@@ -196,19 +198,50 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
                 val observacion = binding.etObservacionMovLoc.text.toString().trim()
                 val placa=""
 
-                val resultado = dalPasoLogVehiculo.crearRegistroMovimientoLocal(
-                    idVehiculo = idVehiculo,
-                    idUsuario = idUsuario!!,
-                    PersonaHaraMovimiento = nombrePersonalMovimiento,
-                    idTipoMovimiento = idTipoMovimiento,
-                    observacion = observacion,
-                    fechaMovimiento = fechaActual,
-                    placa = placa
+
+                val paso=PasoLogVehiculoDet(
+                    /*IdPasoLogVehiculo = vehiculoActual?.IdPasoLogVehiculo,
+                    IdEmpleadoTransporte =idEmpleadoTransporteSalida,
+                    IdEmpleadoPosiciono = null,
+                    Fila = fila,
+                    Columna = columna,
+                    IdBloque = idBloque,
+                    IdStatus = 169,
+                    IdTransporte = idTransporteSalida,
+                    IdTipoMovimiento = null,
+                    IdUsuarioMovimiento = idUsuario,
+                    IdPasoLogVehiculoDet = 0,
+                    IdParteDanno = null,
+                    IdTipoEntradaSalida =tipoEntradaSalida,
+                    EnviadoAInterface = null,
+                    FechaEnviado = null,
+                    Observacion = null,
+                    FechaMovimiento = fechaActual,
+                    NumeroEconomico = numeroEconomico,
+                    Bloque = null,
+                    Placa = placas,
+                    PersonaQueHaraMovimiento = null,
+                    IdVehiculo = vehiculoActual!!.Id.toInt(),
+                    IdVehiculoPlacas = idVehiculoPlacas,*/
+                    IdPasoLogVehiculo = vehiculoActual?.IdPasoLogVehiculo,
+                    IdVehiculo =idVehiculo ,
+                    IdUsuarioMovimiento = idUsuario,
+                    PersonaQueHaraMovimiento = nombrePersonalMovimiento,
+                    IdTipoMovimiento = idTipoMovimiento,
+                    Observacion = observacion,
+                    FechaMovimiento = fechaActual,
+                    Placa = placa,
+                    IdStatus = 172
                 )
+                val exito = dalPasoLog.insertaStatusNuevoPasoLogVehiculo(paso)
+
+                /*val resultado = dalPasoLogVehiculo.crearRegistroMovimientoLocal(
+
+                )*/
 
                 ocultarCarga()
 
-                if (resultado) {
+                if (exito) {
                     Toast.makeText(this@PasoMovimientoLocal_Activity, "Movimiento local registrado exitosamente", Toast.LENGTH_LONG).show()
 
                     val data = Intent()
