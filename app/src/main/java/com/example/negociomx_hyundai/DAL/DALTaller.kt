@@ -97,22 +97,23 @@ class DALTaller {
             // 3. Insertar detalle de taller
             val queryDetalle = """
                 INSERT INTO PasoLogVehiculoDet (
-                    IdPasoLogVehiculo, PersonaQueHaraMovimiento, IdParteDanno, IdtipoEntradaSalida,
+                    IdPasoLogVehiculo, IdTransporte, PersonaQueHaraMovimiento, IdParteDanno, IdtipoEntradaSalida,
                     Observacion, IdStatus, FechaMovimiento, IdUsuarioMovimiento, IdEmpleadoPosiciono, Placa
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent()
 
             statementDetalle = conexion.prepareStatement(queryDetalle)
             statementDetalle.setInt(1, det.IdPasoLogVehiculo!!)
-            statementDetalle.setString(2, det.PersonaQueHaraMovimiento )
-            statementDetalle.setShort(3, det.IdParteDanno!!.toShort())
-            statementDetalle.setInt(4, det.IdTipoEntradaSalida!!)
-            statementDetalle.setString(5, det.Observacion)
-            statementDetalle.setInt(6, det.IdStatus!!)
-            statementDetalle.setString(7, det.FechaMovimiento)
-            statementDetalle.setInt(8, det.IdUsuarioMovimiento!!)
-            statementDetalle.setInt(9, det.IdEmpleadoPosiciono!!)
-            statementDetalle.setString(10, det.Placa!!)
+            statementDetalle.setInt(2, det.IdTransporte!!)
+            statementDetalle.setString(3, det.PersonaQueHaraMovimiento )
+            statementDetalle.setShort(4, det.IdParteDanno!!.toShort())
+            statementDetalle.setInt(5, det.IdTipoEntradaSalida!!)
+            statementDetalle.setString(6, det.Observacion)
+            statementDetalle.setInt(7, det.IdStatus!!)
+            statementDetalle.setString(8, det.FechaMovimiento)
+            statementDetalle.setInt(9, det.IdUsuarioMovimiento!!)
+            statementDetalle.setInt(10, det.IdEmpleadoPosiciono!!)
+            statementDetalle.setString(11, det.Placa!!)
 
             statementDetalle.executeUpdate()
 

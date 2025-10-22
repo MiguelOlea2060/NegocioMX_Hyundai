@@ -103,7 +103,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
     private fun configurarSpinnerPersonal() {
         val nombresEmpleados = mutableListOf("Seleccione personal...")
-        nombresEmpleados.addAll(empleados.map { "${it.NombreCompleto} (ID: ${it.IdEmpleado})" })
+        nombresEmpleados.addAll(empleados.map { " ${it.NombreCompleto} " })
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, nombresEmpleados)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -184,7 +184,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val idVehiculo = vehiculoActual?.Id?.toIntOrNull() ?: 0
-                val idUsuario = 1 // En implementación real, obtener del usuario logueado ///checar con martin
+                val idUsuario = ParametrosSistema.usuarioLogueado.Id?.toInt() // En implementación real, obtener del usuario logueado ///checar con martin
            //     val idPersonalMovimiento = empleados[binding.spinnerPersonalMovLoc.selectedItemPosition - 1].IdEmpleado
 
                 val posicionEmpleado=binding.spinnerPersonalMovLoc.selectedItemPosition
@@ -198,7 +198,7 @@ class PasoMovimientoLocal_Activity : AppCompatActivity() {
 
                 val resultado = dalPasoLogVehiculo.crearRegistroMovimientoLocal(
                     idVehiculo = idVehiculo,
-                    idUsuario = idUsuario,
+                    idUsuario = idUsuario!!,
                     PersonaHaraMovimiento = nombrePersonalMovimiento,
                     idTipoMovimiento = idTipoMovimiento,
                     observacion = observacion,
