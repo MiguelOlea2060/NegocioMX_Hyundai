@@ -122,8 +122,38 @@ class PosicionGrafica_Activity : AppCompatActivity() {
         }
     }
 
-    private fun crearVistaposicion(fila: Short, columna: Short): View {
+    /*private fun crearVistaposicion(fila: Short, columna: Short): View {
         val view = layoutInflater.inflate(R.layout.item_posicion_grafica, null)
+        val imageView = view.findViewById<ImageView>(R.id.imgPosicion)
+        val textView = view.findViewById<TextView>(R.id.tvPosicion)
+
+        // Verificar si la posición está disponible
+        val posicionDisponible = posicionesDisponibles.find {
+            it.Fila == fila && it.Columna == columna
+        }
+
+        val textoposicion = "C$columna-F$fila"
+        textView.text = textoposicion
+
+        if (posicionDisponible != null) {
+            // Posición libre
+            imageView.setImageResource(R.drawable.posicionlibre_32px)
+            view.setOnClickListener {
+                seleccionarPosicion(posicionDisponible, textoposicion)
+            }
+            view.alpha = 1.0f
+        } else {
+            // Posición ocupada
+            imageView.setImageResource(R.drawable.posicionocupada_32px)
+            view.setOnClickListener(null)
+            view.alpha = 0.6f
+        }
+
+        return view
+    }*/
+    private fun crearVistaposicion(fila: Short, columna: Short): View {
+        // <CHANGE> Inflar con el GridLayout como padre para respetar los layout params
+        val view = layoutInflater.inflate(R.layout.item_posicion_grafica, gridLayout, false)
         val imageView = view.findViewById<ImageView>(R.id.imgPosicion)
         val textView = view.findViewById<TextView>(R.id.tvPosicion)
 
