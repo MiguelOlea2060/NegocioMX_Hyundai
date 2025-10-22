@@ -360,6 +360,31 @@
             android:layout_height="wrap_content">
 
             <ImageView
+                android:src="@drawable/icono_catalogos_64px"
+                android:id="@+id/imgMenuCatalogos"
+                android:layout_width="64dp"
+                android:layout_height="wrap_content">
+            </ImageView>
+
+            <Button
+                android:layout_weight="1"
+                android:layout_marginLeft="10dp"
+                android:id="@+id/btnCatalogos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Catalogos" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="15dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
                 android:src="@drawable/menu_adminusers_4px"
                 android:id="@+id/imgMenuAdminUsers"
                 android:layout_width="64dp"

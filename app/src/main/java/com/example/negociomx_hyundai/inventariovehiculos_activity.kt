@@ -1,10 +1,8 @@
 package com.example.negociomx_hyundai
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.example.negociomx_hyundai.canvas.MyCanvas
 import com.example.negociomx_hyundai.databinding.ActivityInventariovehiculosBinding
 
 class inventariovehiculos_activity : AppCompatActivity() {
@@ -13,11 +11,13 @@ class inventariovehiculos_activity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding=ActivityInventariovehiculosBinding.inflate(layoutInflater)
+        val canvas=MyCanvas(this)
+        setContentView(canvas)
+        /*binding=ActivityInventariovehiculosBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.btnRegresarInventario.setOnClickListener {
             finish()
-        }
+        }*/
     }
 }

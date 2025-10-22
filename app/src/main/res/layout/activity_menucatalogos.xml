@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
-    tools:context=".inventariovehiculos_activity">
+    tools:context=".menucatalogos_activity">
 
     <LinearLayout
         android:id="@+id/mainInventarioVehiculos"
@@ -25,7 +25,7 @@
             android:layout_marginBottom="12dp">
 
             <ImageView
-                android:id="@+id/btnRegresarInventario"
+                android:id="@+id/btnRegresarCatalogos"
                 android:src="@drawable/regresar_icono_64x64"
                 android:layout_width="48dp"
                 android:layout_height="48dp">
@@ -34,7 +34,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="INVENTARIO"
+                android:text="CATALOGOS"
                 android:textColor="#FFFFFF"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -52,65 +52,22 @@
                 android:layout_marginRight="10dp"
                 android:layout_weight="1"
                 android:textStyle="bold"
-                android:id="@+id/btnGenerarReporteInventario"
+                android:id="@+id/btnCatalogoTransporte"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:text="Generar Reporte"
+                android:text="Transportes"
                 android:backgroundTint="#1565C0"
                 android:textColor="#FFFFFF" />
             <Button
                 android:layout_marginLeft="10dp"
                 android:layout_weight="1"
                 android:textStyle="bold"
-                android:id="@+id/btnEnviarReporteInventario"
+                android:id="@+id/btnOtrosCatalogo"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:text="Enviar Reporte"
+                android:text="Otros"
                 android:backgroundTint="#1565C0"
                 android:textColor="#FFFFFF" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_marginTop="8dp"
-            android:id="@+id/layoutInfoEstadisticas"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            android:orientation="vertical"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ESTADISTICAS"
-                android:textColor="#1565C0"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
-
-            <TextView
-                android:id="@+id/tvTotalVehiculos"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/tvDetalles"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/tvDetalles1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="14sp"
-                android:layout_marginBottom="4dp" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -118,39 +75,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:src="@drawable/fotodanno_frente_original"
-                android:id="@+id/imgFotoDannoFrenteVehiculo"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:layout_marginTop="15dp"
-                android:src="@drawable/fotodanno_trasera_original"
-                android:id="@+id/imgFotoDannoTraseroVehiculo"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:layout_marginTop="15dp"
-                android:src="@drawable/fotodanno_lateral1_original"
-                android:id="@+id/imgFotoDannoLateral1Vehiculo"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:layout_marginTop="15dp"
-                android:src="@drawable/fotodanno_lateral2_original"
-                android:id="@+id/imgFotoDannoLateral2Vehiculo"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
-            <ImageView
-                android:layout_marginTop="15dp"
-                android:src="@drawable/fotodanno_superior_original"
-                android:id="@+id/imgFotoDannoSuuperiorVehiculo"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
         </LinearLayout>
         <!-- OVERLAY DE CARGA -->
         <LinearLayout

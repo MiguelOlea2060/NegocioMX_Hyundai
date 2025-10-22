@@ -241,7 +241,6 @@ class PasoSalida_Activity : AppCompatActivity() {
     private fun cargaConductores() {
         //lifecycleScope.launch {
             try {
-
                 val nombresPersonal = mutableListOf("Seleccionar personal...")
                 nombresPersonal.addAll(empleados.map { it.NombreCompleto ?: "Sin nombre" })
 
