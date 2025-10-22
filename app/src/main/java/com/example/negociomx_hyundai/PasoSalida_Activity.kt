@@ -551,25 +551,76 @@ class PasoSalida_Activity : AppCompatActivity() {
             try {
                 Log.d("Status->Salida de Vehiculo", "💾 Guardando Status->Salida del vehículo")
 
-                val posicionTransporte=binding.spinnerEmpresaMadrinaSalida.selectedItemPosition
+
+                var idTransporteSalida: Int? = null
+                var idEmpleadoTransporteSalida: Int? = null
+                var idVehiculoPlacas: Int? = null
+                var placas: String? = ""
+                var numeroEconomico: String? = null
+                var tipoEntradaSalida = 1 // 1 = Rodando, 2 = En Madrina
+
+
+                // <CHANGE> Verificar qué radio button está seleccionado
+                if (binding.rbRodandoSalida.isChecked) {
+                    // CASO 1: RODANDO - Solo obtener la empresa transportista
+                    Log.d("PasoEntrada", "📦 Guardando con tipo: RODANDO")
+
+                    val posicionTransporte = binding.spinnerEmpresaRodandoSalida.selectedItemPosition
+                    val transporte = transportistas[posicionTransporte - 1]
+                    idTransporteSalida = transporte.IdCliente
+
+                    //lo demas null
+                    tipoEntradaSalida = 1
+
+                } else if (binding.rbEnMadrinaSalida.isChecked) {
+                    // CASO 2: EN MADRINA - Obtener todos los datos (lógica existente)
+                    Log.d("PasoEntrada", "🚛 Guardando con tipo: EN MADRINA")
+
+                    val posicionTransporte = binding.spinnerEmpresaMadrinaSalida.selectedItemPosition
+                    val transporte = transportistas[posicionTransporte - 1]
+                    idTransporteSalida = transporte.IdCliente
+
+                    val posicionEmpleado = binding.spinnerConductorSalida.selectedItemPosition
+                    val empleado = empleados[posicionEmpleado - 1]
+                    idEmpleadoTransporteSalida = empleado.IdEmpleado
+
+                    val posicionPlaca = binding.spinnerPlacaTransporteSalida.selectedItemPosition
+                    val placa = transportistaSeleccionado?.Placas!![posicionPlaca - 1]
+                    idVehiculoPlacas = placa.IdVehiculoPlacas
+                    placas = placa.Placas
+
+                    numeroEconomico = binding.etNumeroEconomicoSalida.text.toString().trim()
+                    tipoEntradaSalida = 2
+                }
+
+                // <CHANGE> Crear el objeto PasoLogVehiculoDet con los datos correspondientes
+                val idBloque: Short? = null
+                val fila: Short? = null
+                val columna: Short? = null
+                val idUsuario = ParametrosSistema.usuarioLogueado.Id?.toInt()
+
+
+
+              /*  val posicionTransporte=binding.spinnerEmpresaMadrinaSalida.selectedItemPosition
                 val transporte= transportistas[posicionTransporte-1]
-                val idTransporteSalida=transporte.IdCliente
+                val idTransporteSalida=transporte.IdCliente*/
 
-                val posicionEmpleado=binding.spinnerConductorSalida.selectedItemPosition
+               /* val posicionEmpleado=binding.spinnerConductorSalida.selectedItemPosition
                 val empleado= empleados[posicionEmpleado-1]
-                val idEmpleadoTransporteSalida=empleado.IdEmpleado
+                val idEmpleadoTransporteSalida=empleado.IdEmpleado*/
 
-                val posicionPlaca=binding.spinnerPlacaTransporteSalida.selectedItemPosition
+                /*val posicionPlaca=binding.spinnerPlacaTransporteSalida.selectedItemPosition
                 val placa= transportistaSeleccionado?.Placas!![posicionPlaca-1]
                 val idVehiculoPlacas=placa.IdVehiculoPlacas
-                var placas=placa.Placas
-                var tipoEntradaSalida = 1
-                if(binding.rbEnMadrinaSalida.isSelected) tipoEntradaSalida=2
-                val idBloque:Short? =  null
-                val fila:Short? =  null
-                val columna:Short? =  null
-                var numeroEconomico = binding.etNumeroEconomicoSalida.text.toString().trim()
-                var idUsuario=ParametrosSistema.usuarioLogueado.Id?.toInt()
+                var placas=placa.Placas*/
+
+                //var tipoEntradaSalida = 1
+               // if(binding.rbEnMadrinaSalida.isSelected) tipoEntradaSalida=2
+              //  val idBloque:Short? =  null
+               // val fila:Short? =  null
+              //  val columna:Short? =  null
+              //  var numeroEconomico = binding.etNumeroEconomicoSalida.text.toString().trim()
+              //  var idUsuario=ParametrosSistema.usuarioLogueado.Id?.toInt()
 
                 val paso=PasoLogVehiculoDet(
                     IdPasoLogVehiculo = vehiculoActual?.IdPasoLogVehiculo,
@@ -626,22 +677,39 @@ class PasoSalida_Activity : AppCompatActivity() {
     }
 
     private fun validarFormularioStatusSalida(): Boolean {
-        if (binding.spinnerEmpresaMadrinaSalida.selectedItemPosition == 0) {
-            Toast.makeText(this, "Seleccione el el transporte que se llevara el Vehiculo", Toast.LENGTH_SHORT).show()
-            return false
+
+        if(binding.rbRodandoSalida.isChecked){
+
+            if (binding.spinnerEmpresaRodandoSalida.selectedItemPosition == 0) {
+                Toast.makeText(this, "Seleccione la empresa que se llevara el Vehiculo", Toast.LENGTH_SHORT).show()
+                return false
+            }
+
         }
-        else if (binding.spinnerConductorSalida.selectedItemPosition == 0) {
-            Toast.makeText(this, "Seleccione el conductor que manejará el Transporte", Toast.LENGTH_SHORT).show()
-            return false
+
+        if(binding.rbEnMadrinaSalida.isChecked){
+
+            if (binding.spinnerEmpresaMadrinaSalida.selectedItemPosition == 0) {
+                Toast.makeText(this, "Seleccione el el transporte que se llevara el Vehiculo", Toast.LENGTH_SHORT).show()
+                return false
+            }
+            else if (binding.spinnerConductorSalida.selectedItemPosition == 0) {
+                Toast.makeText(this, "Seleccione el conductor que manejará el Transporte", Toast.LENGTH_SHORT).show()
+                return false
+            }
+            else if (binding.spinnerPlacaTransporteSalida.selectedItemPosition == 0) {
+                Toast.makeText(this, "Seleccione las placas del Transporte", Toast.LENGTH_SHORT).show()
+                return false
+            }
+            else if (binding.etNumeroEconomicoSalida.text.isEmpty()) {
+                Toast.makeText(this, "Suministre el numero economico del Transporte", Toast.LENGTH_SHORT).show()
+                return false
+            }
+
         }
-        else if (binding.spinnerPlacaTransporteSalida.selectedItemPosition == 0) {
-            Toast.makeText(this, "Seleccione las placas del Transporte", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        else if (binding.etNumeroEconomicoSalida.text.isEmpty()) {
-            Toast.makeText(this, "Suministre el numero economico del Transporte", Toast.LENGTH_SHORT).show()
-            return false
-        }
+
+
+
         return true
     }
 
